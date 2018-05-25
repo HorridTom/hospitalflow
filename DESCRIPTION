@@ -1,6 +1,6 @@
 Package: hospitalflow
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Analysis of Patient Flow in Hospitals
 Version: 0.0.0.9000
 Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
