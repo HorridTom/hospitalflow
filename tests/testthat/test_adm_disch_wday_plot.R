@@ -2,37 +2,53 @@ context("Admissions and Discharges by Weekday plot")
 library(hospitalflow)
 
 
-test_that("Admission numbers by day of the Week",{
-
+test_that("Admission numbers by day of the Week for January 2015",{
 
   load("testdata/test_sample_data.rda")
 
   #Specify correct results
-  #correct_answers_1 <- tibble::tibble(Weekday = c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"), Av_adm = c(1.50, 3.75, 4.00, 2.00, 2.00, 2.00,2.00),
-                                      #Av_Disch = c(1.00, 1.00, 2.25, 3.25, 3.20, 3.80, 1.80), Non_Emerg_Adm = c(0.00, 0.00, 0.75, 0.00, 0.00, 0.00, 0.20))
+  correct_answers <- tibble::tibble(
+    Weekday = as.character(c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")),
 
-  correct_answers_2 <- tibble::tibble(Weekday =  "Sun", Av_disch = c(1))
-  #correct_answers_3 <- tibble:tibble(Weekday = 1:7, Non_emerg_adm = c(0.00, 0.00, 0.75, 0.00, 0.00, 0.00, 0.20))
+    Event =  c("Avg_admissions", "Avg_admissions","Avg_admissions", "Avg_admissions","Avg_admissions","Avg_admissions","Avg_admissions",
+              "Avg_discharges","Avg_discharges","Avg_discharges","Avg_discharges","Avg_discharges","Avg_discharges","Avg_discharges",
+              "Non_emergency_admissions","Non_emergency_admissions","Non_emergency_admissions","Non_emergency_admissions","Non_emergency_admissions",
+              "Non_emergency_admissions","Non_emergency_admissions"),
+
+    Value = c(1.50, 3.75, 4.00, 2.00, 2.00, 2.00, 2.00, 1.00, 1.00, 2.25, 3.25, 3.20, 3.80, 2.25, 0.00, 0.00, 0.75, 0.00, 0.00, 0.00, 0.20))
+
+  correct_answers <- correct_answers %>%
+    dplyr::arrange(Event, Weekday)
+
+  #correct_answers_2 <- tibble::tibble(Weekday =  "Mon", Avg_admissions = c(3.75))
+  ###correct_answers_3 <- tibble:tibble(Weekday = 1:7, Non_emerg_adm = c(0.00, 0.00, 0.75, 0.00, 0.00, 0.00, 0.20))
 
 
-  #Run Admission Discharges graph
+ #Run Admission Discharges graph
 
-  result <- admission_discharges(start_date = "2015-01-01 00:00:00", end_date = "2015-01-31 00:00:00", data = adm_disch, plot_chart = TRUE)
+  result <- admission_discharges(start_date = "2015-01-01 00:00:00", end_date = "2015-02-01 00:00:00", data = adm_disch, plot_chart = TRUE)
 
   result_data <- result$data
+  result_data$Weekday <- as.character(result_data$Weekday)
+
+
+  result_data <- result_data %>%
+    dplyr::arrange(Event, Weekday)
+
 
  # Results <- result_data %>% dplyr::filter(Weekday == c("Sun", "Wed"), variable == c("Total Admissions", "Total Discharges", "Non Emergency Admissions")) %>% pull(value)
-  Av_disch <- result_data %>% dplyr::filter(Weekday == "Sun", variable == "Total Discharges") %>% dplyr::pull(value)
+  #Av_disch <- result_data %>% dplyr::filter(Weekday == "Mon", Event == "Avg_admissions") %>% dplyr::pull(Value)
 
- # Mon_non_emerg_adm <- result_data %>% filter(Weekday == 1, variable == "Non Emergency Admissions") %>% pull(value)
- # Wed_non_emerg_adm <- result_data %>% filter(Weekday == 3, variable == "Non Emergency Admissions") %>% pull(value)
+ ### Mon_non_emerg_adm <- result_data %>% filter(Weekday == 1, variable == "Non Emergency Admissions") %>% pull(value)
+ ### Wed_non_emerg_adm <- result_data %>% filter(Weekday == 3, variable == "Non Emergency Admissions") %>% pull(value)
 
   #Test results are correct
-  #expect_equal(Results, correct_answers_1 %>% dplyr::filter(Weekday == c("Sun", "Wed"))  %>% pull("Total Admissions"))
-  expect_equal(Av_disch, correct_answers_2 %>%  dplyr::filter(Weekday == "Sun") %>% dplyr::pull(Av_disch))
+  expect_equal(result_data, correct_answers) # %>% dplyr::filter(Weekday == c(Sun, "Wed"))  %>% pull("Total Admissions"))
+  #expect_equal(Av_disch, correct_answers_2 %>%  dplyr::filter(Weekday == "Mon") %>% dplyr::pull(Avg_admissions))
 
  # expect_equal(Mon_non_emerg_adm, correct_answers_3) %>% filter(Weekday == 1) %>% pull("Non Emergency Admissions")
  # expect_equal(Wed_non_emerg_adm, correct_answers_3) %>% filter(Weekday == 3) %>% pull("Non Emergency Admissions")
 
  })
+
 
