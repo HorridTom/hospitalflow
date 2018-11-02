@@ -15,14 +15,10 @@ test_that("Admission numbers by day of the Week for January 2015",{
               "Non_emergency_admissions","Non_emergency_admissions","Non_emergency_admissions","Non_emergency_admissions","Non_emergency_admissions",
               "Non_emergency_admissions","Non_emergency_admissions"),
 
-    Value = c(1.50, 3.75, 4.00, 2.00, 2.00, 2.00, 2.00, 1.00, 1.00, 2.25, 3.25, 3.20, 3.80, 2.25, 0.00, 0.00, 0.75, 0.00, 0.00, 0.00, 0.20))
+    Value = c(1.50, 3.75, 4.00, 2.00, 2.00, 2.00, 2.00, 1.00, 1.00, 2.25, 3.25, 3.20, 3.80, 2.40, 0.00, 0.00, 0.75, 0.00, 0.00, 0.00, 0.20))
 
   correct_answers <- correct_answers %>%
     dplyr::arrange(Event, Weekday)
-
-  #correct_answers_2 <- tibble::tibble(Weekday =  "Mon", Avg_admissions = c(3.75))
-  ###correct_answers_3 <- tibble:tibble(Weekday = 1:7, Non_emerg_adm = c(0.00, 0.00, 0.75, 0.00, 0.00, 0.00, 0.20))
-
 
  #Run Admission Discharges graph
 
@@ -35,19 +31,9 @@ test_that("Admission numbers by day of the Week for January 2015",{
   result_data <- result_data %>%
     dplyr::arrange(Event, Weekday)
 
-
- # Results <- result_data %>% dplyr::filter(Weekday == c("Sun", "Wed"), variable == c("Total Admissions", "Total Discharges", "Non Emergency Admissions")) %>% pull(value)
-  #Av_disch <- result_data %>% dplyr::filter(Weekday == "Mon", Event == "Avg_admissions") %>% dplyr::pull(Value)
-
- ### Mon_non_emerg_adm <- result_data %>% filter(Weekday == 1, variable == "Non Emergency Admissions") %>% pull(value)
- ### Wed_non_emerg_adm <- result_data %>% filter(Weekday == 3, variable == "Non Emergency Admissions") %>% pull(value)
-
   #Test results are correct
-  expect_equal(result_data, correct_answers) # %>% dplyr::filter(Weekday == c(Sun, "Wed"))  %>% pull("Total Admissions"))
-  #expect_equal(Av_disch, correct_answers_2 %>%  dplyr::filter(Weekday == "Mon") %>% dplyr::pull(Avg_admissions))
+  expect_equal(result_data, correct_answers)
 
- # expect_equal(Mon_non_emerg_adm, correct_answers_3) %>% filter(Weekday == 1) %>% pull("Non Emergency Admissions")
- # expect_equal(Wed_non_emerg_adm, correct_answers_3) %>% filter(Weekday == 3) %>% pull("Non Emergency Admissions")
 
  })
 
