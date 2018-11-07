@@ -16,4 +16,5 @@ Imports: tidyverse,
     reshape2,
     scales,
     lazyeval,
-    qicharts2
+    qicharts2,
+    readr
