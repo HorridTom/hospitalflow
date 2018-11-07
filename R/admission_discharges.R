@@ -1,5 +1,5 @@
 # Admission and Discharges Function
-# data isn't pressumed to be standardised
+# data isn't  standardised
 
 #' admission_discharges
 #'
@@ -34,36 +34,29 @@ admission_discharges <- function(start_date, end_date, data, plot_chart){
                   Disch_period = dplyr::if_else(Discharges < end_date, "TRUE", "FALSE" ),
                   Los_binned = dplyr::if_else(Los > 1440, "TRUE", "FALSE")) %>%
     dplyr::mutate(Same_day_non_emerg = dplyr::if_else(PatientType != "Emergency" & Los < "1440", "TRUE", "FALSE"),
-                  Start_date = as.Date(Admissions),
-                  End_date = as.Date(Discharges))
+                  Start_date = as.Date(Admissions, tz = "Europe/London"),
+                  End_date = as.Date(Discharges, tz = "Europe/London"))
 
   # Retrieve the weekdays and days and COUNT the patients based on the dates, weeday and day
-  dt_adm <- admission_discharges  %>%
-    dplyr::select(IDcol, Admissions, EpisodeNumber, Los, Adm_period, Start_date) %>%
-    dplyr::filter(Los > 1440 & EpisodeNumber == 1 & Adm_period == "TRUE") %>%
+  dt_adm <- admission_discharges %>%
+    dplyr::select(IDcol, Admissions, EpisodeNumber, Los_binned, Adm_period, Start_date) %>%
+    dplyr::filter(Los_binned == "TRUE" & EpisodeNumber == 1 & Adm_period == "TRUE") %>%
     dplyr::mutate(Day = lubridate::day(Admissions),
                   Weekday = lubridate::wday(Admissions, label = TRUE)) %>%
     dplyr::group_by(Start_date, Weekday, Day) %>%
     dplyr::tally() %>%
-    #dplyr::mutate(Sum_wkday = n())
+    dplyr::mutate(Sum_wkday = n()) %>%
+    dplyr::rename(num_adms = n)
 
 
-
-  # ymd function parses dates in year-month-day format
-  start_date_new_col <- as.POSIXct(start_date, format = "%Y-%m-%d", tz = "Europe/London")
-
-  # Generating a list of dates for the Jan month only
-  # The %m+% adds months to dates without exceeding the last day - do not forget to document this.
-  df_adm_per <- start_date_new_col %m+% lubridate::days(c(0:30))
-
-  # TO BE REVIEWED WITH TOM - This may be more flexible than the next code -
-      #seq(lubridate::ymd('2015-01-01'), lubridate::ymd('2015-02-01'), by = 'day')
+  #This format is more flexible than the one I suggested
+  df_adm_per <- seq(as.Date(start_date, tz = "Europe/London"), as.Date(end_date, tz = "Europe/London"), by = 'day')
 
   # Place the new list, with dates, into a tibble and format it accordingly.
   # DO the same as with the adm column by finding the weekday, and merged with the admission table
 
   df_adm_date <- tibble::as.tibble(df_adm_per)
-  df_adm_date$value <- as.POSIXct(df_adm_date$value, format = "%y-%m-%d", format = "Europe/London")
+
   df_date_adm_ren <- df_adm_date %>%
     dplyr::rename(Start_d  = "value") %>%
     dplyr::mutate(Start_date = lubridate::date(Start_d))
@@ -72,6 +65,7 @@ admission_discharges <- function(start_date, end_date, data, plot_chart){
     dplyr::mutate(Weekday = lubridate::wday(Start_date, label = TRUE),
                   Day = lubridate::day(Start_date)) %>%
     dplyr::select(Start_date, Weekday, Day)
+
 
   dt_adm_calc <- dplyr::full_join(dt_adm, df_adm_wkday, by = c("Start_date", "Weekday", "Day"))
 
@@ -86,6 +80,8 @@ admission_discharges <- function(start_date, end_date, data, plot_chart){
     dplyr::group_by(Weekday) %>%
     dplyr::summarise( "Avg_admissions" = mean(num_adms))
 
+
+
   # The same process followed into calculating the mean for discharges
   dt_disch <- admission_discharges  %>%
     dplyr::select(IDcol, Discharges, EpisodeNumber, Los, Disch_period, End_date) %>%
@@ -98,14 +94,10 @@ admission_discharges <- function(start_date, end_date, data, plot_chart){
 
   # Creating a new columns with dates for the month in question - table the dates
   #
-  # ymd function parses dates in year-month-day format
-  end_date_new_col <- as.POSIXct(start_date, format = "%Y-%m-%d", tz = "Europe/London")
-  # The %m+% adds months to dates without exceeding the last day
-  df_disch_per <- end_date_new_col %m+% lubridate::days(c(0:30))
+  df_disch_per <- seq(as.Date(start_date, tz = "Europe/London"), as.Date(end_date, tz = "Europe/London"), by = 'day')
 
   df_disch_date <- tibble::as.tibble(df_disch_per)
 
-  df_disch_date$value <- as.POSIXct(df_disch_date$value, format = "%y-%m-%d", format = "Europe/London")
 
   #renamed the dates when merging the new table with the discharges calculated above
 
@@ -132,6 +124,7 @@ admission_discharges <- function(start_date, end_date, data, plot_chart){
   avg_disch_total <- dt_disch_final %>%
     dplyr::group_by(Weekday) %>%
     dplyr::summarise( "Avg_discharges" = mean(num_disch))
+
 
   dt_disch_avg <- dplyr::left_join(avg_adm_total, avg_disch_total, by = c("Weekday"))
 
