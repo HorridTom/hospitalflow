@@ -1,5 +1,4 @@
 
-
 #################################################################################
 ###3.A&E Arrivals and Occupancy, 3rd of March to 27th of April, 2015 ############
 #################################################################################
@@ -11,7 +10,7 @@ arrival_occupancy <- function(start_date, end_date, data, plot_chart){
   # extracting Month and hour from Time column and
   # count = occupancy.
   # ASK TOM FOR THE AVERAGES - WE GET DIFFERENT AVERAGES DEPENDENT OF THE GROUP BY IN DIFFERENT CASES - GROUP_BY WITH DAY AND HOUR GIVES DIFFERENT AVERAGES
-  dt_occ_count <- data %>%
+  dt_occ_count <- dt_hrs %>%
     dplyr::mutate(
       Time = ymd_hms(Time),
       Month = month(Time),
