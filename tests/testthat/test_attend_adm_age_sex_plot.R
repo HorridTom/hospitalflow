@@ -45,13 +45,12 @@ test_that("Admission by age-Sex, Jan, 2012 - March, 2015",{
                         "Male admitted",   "Male admitted",  "Male admitted", "Male admitted","Male admitted",   "Male admitted",  "Male admitted", "Male admitted",
                         "Male admitted",   "Male admitted",  "Male admitted")))
 
-
-    correct_answers <- correct_answers %>%
-      dplyr::arrange(Age_band, Group)
-
    correct_answers_1 <- correct_answers %>%
      dplyr::mutate(Age_band =  factor(Age_band, levels = c("0 yrs", "1-4 yrs","5-9 yrs","10-14 yrs","15-19 yrs","20-24 yrs","25-29 yrs","30-34 yrs","35-39 yrs","40-44 yrs","45-49 yrs",
                                                           "50-54 yrs","55-59 yrs","60-64 yrs","65-69 yrs","70-74 yrs","75-79 yrs","80-84 yrs", "85+ yrs")))
+
+   final_answers <- correct_answers_1 %>%
+     dplyr::arrange(Age_band, Group)
 
     #Run Admission Discharges graph
     result <- ae_attendances_admissions_age_sex(start_date = "2012-01-01 00:00:00", end_date = "2015-01-01 00:00:00", data = test_data_age_sex_att_adm, plot_chart = TRUE)
@@ -60,8 +59,8 @@ test_that("Admission by age-Sex, Jan, 2012 - March, 2015",{
     result_data$Value <- as.numeric(result_data$Value)
     result_data$Group <- as.factor(result_data$Group)
 
-    #result_data <- result_data %>%
-      #dplyr::arrange(Age_band, Group)
+    result_data <- result_data %>%
+      dplyr::arrange(Age_band, Group)
 
     #Test results are correct
     expect_equal(as.data.frame(result_data), as.data.frame(correct_answers), tolerance = 0.1)
