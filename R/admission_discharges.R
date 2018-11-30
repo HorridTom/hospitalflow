@@ -26,6 +26,7 @@ admission_discharges <- function(start_date, end_date, data, plot_chart){
      # - Discharges, created a new columne Disch_period.
      # - A column with Admissions to the hospital - with Lenght of stay more than a day
      # - Start date and End Date were stripped of the time since I need these later on
+
   admission_discharges <- data %>%
     dplyr::filter(Admissions < end_date & Discharges > start_date) %>%
     dplyr::select(IDcol, Admissions, Discharges, PatientType, EpisodeNumber, WardCode, AGE_BAND, SEX) %>%
