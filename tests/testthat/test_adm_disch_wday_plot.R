@@ -4,7 +4,7 @@ library(hospitalflow)
 
 test_that("Admission numbers by day of the Week for January 2015",{
 
-  load("testdata/test_sample_data.rda")
+  load("testdata/test_adm_disch_data.rda")
 
   #Specify correct results
   correct_answers <- tibble::tibble(
@@ -20,7 +20,9 @@ test_that("Admission numbers by day of the Week for January 2015",{
   correct_answers <- correct_answers %>%
     dplyr::arrange(Event, Weekday)
 
- #Run Admission Discharges graph
+  str(correct_answers)
+
+  #Run Admission Discharges graph
   result <- admission_discharges(start_date = "2015-01-01 00:00:00", end_date = "2015-02-01 00:00:00", data = adm_disch, plot_chart = TRUE)
 
   result_data <- result$data
@@ -39,7 +41,7 @@ test_that("Admission numbers by day of the Week for January 2015",{
 
 test_that("Admission numbers by day of the Week for January-Jun 2015",{
 
-  load("testdata/test_jan_jun_data.rda")
+  load("testdata/test_adm_disch_jan_jun_data.rda")
 
   #Specify correct results
   correct_answers_jan_jun <- tibble::tibble(
