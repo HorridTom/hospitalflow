@@ -66,6 +66,10 @@ test_that("Admission by age-Sex, Jan, 2012 - March, 2015",{
     result_data$Group <- as.factor(result_data$Group)
     result_data$Age_band <- forcats::fct_relevel(result_data$Age_band)
 
+    #result_data <- result_data %>%
+      #dplyr::mutate(Gender = fct_collapse(fct_inorder(Gender), Male = c("Male", "Not Specified"), Female = c("Female")))
+
+
     str(result_data)
     #Test results are correct
     expect_equal(as.data.frame(result_data), as.data.frame(correct_answers_1), tolerance = 0.1)
