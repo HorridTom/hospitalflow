@@ -1,6 +1,22 @@
-# A&E Attendances and Admissions by age group
-##################################################################################################
-ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_chart){
+
+#' ae_attendances_admissions_age_sex
+#'
+#' @param start_date date of earliest discharge to be included in the analysis
+#' @param end_date date of latest admission to be included in the analysis
+#' @param data hospital episode data
+#' @param plot_chart if TRUE return chart, otherwise if FALSE return dataframe
+#' @param hospital_name this is a string specifying the hospital name for the chart title
+#'
+#' @return Chart or dataframe showing A&E Attendances and Admissions by Gender and Age
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' hospitalflow::ae_attendances_admissions_age_sex(start_date = "2012-01-01 00:00:00",
+#' end_date = "2015-01-01 00:00:00",
+#' data = test_data_age_sex_att_adm, plot_chart = TRUE)
+#' }
+ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
   # finding the number of ae attendances
   # finding the number of ae attendances
@@ -22,6 +38,9 @@ ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_c
 
   df_numbers_only <- dplyr::full_join(df_ae_attendances, df_ae_admissions, by  = c("Gender", "Age_band", "Value", "Group"))
 
+  # SET CHART TITLE -
+  title_stub = " hospital: A&E Attendances and Admissions, "
+  chart_title <- paste0(hospital_name, title_stub, start_date," to ", end_date)
 
   plot_test <- ggplot2::ggplot(df_numbers_only, ggplot2::aes(Age_band, Value, fill = Group)) +
     ggplot2::geom_col(data = dplyr::filter(df_numbers_only, Group %in% c("Male not admitted", "Female not admitted")),
@@ -39,7 +58,7 @@ ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_c
                   "60-64 yrs", "65-69 yrs", "70-74 yrs", "75-79 yrs", "80-84 yrs", "85+ yrs") +
     ggplot2::xlab("Age Group") +
     ggplot2:: ylab("ED Attendances and Admissions") +
-    ggplot2::labs(title = "Chelsea & Westminster: A&E Attendances and Admissions, 1st Jan to 31st of March, 2015",
+    ggplot2::labs(title = chart_title,
                   subtitle = "ED attendance and hospital admissions from ED, \nNote: (i) planned return/recall attendances have been excluded; (ii) results are intended for management information only",
                   y = "Attendances and Admissions, n", x = "Age Group", caption = "Source: CLAHRC NWL") +
     ggplot2::theme_bw() +
