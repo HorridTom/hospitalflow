@@ -1,3 +1,7 @@
+# Length of stay distribution for elective and emergency patients
+#
+
+
 los_distrib_elect_emerg_discharge <- function(start_date, end_date, data, plot_chart){
 
   df_wrd_c <- data %>%

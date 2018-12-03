@@ -2,9 +2,6 @@
 ##################################################################################################
 ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_chart){
 
-
-
-
   # finding the number of ae attendances
   # finding the number of ae attendances
   df_ae_attendances <- data %>%
