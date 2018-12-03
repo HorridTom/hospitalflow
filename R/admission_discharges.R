@@ -18,7 +18,7 @@
 #' hospitalflow::admission_discharges(start_date = "2015-01-01 00:00:00", end_date = "2015-02-01 00:00:00",
 #'                                    data = example_data, plot_chart = TRUE)
 #' }
-admission_discharges <- function(start_date, end_date, data, plot_chart){
+admission_discharges <- function(start_date, end_date, data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
   # Selecting the variables needed.
   # Creating new variables:
@@ -156,6 +156,10 @@ admission_discharges <- function(start_date, end_date, data, plot_chart){
 
   melt_for_plt <- tidyr::gather(adm_disc_non_emerg_join, key = "Event", value = Value, Avg_admissions, Avg_discharges, Non_emergency_admissions)
 
+  # sET CHART TITLE -
+  title_stub = " hospital: Admissions and Discharges by days of the week, "
+  chart_title <- paste0(hospital_name, title_stub, start_date," to ", end_date)
+
   # plot the admissions and discharges (non-emergency appears as well )
   plot_adm_disc <- ggplot2::ggplot(melt_for_plt,  ggplot2::aes(Weekday, Value, group = Event)) + #shape = Event,  colour = Event
     ggplot2::geom_bar(stat = "identity", position = "identity" , alpha=0.4, width = 0.5, fill = "slateblue4") +
@@ -167,7 +171,7 @@ admission_discharges <- function(start_date, end_date, data, plot_chart){
     ggplot2::theme_bw() +
     ggplot2::scale_y_continuous(expand = c(0, .1)) +
     ggplot2::xlim("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun") +
-    ggplot2::labs(title = "Chelsea Westminster hospital: Admissions and Discharges by days of the week, 1st of Jan to 31st of March, 2015",
+    ggplot2::labs(title = chart_title,
                   subtitle = "Averages of daily hospital arrivals and discharges(excluding the same day non-emergency cases, and non-admitted ED attendances) by the day of the week.\nNote: results are intended for management information only",
                   y = "Average", x = "Days of the week", caption = "Source: CLAHRC NWL") +
     ggplot2::theme(axis.title.y = ggplot2::element_text(margin = ggplot2::margin(t = 0, r = 21, b = 0, l = 0)),
