@@ -2,9 +2,6 @@
 ##################################################################################################
 ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_chart){
 
-
-
-
   # finding the number of ae attendances
   # finding the number of ae attendances
   df_ae_attendances <- data %>%
@@ -25,8 +22,6 @@ ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_c
 
   df_numbers_only <- dplyr::full_join(df_ae_attendances, df_ae_admissions, by  = c("Gender", "Age_band", "Value", "Group"))
 
-  df_num_only <- df_numbers_only %>%
-    dplyr::arrange(Age_band, Group)
 
   plot_test <- ggplot2::ggplot(df_numbers_only, ggplot2::aes(Age_band, Value, fill = Group)) +
     ggplot2::geom_col(data = dplyr::filter(df_numbers_only, Group %in% c("Male not admitted", "Female not admitted")),
