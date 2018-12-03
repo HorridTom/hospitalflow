@@ -47,8 +47,8 @@ test_that("Admission by age-Sex, Jan, 2012 - March, 2015",{
                                                             "50-54 yrs","55-59 yrs","60-64 yrs","65-69 yrs","70-74 yrs","75-79 yrs","80-84 yrs", "85+ yrs")))
 
 
-   #correct_answers_1 <- correct_answers_1 %>%
-     #dplyr::mutate(Gender = factor(Gender, levels = c("Male","Female", "Not Specified")))
+   correct_answers_1 <- correct_answers_1 %>%
+     dplyr::mutate(Gender = factor(Gender, levels = c("Female", "Male","Not Specified")))
 
     str(correct_answers_1)
 
