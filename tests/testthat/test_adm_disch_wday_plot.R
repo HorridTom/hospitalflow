@@ -4,7 +4,7 @@ library(hospitalflow)
 
 test_that("Admission numbers by day of the Week for January 2015",{
 
-  load("testdata/test_adm_disch_data.rda")
+  load("testdata/test_sample_data.rda")
 
   #Specify correct results
   correct_answers <- tibble::tibble(
@@ -41,7 +41,7 @@ test_that("Admission numbers by day of the Week for January 2015",{
 
 test_that("Admission numbers by day of the Week for January-Jun 2015",{
 
-  load("testdata/test_adm_disch_jan_jun_data.rda")
+  load("testdata/test_jan_jun_data.rda")
 
   #Specify correct results
   correct_answers_jan_jun <- tibble::tibble(
