@@ -2,5 +2,9 @@
 
 export(admission_discharges)
 export(hello_world)
+export(lgt_col_mapping)
+export(make_adm_disch_cols)
+export(make_adm_type_col)
+export(standardise_column_names)
 importFrom(lubridate,"%m+%")
 importFrom(magrittr,"%>%")
