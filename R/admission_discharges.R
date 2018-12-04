@@ -131,7 +131,7 @@ admission_discharges <- function(start_date, end_date, data, plot_chart, hospita
   # Process followed for non-emergency admissions as well
   non_emergency_adm <- admission_discharges  %>%
     dplyr::select(IDcol, Admissions, EpisodeNumber, Los, Adm_period, PatientType, WardCode, Same_day_non_emerg, Start_date) %>%
-    dplyr::filter(Same_day_non_emerg == "TRUE" & EpisodeNumber == 1) %>% #LoS > "1,440"
+    dplyr::filter(PatientType != "Emergency" & EpisodeNumber == 1) %>% #LoS > "1,440"
     dplyr::filter(Los > 1440 & Adm_period == "TRUE") %>% #& PatientType != "Emergency" #&  WardCode !="A&E"PatientType != "Emergency" &
     dplyr::mutate(Weekday = lubridate::wday(Admissions, label = TRUE),
                   Day = lubridate::day(Admissions)) %>%
@@ -169,7 +169,7 @@ admission_discharges <- function(start_date, end_date, data, plot_chart, hospita
     ggplot2::scale_linetype_manual(values = c("solid", "solid" , "twodash")) +
     ggplot2::scale_color_manual(values=c("red", "black",  "blue")) +
     ggplot2::theme_bw() +
-    ggplot2::scale_y_continuous(expand = c(0, .1)) +
+    ggplot2::scale_y_continuous(expand = c(0, 0)) +
     ggplot2::xlim("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun") +
     ggplot2::labs(title = chart_title,
                   subtitle = "Averages of daily hospital arrivals and discharges(excluding the same day non-emergency cases, and non-admitted ED attendances) by the day of the week.\nNote: results are intended for management information only",
