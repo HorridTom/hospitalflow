@@ -8,7 +8,7 @@ test_that("Arrivals_Occupancy_January-March 2015",{
 
   #Specify correct results
   correct_answers_arriv_occ <- tibble::tibble(
-           Hour = as.character(c(0,   1,    2,    3,    4, 5, 6,    7,    8,    9,   10, 11,   12,     13,   14,    15,    16, 17, 18,    19,    20,    21,    22,   23)),
+           Hour = as.character(c(0, 1, 2, 3, 4, 5, 6, 7, 8,    9,   10, 11,   12,     13,   14,    15,    16, 17, 18,    19,    20,    21,    22,   23)),
 
     Average_arrivals = as.numeric(c(3.33, 3.33, 1,    2,    1, 2, 1,    1.66, 5,    5,    6, 6,    9,     9.66,  5.66,  7,     10, 11, 4.33, 5.66, 6.33, 6.33, 3.66, 4.66)),
     Average_Occ = as.numeric(c( 8.66, 7.33, 5.66, 7.66, 3, 4, 2.33, 3,    6.66, 7.33, 8, 9.66, 14.33, 16.33, 12.33, 15.66, 19, 20, 11.33, 14, 12.66, 13.66, 7.33, 11.33)))
