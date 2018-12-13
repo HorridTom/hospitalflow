@@ -16,7 +16,9 @@
 #' end_date = "2015-01-01 00:00:00",
 #' data = test_data_age_sex_att_adm, plot_chart = TRUE)
 #' }
-ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_chart, hospital_name = "Chelsea & Westminster"){
+ae_attendances_admissions_age_sex <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
+                                              end_date = as.Date("2015-01-01", tz = "Europe/London"),
+                                              data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
   # finding the number of ae attendances
   # finding the number of ae attendances
@@ -38,9 +40,12 @@ ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_c
 
   df_numbers_only <- dplyr::full_join(df_ae_attendances, df_ae_admissions, by  = c("Gender", "Age_band", "Value", "Group"))
 
-  # SET CHART TITLE -
-  title_stub = " hospital: A&E Attendances and Admissions, "
-  chart_title <- paste0(hospital_name, title_stub, start_date," to ", end_date)
+  # Set the title
+  title_stub <- " hospital: Admissions and Discharges by days of the week, "
+  #hospital_name <- "Chelsea & Westminster"
+  start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
+  end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
+  chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
 
   plot_test <- ggplot2::ggplot(df_numbers_only, ggplot2::aes(Age_band, Value, fill = Group)) +
     ggplot2::geom_col(data = dplyr::filter(df_numbers_only, Group %in% c("Male not admitted", "Female not admitted")),
@@ -65,8 +70,8 @@ ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_c
     ggplot2::theme(axis.title.y = ggplot2::element_text(margin = ggplot2::margin(t = 0, r = 21, b = 0, l = 0)),
                    plot.title = ggplot2::element_text(size = 12, face = "bold"),
                    plot.subtitle = ggplot2::element_text(size = 10),
-                  legend.position = "bottom", legend.box = "horizontal") +
-    ggplot2::scale_y_continuous(expand = c(0, .5))
+                  legend.position = "bottom", legend.box = "horizontal")
+    #ggplot2::scale_y_continuous(expand = c(0, .5))
 
   plot_test
 
@@ -85,4 +90,4 @@ ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_c
   }
 
 }  ######
-##################################################################################################
+#####################################################################################################################
