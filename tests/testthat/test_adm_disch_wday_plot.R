@@ -15,13 +15,13 @@ test_that("Admission numbers by day of the Week for January-Dec 2015",{
               "Non_emergency_admissions","Non_emergency_admissions","Non_emergency_admissions","Non_emergency_admissions","Non_emergency_admissions",
               "Non_emergency_admissions","Non_emergency_admissions"),
 
-    Value = c(1.61, 1.69, 1.67, 1.69, 1.41, 0.98, 0.96, 1.21, 1.23, 1.51, 1.58, 1.88, 1.26, 1.48, 1.53, 1.53, 1.44, 1.56, 1.28, 0.90, 0.96))
+    Value = c(2.82, 3.75, 3.35, 3.92, 2.51, 1.73, 1.57, 2.46, 2.59, 2.94, 3.19, 3.75, 2.71, 2.13, 2.63, 3.42, 2.98, 3.48, 2.34, 1.59, 1.46))
 
   correct_answers <- correct_answers %>%
     dplyr::arrange(Event, Weekday)
 
  #Run Admission Discharges graph
-  result <- admission_discharges(start_date = "2015-01-01 00:00:00", end_date = "2016-01-01 00:00:00", data = admission_discharge, plot_chart = TRUE, hospital_name = "Chelsea & Westminster" )
+  result <- admissions_discharges(start_date = as.Date("2014-01-01 00:00:00", tz = "Europe/London"), end_date = as.Date("2015-01-01 00:00:00",tz = "Europe/London"), data = admission_discharge, plot_chart = TRUE, hospital_name = "Chelsea & Westminster" )
 
   result_data <- result$data
   result_data$Weekday <- as.character(result_data$Weekday)
