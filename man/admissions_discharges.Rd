@@ -5,7 +5,7 @@
 \title{admission_discharges}
 \usage{
 admissions_discharges(start_date = as.Date("2014-01-01", tz =
-  "Europe/London"), end_date = as.Date("2015-01-01", tz = "Europe/London"),
+  "Europe/London"), end_date = as.Date("2014-12-31", tz = "Europe/London"),
   data, plot_chart, hospital_name = "Chelsea & Westminster")
 }
 \arguments{
@@ -13,7 +13,13 @@ admissions_discharges(start_date = as.Date("2014-01-01", tz =
 
 \item{end_date}{date of latest admission to be included in the analysis}
 
-\item{data}{hospital episode data}
+\item{data}{hospital episode data with at least the following fields:
+Admissions - the admission date
+Discharges - the discharge date
+IDcol - the patient pseudo id
+PatientType - the admission type, distinguishing emergency from other admissions
+EpisodeNumber - the episode id
+WardCode - the ward for the episode}
 
 \item{plot_chart}{if TRUE return chart, otherwise if FALSE return dataframe}
 }

@@ -5,7 +5,13 @@
 #'
 #' @param start_date date of earliest discharge to be included in the analysis
 #' @param end_date date of latest admission to be included in the analysis
-#' @param data hospital episode data
+#' @param data hospital episode data with at least the following fields:
+#' Admissions - the admission date
+#' Discharges - the discharge date
+#' IDcol - the patient pseudo id
+#' PatientType - the admission type, distinguishing emergency from other admissions
+#' EpisodeNumber - the episode id
+#' WardCode - the ward for the episode
 #' @param plot_chart if TRUE return chart, otherwise if FALSE return dataframe
 #'
 #' @return Chart or dataframe showing average Admissions and Discharges by the day of the week
@@ -32,7 +38,7 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
   #selecting the variables needed, with new variables created
   admission_discharge <- data  %>%
     dplyr::filter(Adm <= end_date, Disch >= start_date) %>%
-    dplyr::select(IDcol, Admissions, Discharges, Adm, Disch, PatientType, EpisodeNumber, WardCode, Los) %>%
+    dplyr::select(IDcol, Admissions, Discharges, Adm, Disch, PatientType, EpisodeNumber, WardCode) %>%
     dplyr::mutate(Adm_period = dplyr::if_else(Adm >= start_date, TRUE, FALSE),
                   Disch_period = dplyr::if_else(Disch <= end_date, TRUE, FALSE)) %>%
     dplyr::mutate(Same_day_non_emerg = dplyr::if_else(PatientType != "Emergency" & Adm == Disch, TRUE, FALSE))
@@ -40,7 +46,7 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
 
   # calculating the Admissions by Adm date, Weekday and Dayu
   dt_adm <- admission_discharge  %>%
-    dplyr::select(IDcol, Adm, EpisodeNumber, Los, Adm_period, Los, Same_day_non_emerg) %>%
+    dplyr::select(IDcol, Adm, EpisodeNumber, Adm_period, Same_day_non_emerg) %>%
     dplyr::filter(Same_day_non_emerg == FALSE & EpisodeNumber == 1 & Adm_period == TRUE) %>%
     dplyr::mutate(Day = lubridate::day(Adm),
                   Weekday = lubridate::wday(Adm, label = TRUE)) %>%
@@ -81,7 +87,7 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
 
   # Calculating the Discharges by Discharge Date, Weekday, and Day
   dt_disch <- admission_discharge %>%
-    dplyr::select(IDcol, Disch, EpisodeNumber, Los, Disch_period, Los, Same_day_non_emerg) %>%
+    dplyr::select(IDcol, Disch, EpisodeNumber, Disch_period, Same_day_non_emerg) %>%
     dplyr::filter(Same_day_non_emerg == FALSE & EpisodeNumber == 1 & Disch_period == TRUE) %>%
     dplyr::mutate(Day = lubridate::day(Disch),
                   Weekday = lubridate::wday(Disch, label = TRUE)) %>%
@@ -118,7 +124,7 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
 
   # Process followed for non-emergency admissions as well
   non_emergency_adm <- admission_discharge  %>%
-    dplyr::select(IDcol, Adm, EpisodeNumber, Los, Adm_period, PatientType, Los, Same_day_non_emerg) %>%
+    dplyr::select(IDcol, Adm, EpisodeNumber, Adm_period, PatientType, Same_day_non_emerg) %>%
     dplyr::filter(PatientType != "Emergency" & EpisodeNumber == 1) %>%
     dplyr::filter(Same_day_non_emerg == FALSE & Adm_period == TRUE) %>%
     dplyr::mutate(Weekday = lubridate::wday(Adm, label = TRUE),
