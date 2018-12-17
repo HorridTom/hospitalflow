@@ -148,7 +148,6 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
 
   # Set the title
   title_stub <- " hospital: Admissions and Discharges by days of the week, "
-  hospital_name <- "Chelsea & Westminster"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
