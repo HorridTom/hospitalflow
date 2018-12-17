@@ -157,6 +157,7 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
     # ggplot2::geom_bar(stat = "identity", position = "identity" , alpha=0.4, width = 0.5, fill = "slateblue4") +
     ggplot2::geom_line(ggplot2::aes(linetype = Event, color = Event), size = 1.0) +
     ggplot2::geom_point(ggplot2::aes(shape = Event), size = 1.0) +
+    ggplot2::scale_y_continuous(limits = c(0,NA)) +
     ggplot2::scale_shape_manual(values = c(7, 6, 5)) +
     ggplot2::scale_linetype_manual(values = c("solid", "solid" , "twodash")) +
     ggplot2::scale_color_manual(values=c("red", "black",  "blue")) +
