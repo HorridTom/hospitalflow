@@ -3,6 +3,18 @@
 #################################################################################
 
 
+#' arrival_occupancy
+#'
+#' @param start_date
+#' @param end_date
+#' @param data
+#' @param plot_chart
+#' @param hospital_name
+#'
+#' @return
+#' @export
+#'
+#' @examples
 arrival_occupancy <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
                               end_date = as.Date("2015-01-01", tz = "Europe/London"),
                               data, plot_chart, hospital_name = "Chelsea & Westminster"){
