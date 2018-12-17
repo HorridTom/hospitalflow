@@ -25,6 +25,9 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
                                   end_date = as.Date("2015-01-01",tz = "Europe/London"),          ###
                                   data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
+  # Create Adm and Disch columns containing admission and discharge
+  # dates (as in date only, no time information)
+  data <- data %>% dplyr::mutate(Adm = as.Date(Admissions), Disch = as.Date(Discharges))
 
   #selecting the variables needed, with new variables created
   admission_discharge <- data  %>%
