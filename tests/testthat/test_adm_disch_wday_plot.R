@@ -15,13 +15,15 @@ test_that("Admission numbers by day of the Week for January-Dec 2015",{
               "Non_emergency_admissions","Non_emergency_admissions","Non_emergency_admissions","Non_emergency_admissions","Non_emergency_admissions",
               "Non_emergency_admissions","Non_emergency_admissions"),
 
-    Value = c(2.82, 3.75, 3.35, 3.92, 2.51, 1.73, 1.57, 2.46, 2.59, 2.94, 3.19, 3.75, 2.71, 2.13, 2.63, 3.42, 2.98, 3.48, 2.34, 1.59, 1.46))
+    Value = c(12.88, 13.19, 12.58, 12.46, 11.52, 9.38, 9.37,
+              12.10, 12.13, 12.21, 11.65, 12.65, 10.77, 9.88,
+              2.88, 3.85, 3.28, 3.96, 2.62, 1.81, 1.67))
 
   correct_answers <- correct_answers %>%
     dplyr::arrange(Event, Weekday)
 
  #Run Admission Discharges graph
-  result <- admissions_discharges(start_date = as.Date("2014-01-01 00:00:00", tz = "Europe/London"), end_date = as.Date("2015-01-01 00:00:00",tz = "Europe/London"), data = admission_discharge, plot_chart = TRUE, hospital_name = "Chelsea & Westminster" )
+  result <- admissions_discharges(start_date = as.Date("2014-01-01 00:00:00", tz = "Europe/London"), end_date = as.Date("2014-12-31 00:00:00",tz = "Europe/London"), data = admission_discharge, plot_chart = TRUE, hospital_name = "Chelsea & Westminster" )
 
   result_data <- result$data
   result_data$Weekday <- as.character(result_data$Weekday)
@@ -31,7 +33,7 @@ test_that("Admission numbers by day of the Week for January-Dec 2015",{
     dplyr::arrange(Event, Weekday)
 
   #Test results are correct
-  expect_equal(as.data.frame(result_data), as.data.frame(correct_answers), tolerance = 0.1)
+  expect_equal(as.data.frame(result_data), as.data.frame(correct_answers), tolerance = 0.01)
 
 
  })
