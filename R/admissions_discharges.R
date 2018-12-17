@@ -22,7 +22,7 @@
 # Admission Discharges ############
 #####################################################################################################
 admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europe/London"),       ###
-                                  end_date = as.Date("2015-01-01",tz = "Europe/London"),          ###
+                                  end_date = as.Date("2014-12-31",tz = "Europe/London"),          ###
                                   data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
   # Create Adm and Disch columns containing admission and discharge
@@ -31,17 +31,17 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
 
   #selecting the variables needed, with new variables created
   admission_discharge <- data  %>%
-    dplyr::filter(Adm < as.POSIXct(end_date, tz= "Europe/London") & Disch >= as.POSIXct(start_date, tz= "Europe/London")) %>%
-    dplyr::select(IDcol, Admissions, Discharges, Adm, Disch, PatientType, EpisodeNumber, WardCode, Los, Adm_disch_same_day) %>%
+    dplyr::filter(Adm <= end_date, Disch >= start_date) %>%
+    dplyr::select(IDcol, Admissions, Discharges, Adm, Disch, PatientType, EpisodeNumber, WardCode, Los) %>%
     dplyr::mutate(Adm_period = dplyr::if_else(Adm >= start_date, TRUE, FALSE),
                   Disch_period = dplyr::if_else(Disch <= end_date, TRUE, FALSE)) %>%
-    dplyr::mutate(Same_day_non_emerg = dplyr::if_else(PatientType != "Emergency" & Los < 1440, TRUE, FALSE))
+    dplyr::mutate(Same_day_non_emerg = dplyr::if_else(PatientType != "Emergency" & Adm == Disch, TRUE, FALSE))
 
 
   # calculating the Admissions by Adm date, Weekday and Dayu
   dt_adm <- admission_discharge  %>%
-    dplyr::select(IDcol, Adm, EpisodeNumber, Los, Adm_period, Los) %>%
-    dplyr::filter(Los > 1440 & EpisodeNumber == 1 & Adm_period == TRUE) %>%
+    dplyr::select(IDcol, Adm, EpisodeNumber, Los, Adm_period, Los, Same_day_non_emerg) %>%
+    dplyr::filter(Same_day_non_emerg == FALSE & EpisodeNumber == 1 & Adm_period == TRUE) %>%
     dplyr::mutate(Day = lubridate::day(Adm),
                   Weekday = lubridate::wday(Adm, label = TRUE)) %>%
     dplyr::group_by(Adm, Weekday, Day) %>%
@@ -50,7 +50,7 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
 
 
   # Generating a period of date for calc averages
-  df_period <- seq(as.Date(start_date, tz = "Europe/London"), as.Date(end_date, tz = "Europe/London"), by = 'day')
+  df_period <- seq(start_date, end_date, by = 'day')
 
   # Place the new list, with dates, into a tibble and format it accordingly.
   # DO the same as with the adm column by finding the weekday, and merged with the admission table
@@ -66,7 +66,7 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
 
 
   #Left join does match the columns I need and leaves out the ones with NA.
-  dt_adm_calc <- dplyr::left_join(dt_adm, df_adm_wkday, by = c("Adm", "Weekday", "Day"))
+  dt_adm_calc <- dplyr::left_join(df_adm_wkday, dt_adm, by = c("Adm", "Weekday", "Day"))
 
   # The new column gets NA - as merging found the missing rows for several weedays, these were droped
   # as filters were used in order to select those patients admitted
@@ -81,8 +81,8 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
 
   # Calculating the Discharges by Discharge Date, Weekday, and Day
   dt_disch <- admission_discharge %>%
-    dplyr::select(IDcol, Disch, EpisodeNumber, Los, Disch_period, Los) %>%
-    dplyr::filter(Los > 1440 & EpisodeNumber == 1 & Disch_period == TRUE) %>%
+    dplyr::select(IDcol, Disch, EpisodeNumber, Los, Disch_period, Los, Same_day_non_emerg) %>%
+    dplyr::filter(Same_day_non_emerg == FALSE & EpisodeNumber == 1 & Disch_period == TRUE) %>%
     dplyr::mutate(Day = lubridate::day(Disch),
                   Weekday = lubridate::wday(Disch, label = TRUE)) %>%
     dplyr::group_by(Disch, Weekday, Day) %>%
@@ -102,7 +102,7 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
 
   # Left join does not give me the days that are missing from the original dataset (these dates shall appear when the sequence
   # of dates generated on the period in question. Yet, the full join does. To be reviewed by Tom.)
-  dt_disch_calc <- dplyr::left_join(dt_disch, df_disch_wkday, by = c("Disch", "Weekday", "Day"))
+  dt_disch_calc <- dplyr::left_join(df_disch_wkday, dt_disch, by = c("Disch", "Weekday", "Day"))
 
   # replace NA with 0 for the purpose of averaging across weekdays
   dt_disch_final <- dt_disch_calc %>%
@@ -118,16 +118,16 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
 
   # Process followed for non-emergency admissions as well
   non_emergency_adm <- admission_discharge  %>%
-    dplyr::select(IDcol, Adm, EpisodeNumber, Los, Adm_period, PatientType, Los, Adm_disch_same_day) %>%
-    dplyr::filter(PatientType != "Emergency" & EpisodeNumber == 1) %>% #LoS > "1,440"
-    dplyr::filter(Los > 1440 & Adm_period == TRUE & Adm_disch_same_day == FALSE) %>% #& PatientType != "Emergency" #  & Adm_disch_same_day == FALSE WardCode !="A&E"PatientType != "Emergency" &
+    dplyr::select(IDcol, Adm, EpisodeNumber, Los, Adm_period, PatientType, Los, Same_day_non_emerg) %>%
+    dplyr::filter(PatientType != "Emergency" & EpisodeNumber == 1) %>%
+    dplyr::filter(Same_day_non_emerg == FALSE & Adm_period == TRUE) %>%
     dplyr::mutate(Weekday = lubridate::wday(Adm, label = TRUE),
                   Day = lubridate::day(Adm)) %>%
     dplyr::group_by(Adm, Weekday, Day) %>%
     dplyr::tally() %>%
     dplyr::rename(num_non_emerg_adm = n)
 
-  dt_non_emerg_calc <- dplyr::full_join(non_emergency_adm, df_adm_wkday, by = c("Adm", "Weekday", "Day"))
+  dt_non_emerg_calc <- dplyr::left_join(df_adm_wkday, non_emergency_adm, by = c("Adm", "Weekday", "Day"))
 
   dt_non_emerg_adm_final <- dt_non_emerg_calc %>%
     tidyr::replace_na(list(num_non_emerg_adm = 0))
