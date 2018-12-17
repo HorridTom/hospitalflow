@@ -154,7 +154,7 @@ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europ
 
   # plot the admissions and discharges (non-emergency appears as well )
   plot_adm_disc <- ggplot2::ggplot(melt_for_plt,  ggplot2::aes(Weekday, Value, group = Event)) + #shape = Event,  colour = Event
-    ggplot2::geom_bar(stat = "identity", position = "identity" , alpha=0.4, width = 0.5, fill = "slateblue4") +
+    # ggplot2::geom_bar(stat = "identity", position = "identity" , alpha=0.4, width = 0.5, fill = "slateblue4") +
     ggplot2::geom_line(ggplot2::aes(linetype = Event, color = Event), size = 1.0) +
     ggplot2::geom_point(ggplot2::aes(shape = Event), size = 1.0) +
     ggplot2::scale_shape_manual(values = c(7, 6, 5)) +
