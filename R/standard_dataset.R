@@ -120,3 +120,17 @@ standardise_column_names <- function(data, colname_mapping) {
   newnames <- colname_mapping %>% pull(analysisCol)
   data %>% rename_at(vars(oldnames), ~ newnames)
 }
+
+# Process used to put LGT A&E data into C&W format 2018-12-17
+# lgt_ae_age_gender_data <- lgt_ae %>% select(SEX, agegroup, START_DATETIME, END_DATETIME)
+# lgt_ae_age_gender_data$Ward <- rep('A&E',nrow(lgt_ae_age_gender_data))
+# lgt_ae_age_gender_data$LastWard <- rep('ED only',nrow(lgt_ae_age_gender_data))
+# lgt_ae_age_gender_data$SEX <- recode(lgt_ae_age_gender_data$SEX, F = "Female", M = "Male", N = "Not Specified", U = "Not Specified")
+# lgt_ae_age_gender_data <- lgt_ae_age_gender_data %>% rename(Gender = SEX)
+# lgt_ae_age_gender_data <- lgt_ae_age_gender_data %>% rename(Age_band = agegroup)
+# lgt_ae_age_gender_data <- lgt_ae_age_gender_data %>% mutate(START_DATETIME = as.POSIXct(START_DATETIME, tz = "Europe/London", format = '%d/%m/%Y %H:%M'))
+# lgt_ae_age_gender_data <- lgt_ae_age_gender_data %>% mutate(END_DATETIME = as.POSIXct(END_DATETIME, tz = "Europe/London", format = '%d/%m/%Y %H:%M'))
+# lgt_ae_a_g_data_Q22018 <- lgt_ae_age_gender_data %>% filter(START_DATETIME <= as.Date('2018-07-31', tz = "Europe/London"), START_DATETIME >= as.Date('2018-04-01', tz = "Europe_London"))
+# lgt_ae_a_g_data_Q22018$EpisodeNumber <- rep(1,nrow(lgt_ae_a_g_data_Q22018))
+# lgt_ae_a_g_data_Q22018$PatientType <- rep('Emergency',nrow(lgt_ae_a_g_data_Q22018))
+# lgt_ae_a_g_data_Q22018_fact <- lgt_ae_a_g_data_Q22018 %>% mutate(Gender = as.factor(Gender), Age_band = as.factor(Age_band), Ward = as.factor(Ward), LastWard = as.factor(LastWard), PatientType = as.factor(PatientType))
