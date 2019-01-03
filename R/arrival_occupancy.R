@@ -18,11 +18,12 @@
 ####################################################################################################################
 ###3.A&E Arrivals and Occupancy, 3rd of March to 27th of April, 2015 ###############################################
 ####################################################################################################################
-arrival_occupancy <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-                              end_date = as.Date("2015-01-01", tz = "Europe/London"),
+arrival_occupancy <- function(start_date = as.POSIXct("2012-01-01 00:00", tz = "Europe/London"),
+                              end_date = as.POSIXct("2015-01-01 00:00", tz = "Europe/London"),
                               data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
-  dt_date <-  test_arrivals_occupancy %>%
+
+  dt_date <-  data %>%
       dplyr::filter(Admissions > start_date & Discharges < end_date) %>%
       dplyr::select(IDcol, Admissions, Discharges)
 
@@ -47,7 +48,6 @@ arrival_occupancy <- function(start_date = as.Date("2012-01-01", tz = "Europe/Lo
 
   # Set the title
   title_stub <- " hospital: Hourly A&E occupancy and arrival profile, "
-  #hospital_name <- "Chelsea & Westminster"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
