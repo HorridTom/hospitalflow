@@ -18,15 +18,13 @@
 ####################################################################################################################
 ###3.A&E Arrivals and Occupancy, 3rd of March to 27th of April, 2015 ###############################################
 ####################################################################################################################
-arrival_occupancy <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),        ############
-                                       end_date = as.Date("2015-01-01", tz = "Europe/London"),          ############
-                                       data, plot_chart, hospital_name = "Chelsea & Westminster"){
+arrival_occupancy <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
+                              end_date = as.Date("2015-01-01", tz = "Europe/London"),
+                              data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
-
-
-    dt_date <-  data %>%
-    dplyr::filter(Admissions > start_date & Discharges < end_date) %>%
-    dplyr::select(IDcol, Admissions, Discharges)
+  dt_date <-  test_arrivals_occupancy %>%
+      dplyr::filter(Admissions > start_date & Discharges < end_date) %>%
+      dplyr::select(IDcol, Admissions, Discharges)
 
   # using gather function to create a new column with date; and filter only by Emergency Department
   arrivals_occupancy_jan_march <-  dt_date %>%
@@ -44,7 +42,7 @@ arrival_occupancy <- function(start_date = as.Date("2012-01-01", tz = "Europe/Lo
     dplyr::mutate(Hour = lubridate::hour(time_hr)) %>%
     dplyr::group_by(Hour) %>%
     dplyr::summarize(Average_arrivals = mean(Arrivals),
-              Average_occupancy = mean(Occupancy))
+                     Average_occupancy = mean(Occupancy))
 
 
   # Set the title
@@ -86,5 +84,5 @@ arrival_occupancy <- function(start_date = as.Date("2012-01-01", tz = "Europe/Lo
 
   }
 
-}  ############
-####################################################################################################################
+}
+
