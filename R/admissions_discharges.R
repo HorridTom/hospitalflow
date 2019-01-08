@@ -27,8 +27,8 @@
 ###################################
 # Admission Discharges ############
 #####################################################################################################
- admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europe/London"),       ###
-                                  end_date = as.Date("2014-12-31",tz = "Europe/London"),          ###
+ admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europe/London"),
+                                  end_date = as.Date("2014-12-31",tz = "Europe/London"),
                                   data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
   # Create Adm and Disch columns containing admission and discharge
@@ -183,8 +183,8 @@
 
   }
 
-} ###
-#####################################################################################################
+}
+
 
 
 
