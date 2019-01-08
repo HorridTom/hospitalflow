@@ -49,8 +49,6 @@ test_that("Los distribution Elective and Emergency for improvised data",{
                              Episode_number, Spell_type, Ward_code)
 
 
-
-
   #Run Admission Discharges graph
   result <- los_distrib_elect_emerg_discharge(start_date = as.Date("2018-10-10",tz = "Europe/London"), end_date = as.Date("2018-12-14", tz = "Europe/London"), data = test_los,
                                               plot_chart = TRUE, hospital_name = "Chelsea & Westminster")

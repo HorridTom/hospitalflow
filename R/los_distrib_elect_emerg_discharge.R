@@ -5,11 +5,6 @@ los_distrib_elect_emerg_discharge <- function(start_date = as.Date("2012-01-01",
                                                    end_date = as.Date("2015-01-01", tz = "Europe/London"),
                                                    data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
-  #select(PAT_CODE, START_DATETIME, END_DATETIME, episode.order, Admission.Type, spell.type, WARD_CODE) %>%
-  #dplyr::rename(IDcol = PAT_CODE, Admissions = START_DATETIME,
-  #Discharges = END_DATETIME, Episode_number = episode.order, Ward_code = WARD_CODE,
-  #Admission_type = Admission.Type, Spell_type = spell.type)
-
 
   #subseting data set#
 
