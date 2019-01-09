@@ -20,17 +20,24 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2012-01-01",
                                               end_date = as.Date("2015-01-01", tz = "Europe/London"),
                                               data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
+  #start_date <- as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London")
+  #end_date <- as.POSIXct( "2019-01-05 00:00:00", tz = "Europe/London")
+
+  dt <- data %>%
+    dplyr::filter(Admissions <= end_date & Discharges >= start_date) %>%
+    dplyr::select(IDcol, Admissions, Discharges, PatientType, Gender, Age_band, Ward, LastWard, EpisodeNumber)
+
+
   # finding the number of ae attendances
-  # finding the number of ae attendances
-  df_ae_attendances <- data %>%
+  df_ae_attendances <- dt %>%
     dplyr::filter(Ward == "A&E" & Gender != "Not Specified") %>%
     dplyr::filter(EpisodeNumber == 1 & PatientType == "Emergency") %>%
     dplyr::group_by(Gender, Age_band) %>%
     dplyr::summarize(Value= n()) %>%
-    dplyr::mutate(Group = dplyr::case_when(Gender == "Female" ~ "Female not admitted",
-                                    Gender == "Male" ~ "Male not admitted"))
+    dplyr::mutate(Group = dplyr::case_when(Gender == "Female" ~ "Female attendances",
+                                    Gender == "Male" ~ "Male attendances"))
 
-  df_ae_admissions <- data %>%
+  df_ae_admissions <- dt %>%
     dplyr::filter(Ward == "A&E" & LastWard != "ED only" & PatientType == "Emergency") %>%
     dplyr::filter(Gender != "Not Specified" & EpisodeNumber == 1) %>%
     dplyr::group_by(Gender, Age_band) %>%
@@ -48,19 +55,19 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2012-01-01",
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
 
   plot_test <- ggplot2::ggplot(df_numbers_only, ggplot2::aes(Age_band, Value, fill = Group)) +
-    ggplot2::geom_col(data = dplyr::filter(df_numbers_only, Group %in% c("Male not admitted", "Female not admitted")),
+    ggplot2::geom_col(data = dplyr::filter(df_numbers_only, Group %in% c("Male attendances", "Female attendances")),
                       position = ggplot2::position_dodge()) +
     ggplot2::geom_col(data = dplyr::filter(df_numbers_only, Group %in% c("Male admitted", "Female admitted")),
                       position = ggplot2::position_dodge(0.9), width = 0.5) +
     ggplot2::scale_fill_manual(name = "",
-                               breaks = c("Male admitted", "Male not admitted",
-                                          "Female admitted", "Female not admitted"),
-                               labels = c("Male Admitted", "Male not admitted",
-                                          "Female Admitted", "Female not admitted"),
+                               breaks = c("Male admitted", "Male attendances",
+                                          "Female admitted", "Female attendances"),
+                               labels = c("Male Admitted", "Male attendances",
+                                          "Female Admitted", "Female attendances"),
                                values = c("coral3",  "lightcoral", "steelblue4", "lightblue2")) +
-    ggplot2::xlim("0 yrs" , "1-4 yrs", "5-9 yrs", "10-14 yrs", "15-19 yrs", "20-24 yrs", "25-29 yrs",
-                  "30-34 yrs", "35-39 yrs", "40-44 yrs", "45-49 yrs", "50-54 yrs", "55-59 yrs",
-                  "60-64 yrs", "65-69 yrs", "70-74 yrs", "75-79 yrs", "80-84 yrs", "85+ yrs") +
+    #ggplot2::xlim("0 yrs" , "1-4 yrs", "5-9 yrs", "10-14 yrs", "15-19 yrs", "20-24 yrs", "25-29 yrs",
+    #"30-34 yrs", "35-39 yrs", "40-44 yrs", "45-49 yrs", "50-54 yrs", "55-59 yrs",
+    #"60-64 yrs", "65-69 yrs", "70-74 yrs", "75-79 yrs", "80-84 yrs", "85+ yrs") +
     ggplot2::xlab("Age Group") +
     ggplot2:: ylab("ED Attendances and Admissions") +
     ggplot2::labs(title = chart_title,
@@ -70,8 +77,8 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2012-01-01",
     ggplot2::theme(axis.title.y = ggplot2::element_text(margin = ggplot2::margin(t = 0, r = 21, b = 0, l = 0)),
                    plot.title = ggplot2::element_text(size = 12, face = "bold"),
                    plot.subtitle = ggplot2::element_text(size = 10),
-                  legend.position = "bottom", legend.box = "horizontal")
-    #ggplot2::scale_y_continuous(expand = c(0, .5))
+                   legend.position = "bottom", legend.box = "horizontal") #%>%
+  #ggplot2::scale_y_continuous(expand = c(0, .5))
 
   plot_test
 
@@ -82,12 +89,12 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2012-01-01",
 
     plot_test
 
-    }else{
+  }else{
 
 
-     plot_test$data %>% dplyr::select(Gender, Age_band, Value, Group)
+    plot_test$data %>% dplyr::select(Gender, Age_band, Value, Group)
 
   }
 
-}  ######
+}
 #####################################################################################################################
