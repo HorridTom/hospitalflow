@@ -27,20 +27,19 @@
 ###################################
 # Admission Discharges ############
 #####################################################################################################
- admissions_discharges <- function(start_date = as.Date("2014-01-01", tz = "Europe/London"),
-                                  end_date = as.Date("2014-12-31",tz = "Europe/London"),
+admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europe/London"),
+                                  end_date = as.Date("2018-12-23",tz = "Europe/London"),
                                   data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
-  # Create Adm and Disch columns containing admission and discharge
-  # dates (as in date only, no time information)
-  data <- data %>% dplyr::mutate(Adm = as.Date(Admissions), Disch = as.Date(Discharges))
 
   #selecting the variables needed, with new variables created
   admission_discharge <- data  %>%
-    dplyr::filter(Adm <= end_date, Disch >= start_date) %>%
-    dplyr::select(IDcol, Admissions, Discharges, Adm, Disch, PatientType, EpisodeNumber, WardCode) %>%
-    dplyr::mutate(Adm_period = dplyr::if_else(Adm >= start_date, TRUE, FALSE),
-                  Disch_period = dplyr::if_else(Disch <= end_date, TRUE, FALSE)) %>%
+    dplyr::select(IDcol, Admissions, Discharges, PatientType, EpisodeNumber) %>%
+    dplyr::filter(Admissions < end_date, Discharges > start_date) %>%
+    dplyr::mutate(Adm_period = dplyr::if_else(Admissions >= start_date, TRUE, FALSE),
+                  Disch_period = dplyr::if_else(Discharges <= end_date, TRUE, FALSE),
+                  Adm = as.Date(Admissions),
+                  Disch = as.Date(Discharges)) %>%
     dplyr::mutate(Same_day_non_emerg = dplyr::if_else(PatientType != "Emergency" & Adm == Disch, TRUE, FALSE))
 
 
@@ -54,7 +53,6 @@
     dplyr::tally() %>%
     dplyr::rename(num_adms = n)
 
-
   # Generating a period of date for calc averages
   df_period <- seq(start_date, end_date, by = 'day')
 
@@ -62,7 +60,6 @@
   # DO the same as with the adm column by finding the weekday, and merged with the admission table
 
   df_adm_date <- tibble::as.tibble(df_period)
-
 
   df_adm_wkday <- df_adm_date  %>%
     dplyr::rename(Adm  = "value") %>%
@@ -106,20 +103,19 @@
                   Day = lubridate::day(Disch)) %>%
     dplyr::select(Disch, Weekday, Day)
 
-  # Left join does not give me the days that are missing from the original dataset (these dates shall appear when the sequence
-  # of dates generated on the period in question. Yet, the full join does. To be reviewed by Tom.)
+
   dt_disch_calc <- dplyr::left_join(df_disch_wkday, dt_disch, by = c("Disch", "Weekday", "Day"))
 
   # replace NA with 0 for the purpose of averaging across weekdays
   dt_disch_final <- dt_disch_calc %>%
     tidyr::replace_na(list(num_adms = 0))
 
- # Get the Average Discharges by Day of the Week
+  # Get the Average Discharges by Day of the Week
   avg_disch_total <- dt_disch_final %>%
     dplyr::group_by(Weekday) %>%
     dplyr::summarise( "Avg_discharges" = mean(num_adms))
 
- # joining the tibbles
+  # joining the tibbles
   dt_adm_disch_avg <- dplyr::left_join(avg_adm_total, avg_disch_total, by = c("Weekday"))
 
   # Process followed for non-emergency admissions as well
@@ -144,10 +140,11 @@
 
   total_adm_disch_non_emerg <- dplyr::left_join(dt_adm_disch_avg, avg_non_emerg, by = c("Weekday"))
 
-  melt_for_plt <- tidyr::gather(total_adm_disch_non_emerg, key = "Event", value = Value, Avg_admissions, Avg_discharges, Non_emergency_admissions)
+  melt_for_plt <- tidyr::gather(total_adm_disch_non_emerg, key = "Event", value = Value, Avg_admissions, Avg_discharges,Non_emergency_admissions) #
 
   # Set the title
   title_stub <- " hospital: Admissions and Discharges by days of the week, "
+  hospital_name <- "Chelsea & Westminster"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
@@ -171,7 +168,7 @@
                    plot.title = ggplot2::element_text(size = 10, face = "bold"),
                    plot.subtitle = ggplot2::element_text(size = 9),
                    legend.position = "bottom", legend.box = "horizontal")
-
+  plot_adm_disc
 
   if(plot_chart == TRUE){
 
