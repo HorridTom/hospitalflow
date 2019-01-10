@@ -87,7 +87,7 @@ test_that("Admission and Attendances by age-Sex, for improvised data",{
   correct_answers <- tibble::tibble(
     Gender =  as.factor(c( "Female","Female", "Male", "Male","Female","Female","Male", "Male")),
 
-  Age_band = as.factor(c( "1-4 yrs" , "85 + yrs", "1-4 yrs" , "85 + yrs",  "1-4 yrs" , "85 + yrs","1-4 yrs" , "85 + yrs")),
+  Age_band = as.factor(c( "1-4 yrs" , "85+ yrs", "1-4 yrs" , "85+ yrs",  "1-4 yrs" , "85+ yrs","1-4 yrs" , "85+ yrs")),
 
 
   Value = as.numeric(c(3, 3, 3, 3, 2, 2, 2, 2)),
@@ -95,11 +95,9 @@ test_that("Admission and Attendances by age-Sex, for improvised data",{
   Group = as.factor(c("Female attendances", "Female attendances", "Male attendances","Male attendances","Female admitted", "Female admitted","Male admitted","Male admitted"))
   )
 
-
   correct_answers_1 <- correct_answers %>%
-    dplyr::mutate(Age_band =  factor(Age_band, levels = c( "1-4 yrs","85 + yrs")))
-
-  str(correct_answers_1)
+    dplyr::mutate(Age_band =  factor(Age_band, levels = c("0 yrs", "1-4 yrs","5-9 yrs","10-14 yrs","15-19 yrs","20-24 yrs","25-29 yrs","30-34 yrs","35-39 yrs","40-44 yrs",
+                                                          "45-49 yrs","50-54 yrs","55-59 yrs","60-64 yrs","65-69 yrs","70-74 yrs","75-79 yrs","80-84 yrs", "85+ yrs")))
 
   adm <- c("2019-01-01 09:30:00", "2019-01-01 09:30:00", "2019-01-02 07:30:00", "2019-01-01 09:30:00", "2019-01-01 09:30:00", "2019-01-02 07:30:00", "2019-01-01 09:30:00", "2019-01-01 09:30:00", "2019-01-02 07:30:00","2019-01-01 09:30:00","2019-01-01 09:30:00","2019-01-02 07:30:00", "2019-01-02 07:30:00")
 
@@ -113,13 +111,12 @@ test_that("Admission and Attendances by age-Sex, for improvised data",{
 
   Gender <- c("Female", "Female", "Female", "Male", "Male", "Male", "Female", "Female", "Female", "Male", "Male", "Male", "Male")
 
-  #Admission_type <- c("Maternity", "Other Babies", "Maternity", "Other Babies", "Maternity", "Other Babies", "Maternity", "Other Babies")
 
   Ward <- c("A&E", "A&E", "A&E", "A&E", "A&E", "A&E", "A&E", "A&E", "A&E", "A&E", "A&E", "A&E", "A&E")
 
   LastWard <- c("SM", "ED only", "SM", "SM", "ED only", "SM", "SM", "ED only", "SM", "SM", "ED only", "SM", "SN")
 
-  Age_band <- c("1-4 yrs", "1-4 yrs", "1-4 yrs", "1-4 yrs", "1-4 yrs", "1-4 yrs", "85 + yrs","85 + yrs","85 + yrs","85 + yrs","85 + yrs","85 + yrs","85 + yrs")
+  Age_band <- c("1-4 yrs", "1-4 yrs", "1-4 yrs", "1-4 yrs", "1-4 yrs", "1-4 yrs", "85+ yrs","85+ yrs","85+ yrs","85+ yrs","85+ yrs","85+ yrs","85+ yrs")
 
   EpisodeNumber <- c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2)
 
@@ -130,6 +127,10 @@ test_that("Admission and Attendances by age-Sex, for improvised data",{
                                          Admissions, Discharges,
                                          PatientType, Gender,
                                          Age_band, Ward, LastWard, EpisodeNumber)
+
+  test_att_adm_age_sex <- test_att_adm_age_sex %>%
+    dplyr::mutate(Age_band =  factor(Age_band, levels = c("0 yrs", "1-4 yrs","5-9 yrs","10-14 yrs","15-19 yrs","20-24 yrs","25-29 yrs","30-34 yrs","35-39 yrs","40-44 yrs",
+                                                          "45-49 yrs","50-54 yrs","55-59 yrs","60-64 yrs","65-69 yrs","70-74 yrs","75-79 yrs","80-84 yrs", "85+ yrs")))
 
 
   #Run Admission Discharges graph
@@ -143,7 +144,6 @@ test_that("Admission and Attendances by age-Sex, for improvised data",{
 
   #result_data <- result_data %>%
   # dplyr::mutate(Gender = fct_collapse(fct_inorder(Gender), Male = c("Male", "Not Specified"), Female = c("Female")))
-
 
   result_data$Group <- as.factor(result_data$Group)
   result_data$Gender <- as.factor(result_data$Gender)
