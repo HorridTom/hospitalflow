@@ -65,9 +65,9 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2012-01-01",
                                labels = c("Male Admitted", "Male attendances",
                                           "Female Admitted", "Female attendances"),
                                values = c("coral3",  "lightcoral", "steelblue4", "lightblue2")) +
-    #ggplot2::xlim("0 yrs" , "1-4 yrs", "5-9 yrs", "10-14 yrs", "15-19 yrs", "20-24 yrs", "25-29 yrs",
-    #"30-34 yrs", "35-39 yrs", "40-44 yrs", "45-49 yrs", "50-54 yrs", "55-59 yrs",
-    #"60-64 yrs", "65-69 yrs", "70-74 yrs", "75-79 yrs", "80-84 yrs", "85+ yrs") +
+    ggplot2::xlim("0 yrs" , "1-4 yrs", "5-9 yrs", "10-14 yrs", "15-19 yrs", "20-24 yrs", "25-29 yrs",
+    "30-34 yrs", "35-39 yrs", "40-44 yrs", "45-49 yrs", "50-54 yrs", "55-59 yrs",
+    "60-64 yrs", "65-69 yrs", "70-74 yrs", "75-79 yrs", "80-84 yrs", "85+ yrs") +
     ggplot2::xlab("Age Group") +
     ggplot2:: ylab("ED Attendances and Admissions") +
     ggplot2::labs(title = chart_title,
