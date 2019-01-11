@@ -21,9 +21,11 @@ standardisation_dt <- function(data){
 
  }
 
+
 # Ran the above function on the raw 2012-2015 C&W data, then as follows:
 # cw_pt_ids <- cw_disch_201201_201507 %>% distinct(IDcol) %>% dplyr::pull(IDcol)
 # pt_id_sample <- sample(cw_pt_ids, 50000, replace = FALSE)
 # stringr::str_sub(system("git rev-parse HEAD", intern=TRUE), 1, 8)
 # cw_disch_201201_201507_782cfa21_stddt_s <- cw_disch_201201_201507 %>% filter(IDcol %in% pt_id_sample)
 # devtools::use_data(cw_disch_201201_201507_782cfa21_stddt_s)
+
