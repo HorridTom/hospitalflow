@@ -184,4 +184,17 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
 
 
 
+#' adm_disch_day_of_week
+#'
+#' @return
+#' @export
+#'
+adm_disch_day_of_week <- function() {
+  admissions_discharges(start_date = as.Date("2012-01-01", tz = "Europe/London"),
+                                    end_date = as.Date("2015-01-01", tz = "Europe/London"),
+                                    data = hospitalflow::cw_disch_201201_201507_782cfa21_stddt_s, plot_chart = TRUE, hospital_name = "Chelsea & Westminster")
+}
+
+
+
 

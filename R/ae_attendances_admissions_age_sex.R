@@ -95,3 +95,15 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2012-01-01",
 
 }
 #####################################################################################################################
+
+
+#' age_sex
+#'
+#' @return
+#' @export
+#'
+age_sex <- function() {
+  ae_attendances_admissions_age_sex(start_date = as.Date("2012-01-01", tz = "Europe/London"),
+                                    end_date = as.Date("2015-01-01", tz = "Europe/London"),
+                                    data = hospitalflow::cw_disch_201201_201507_782cfa21_stddt_s, plot_chart = TRUE, hospital_name = "Chelsea & Westminster")
+}
