@@ -40,3 +40,6 @@ rsconnect/
 
 # Test data
 /tests/testthat/testdata
+
+# Data
+/data
