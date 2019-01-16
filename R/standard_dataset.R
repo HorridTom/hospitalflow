@@ -89,6 +89,15 @@ make_adm_type_col <- function(data, adm_method_mapping) {
 
 }
 
+#' spell_type
+#'
+#' @param spell_episode_types a vector containing the episode types for episodes
+#' within one spell in hospital.
+#'
+#' @return the type of the spell - if all episode types are equal, this unique type is the
+#' type of the spell, otherwise the type of the spell is 'Mixed'.
+#' @export
+#'
 spell_type <- function(spell_episode_types) {
   if(length(spell_episode_types)==0) {
     spell_typ <- NA
@@ -134,3 +143,24 @@ standardise_column_names <- function(data, colname_mapping) {
 # lgt_ae_a_g_data_Q22018$EpisodeNumber <- rep(1,nrow(lgt_ae_a_g_data_Q22018))
 # lgt_ae_a_g_data_Q22018$PatientType <- rep('Emergency',nrow(lgt_ae_a_g_data_Q22018))
 # lgt_ae_a_g_data_Q22018_fact <- lgt_ae_a_g_data_Q22018 %>% mutate(Gender = as.factor(Gender), Age_band = as.factor(Age_band), Ward = as.factor(Ward), LastWard = as.factor(LastWard), PatientType = as.factor(PatientType))
+
+
+#' spell_intersections
+#'
+#' @param data1 a dataset with a column called 'Spell Number'
+#' @param data2 a dataset with a column called 'Spell Number'
+#'
+#' @return list of three vectors giving distinct values of spell number present in both, and only in each,
+#' of data1 and data2
+#' @export
+#'
+spell_intersections <- function(data1, data2) {
+  spell_nos1 <- data1 %>% distinct(`Spell Number`)
+  spell_nos2 <- data2 %>% distinct(`Spell Number`)
+  spell_nos1 <- spell_nos1 %>% mutate(inData2 = `Spell Number` %in% (spell_nos2 %>% pull(`Spell Number`)))
+  spell_nos2 <- spell_nos2 %>% mutate(inData1 = `Spell Number` %in% (spell_nos1 %>% pull(`Spell Number`)))
+  in_1_only <- spell_nos1 %>% filter(inData2 == FALSE) %>% pull(`Spell Number`)
+  in_2_only <- spell_nos2 %>% filter(inData1 == FALSE) %>% pull(`Spell Number`)
+  in_both <- spell_nos1 %>% filter(inData2 == TRUE) %>% pull(`Spell Number`)
+  return(list('intersect'=in_both, '1 only'=in_1_only, '2 only'=in_2_only))
+}
