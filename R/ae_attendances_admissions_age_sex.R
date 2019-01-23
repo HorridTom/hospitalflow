@@ -48,7 +48,7 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2012-01-01",
   df_numbers_only <- dplyr::full_join(df_ae_attendances, df_ae_admissions, by  = c("Gender", "Age_band", "Value", "Group"))
 
   # Set the title
-  title_stub <- " hospital: Admissions and Discharges by days of the week, "
+  title_stub <- " hospital: Attendances and Admissions by Age and Gender, "
   #hospital_name <- "Chelsea & Westminster"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
