@@ -66,25 +66,25 @@ colImportTypes <- cols(
   agegroup = col_character())
 # The following csv files were created by saving the corresponding sheets of the
 # received Excel files as .csv
-qeh_ip <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_IP.csv',
+qeh_ip <- readr::read_csv('../../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_IP.csv',
                           locale = locale(tz = 'Europe/London'),
                           col_types = colImportTypes) %>% rename(agegroup = Column1)
-qeh_ed <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_ED.csv',
+qeh_ed <- readr::read_csv('../../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_ED.csv',
                           locale = locale(tz = 'Europe/London'),
                           col_types = colImportTypes)
-qeh_ncf <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_NCF.csv',
+qeh_ncf <- readr::read_csv('../../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_NCF.csv',
                            locale = locale(tz = 'Europe/London'),
                            col_types = colImportTypes) %>% rename(agegroup = Column1)
-qeh_aw <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_AW.csv',
+qeh_aw <- readr::read_csv('../../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_AW.csv',
                           locale = locale(tz = 'Europe/London'),
                           col_types = colImportTypes) %>% rename(agegroup = Column1)
-uhl_ip <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_IP.csv',
+uhl_ip <- readr::read_csv('../../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_IP.csv',
                           locale = locale(tz = 'Europe/London'),
                           col_types = colImportTypes) %>% rename(agegroup = Column1)
-uhl_ed <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_ED.csv',
+uhl_ed <- readr::read_csv('../../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_ED.csv',
                           locale = locale(tz = 'Europe/London'),
                           col_types = colImportTypes)
-uhl_aw <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_AW.csv',
+uhl_aw <- readr::read_csv('../../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_AW.csv',
                           locale = locale(tz = 'Europe/London'),
                           col_types = colImportTypes) %>% rename(agegroup = Column1)
 ```
@@ -160,7 +160,7 @@ uhl_aw_st <- uhl_aw_st %>% mutate(
 ```
 
 ```{r new-features}
-adm_method_mapping <- readr::read_csv('../hospitalflow/data/AdmMethod.csv',
+adm_method_mapping <- readr::read_csv('AdmMethod.csv',
                                       col_types = cols(
                                         Admission.Method = col_character(),
                                         Admission.Type = col_character()
@@ -197,11 +197,11 @@ So we conclude that, of the spell numbers in the QEH IP data, `r consistencyTabl
 Since we cannot resolve this yet, it does not make sense to do anything that mixes or links these extracts in any way. So for now I will save the R objects created, and load them into the master (or other) branch for analysis.
 
 ```{r export-data}
-save(qeh_ed_st, file = '../lgt-data/data-extract-201901/partially-cleaned-data/qeh_ed_st.rda')
-save(qeh_ip_st_cc, file = '../lgt-data/data-extract-201901/partially-cleaned-data/qeh_ip_st_cc.rda')
-save(qeh_aw_st_cc, file = '../lgt-data/data-extract-201901/partially-cleaned-data/qeh_aw_st_cc.rda')
-save(qeh_ncf_st_cc, file = '../lgt-data/data-extract-201901/partially-cleaned-data/qeh_ncf_st_cc.rda')
-save(uhl_ed_st, file = '../lgt-data/data-extract-201901/partially-cleaned-data/uhl_ed_st.rda')
-save(uhl_ip_st_cc, file = '../lgt-data/data-extract-201901/partially-cleaned-data/uhl_ip_st_cc.rda')
-save(uhl_aw_st_cc, file = '../lgt-data/data-extract-201901/partially-cleaned-data/uhl_aw_st_cc.rda')
+save(qeh_ed_st, file = '../../lgt-data/data-extract-201901/partially-cleaned-data/qeh_ed_st.rda')
+save(qeh_ip_st_cc, file = '../../lgt-data/data-extract-201901/partially-cleaned-data/qeh_ip_st_cc.rda')
+save(qeh_aw_st_cc, file = '../../lgt-data/data-extract-201901/partially-cleaned-data/qeh_aw_st_cc.rda')
+save(qeh_ncf_st_cc, file = '../../lgt-data/data-extract-201901/partially-cleaned-data/qeh_ncf_st_cc.rda')
+save(uhl_ed_st, file = '../../lgt-data/data-extract-201901/partially-cleaned-data/uhl_ed_st.rda')
+save(uhl_ip_st_cc, file = '../../lgt-data/data-extract-201901/partially-cleaned-data/uhl_ip_st_cc.rda')
+save(uhl_aw_st_cc, file = '../../lgt-data/data-extract-201901/partially-cleaned-data/uhl_aw_st_cc.rda')
 ```
