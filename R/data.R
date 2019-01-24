@@ -1,6 +1,6 @@
 #' Episode data for Lewisham and Greenwhich Hospital
 #'
-#' A dataset containing data ... episodes for Emergency Department(ED)
+#' A dataset containing data ... episodes for Emergency Department (ED)
 #' for Lewisham and Greenwhich hospital, for all patients between 2015 and 2018
 #'
 #' @format A tibble containing observations of 16 variables. Each observation corresponds to an episode of
