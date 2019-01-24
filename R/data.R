@@ -22,11 +22,11 @@
 #'   "First Attendance", "Follow-up Planned", "Follow-up unplanned"}
 #'   \item{triage_category}{The triage category factor variable recorded as per NHS data dictionary coding system
 #'   \url{https://www.datadictionary.nhs.uk/data_dictionary/attributes/a/a_and_e_initial_assessment_triage_category_de.asp?shownav=1}}
-#'   \item{diagnosis_string}{A character variable  with a coding system based on NHS data dictionary?}
+#'   \item{diagnosis_string}{A character variable  with a coding system based on NHS data dictionary?
 #'   \url{https://www.datadictionary.nhs.uk/web_site_content/supporting_information/clinical_coding/accident_and_emergency_diagnosis_tables.asp?shownav=1}}
 #'   \item{hrg_string}{Need to check with Tom}
 #'   \item{postcode_sector}{The postcode character variable of the patient's home, up to sector level}
-#'   \item{arrival_mode}{The means of arrival of the patient at the ED department, variable recorded as factor.}
+#'   \item{arrival_mode}{The means of arrival of the patient at the ED department, variable recorded as factor}
 #'   \item{attendance_disposal}{Attendance disposal recorded as a factor variable, ask Tom for more info, forgotten what it means}
 #'   \item{referal_source}{The source of referral of recorded as per NHS data dictionary coding system
 #'   \url{https://www.datadictionary.nhs.uk/data_dictionary/attributes/s/smo/source_of_referral_for_a_and_e_de.asp?shownav=1}}
