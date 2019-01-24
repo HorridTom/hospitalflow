@@ -1,0 +1,207 @@
+---
+title: "LGT Flow Analysis - Data Import"
+author: "Tom Woodcock, Gabriel Burcea"
+date: "15/01/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readr)
+```
+
+```{r data-load}
+
+colImportTypes <- cols(
+  `Ethnic Origin Code` = col_character(),
+  `Ethnic Code Description` = col_character(),
+  `Responsible PCT Code` = col_character(),
+  `Responsible PCT Name` = col_character(),
+  `Registered GP Practice Code` = col_character(),
+  `A&E Patient Category` = col_integer(),
+  `A&E Patient Category Desc` = col_character(),
+  PAT_CODE = col_character(),
+  SITE_CODE = col_character(),
+  WARD_CODE = col_character(),
+  SIG_FAC = col_character(),
+  START_DATETIME = col_character(),
+  END_DATETIME = col_character(),
+  REQ_CODE_STRING = col_character(),
+  REQ_DATETIME_STRING = col_character(),
+  REQ_LOC_STRING = col_character(),
+  HCP_CODE_STRING = col_character(),
+  SPECIALTY_STRING_HCP = col_character(),
+  SPECIALTY_STRING_NAT = col_character(),
+  TRIAGE_CAT = col_integer(),
+  DIAGNOSIS_STRING = col_character(),
+  PROC_CODE_STRING = col_character(),
+  HRG_CODE_STRING = col_character(),
+  ADMISSION_FROM_CODE = col_character(),
+  ARRIVAL_MODE = col_character(),
+  REF_SOURCE = col_character(),
+  ARRIVAL_TYPE = col_character(),
+  ATT_STATUS = col_character(),
+  MOP_CODE = col_character(),
+  WAIT_CODE = col_character(),
+  DISCHARGE_TO = col_character(),
+  GP_PRACTICE_CODE = col_character(),
+  PC_SECTOR_RES = col_character(),
+  SEX = col_character(),
+  DATE_OF_DEATH = col_character(),
+  `A&E Arrival Mode` = col_character(),
+  `A&E Attendance Disposal Code` = col_character(),
+  `A&E Bed Availability Date & Time` = col_character(),
+  `A&E Bed Request Date & Time` = col_character(),
+  `A&E Discharge Date` = col_character(),
+  `A&E Discharge from Locator?` = col_character(),
+  `A&E Init. Assessment Date & Time` = col_character(),
+  `A&E Seen for Treatment  Date & Time` = col_character(),
+  `A&E Source of Referral` = col_character(),
+  `A&E Specialist Eval. Date & Time` = col_character(),
+  `A&E Specialty` = col_character(),
+  `Episode Number` = col_integer(),
+  `Spell Number` = col_character(),
+  `A&E Attendance Category` = col_integer(),
+  agegroup = col_character())
+# The following csv files were created by saving the corresponding sheets of the
+# received Excel files as .csv
+qeh_ip <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_IP.csv',
+                          locale = locale(tz = 'Europe/London'),
+                          col_types = colImportTypes) %>% rename(agegroup = Column1)
+qeh_ed <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_ED.csv',
+                          locale = locale(tz = 'Europe/London'),
+                          col_types = colImportTypes)
+qeh_ncf <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_NCF.csv',
+                           locale = locale(tz = 'Europe/London'),
+                           col_types = colImportTypes) %>% rename(agegroup = Column1)
+qeh_aw <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_AW.csv',
+                          locale = locale(tz = 'Europe/London'),
+                          col_types = colImportTypes) %>% rename(agegroup = Column1)
+uhl_ip <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_IP.csv',
+                          locale = locale(tz = 'Europe/London'),
+                          col_types = colImportTypes) %>% rename(agegroup = Column1)
+uhl_ed <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_ED.csv',
+                          locale = locale(tz = 'Europe/London'),
+                          col_types = colImportTypes)
+uhl_aw <- readr::read_csv('../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_AW.csv',
+                          locale = locale(tz = 'Europe/London'),
+                          col_types = colImportTypes) %>% rename(agegroup = Column1)
+```
+
+```{r format-data}
+# Column names
+qeh_ed_st <- qeh_ed %>% select(IDcol = PAT_CODE, SITE_CODE, START_DATETIME, END_DATETIME, WardCode = WARD_CODE, Gender = SEX, Age_band = agegroup, EpisodeNumber = 'Episode Number', ADMISSION_FROM_CODE,
+                               'Spell Number')
+qeh_ip_st <- qeh_ip %>% select(IDcol = PAT_CODE, SITE_CODE, START_DATETIME, END_DATETIME, WardCode = WARD_CODE, Gender = SEX, Age_band = agegroup, EpisodeNumber = 'Episode Number', ADMISSION_FROM_CODE,
+                               'Spell Number')
+qeh_aw_st <- qeh_aw %>% select(IDcol = PAT_CODE, SITE_CODE, START_DATETIME, END_DATETIME, WardCode = WARD_CODE, Gender = SEX, Age_band = agegroup, EpisodeNumber = 'Episode Number', ADMISSION_FROM_CODE,
+                               'Spell Number')
+qeh_ncf_st <- qeh_ncf %>% select(IDcol = PAT_CODE, SITE_CODE, START_DATETIME, END_DATETIME, WardCode = WARD_CODE, Gender = SEX, Age_band = agegroup, EpisodeNumber = 'Episode Number', ADMISSION_FROM_CODE,
+                               'Spell Number')
+uhl_ed_st <- uhl_ed %>% select(IDcol = PAT_CODE, SITE_CODE, START_DATETIME, END_DATETIME, WardCode = WARD_CODE, Gender = SEX, Age_band = agegroup, EpisodeNumber = 'Episode Number', ADMISSION_FROM_CODE,
+                               'Spell Number')
+uhl_ip_st <- uhl_ip %>% select(IDcol = PAT_CODE, SITE_CODE, START_DATETIME, END_DATETIME, WardCode = WARD_CODE, Gender = SEX, Age_band = agegroup, EpisodeNumber = 'Episode Number', ADMISSION_FROM_CODE,
+                               'Spell Number')
+uhl_aw_st <- uhl_aw %>% select(IDcol = PAT_CODE, SITE_CODE, START_DATETIME, END_DATETIME, WardCode = WARD_CODE, Gender = SEX, Age_band = agegroup, EpisodeNumber = 'Episode Number', ADMISSION_FROM_CODE,
+                               'Spell Number')
+
+# Column types
+qeh_ed_st <- qeh_ed_st %>% mutate(
+  START_DATETIME = as.POSIXct(START_DATETIME, tz = "Europe/London", format = '%d/%m/%Y %H:%M'),
+  END_DATETIME = as.POSIXct(END_DATETIME, tz = "Europe/London", format = '%d/%m/%Y %H:%M'),
+  Gender = factor(Gender, levels = c("F", "M","N", "U")), Age_band = factor(Age_band, levels = c("0", "1-4","5-9","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49", "50-54","55-59","60-64","65-69","70-74","75-79","80-84", "85-89", "90-94", "95+")), WardCode = as.factor(WardCode),
+  SITE_CODE = as.factor(SITE_CODE)
+  ) %>% mutate(Gender = fct_recode(Gender, Female = "F", Male = "M", "Not Specified" = "N", "Not Specified" = "U"))
+
+qeh_ip_st <- qeh_ip_st %>% mutate(
+  START_DATETIME = as.POSIXct(START_DATETIME, tz = "Europe/London", format = '%Y-%m-%d %H:%M:%S'),
+  END_DATETIME = as.POSIXct(END_DATETIME, tz = "Europe/London", format = '%Y-%m-%d %H:%M:%S'),
+  Gender = factor(Gender, levels = c("F", "M","N", "U")), Age_band = factor(Age_band, levels = c("0", "1-4","5-9","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49", "50-54","55-59","60-64","65-69","70-74","75-79","80-84", "85-89", "90-94", "95+")), WardCode = as.factor(WardCode),
+  SITE_CODE = as.factor(SITE_CODE)
+  ) %>% mutate(Gender = fct_recode(Gender, Female = "F", Male = "M", "Not Specified" = "N", "Not Specified" = "U"))
+
+qeh_aw_st <- qeh_aw_st %>% mutate(
+  START_DATETIME = as.POSIXct(START_DATETIME, tz = "Europe/London", format = '%d/%m/%Y %H:%M'),
+  END_DATETIME = as.POSIXct(END_DATETIME, tz = "Europe/London", format = '%d/%m/%Y %H:%M'),
+  Gender = factor(Gender, levels = c("F", "M","N", "U")), Age_band = factor(Age_band, levels = c("0", "1-4","5-9","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49", "50-54","55-59","60-64","65-69","70-74","75-79","80-84", "85-89", "90-94", "95+")), WardCode = as.factor(WardCode),
+  SITE_CODE = as.factor(SITE_CODE)
+  ) %>% mutate(Gender = fct_recode(Gender, Female = "F", Male = "M", "Not Specified" = "N", "Not Specified" = "U"))
+
+qeh_ncf_st <- qeh_ncf_st %>% mutate(
+  START_DATETIME = as.POSIXct(START_DATETIME, tz = "Europe/London", format = '%d/%m/%Y %H:%M'),
+  END_DATETIME = as.POSIXct(END_DATETIME, tz = "Europe/London", format = '%d/%m/%Y %H:%M'),
+  Gender = factor(Gender, levels = c("F", "M","N", "U")), Age_band = factor(Age_band, levels = c("0", "1-4","5-9","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49", "50-54","55-59","60-64","65-69","70-74","75-79","80-84", "85-89", "90-94", "95+")), WardCode = as.factor(WardCode),
+  SITE_CODE = as.factor(SITE_CODE)
+  ) %>% mutate(Gender = fct_recode(Gender, Female = "F", Male = "M", "Not Specified" = "N", "Not Specified" = "U"))
+
+uhl_ed_st <- uhl_ed_st %>% mutate(
+  START_DATETIME = as.POSIXct(START_DATETIME, tz = "Europe/London", format = '%d/%m/%Y %H:%M'),
+  END_DATETIME = as.POSIXct(END_DATETIME, tz = "Europe/London", format = '%d/%m/%Y %H:%M'),
+  Gender = factor(Gender, levels = c("F", "M","N", "U")), Age_band = factor(Age_band, levels = c("0", "1-4","5-9","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49", "50-54","55-59","60-64","65-69","70-74","75-79","80-84", "85-89", "90-94", "95+")), WardCode = as.factor(WardCode),
+  SITE_CODE = as.factor(SITE_CODE)
+  ) %>% mutate(Gender = fct_recode(Gender, Female = "F", Male = "M", "Not Specified" = "N", "Not Specified" = "U"))
+
+uhl_ip_st <- uhl_ip_st %>% mutate(
+  START_DATETIME = as.POSIXct(START_DATETIME, tz = "Europe/London", format = '%Y-%m-%d %H:%M:%S'),
+  END_DATETIME = as.POSIXct(END_DATETIME, tz = "Europe/London", format = '%Y-%m-%d %H:%M:%S'),
+  Gender = factor(Gender, levels = c("F", "M","N", "U")), Age_band = factor(Age_band, levels = c("0", "1-4","5-9","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49", "50-54","55-59","60-64","65-69","70-74","75-79","80-84", "85-89", "90-94", "95+")), WardCode = as.factor(WardCode),
+  SITE_CODE = as.factor(SITE_CODE)
+  ) %>% mutate(Gender = fct_recode(Gender, Female = "F", Male = "M", "Not Specified" = "N", "Not Specified" = "U"))
+
+uhl_aw_st <- uhl_aw_st %>% mutate(
+  START_DATETIME = as.POSIXct(START_DATETIME, tz = "Europe/London", format = '%d/%m/%Y %H:%M'),
+  END_DATETIME = as.POSIXct(END_DATETIME, tz = "Europe/London", format = '%d/%m/%Y %H:%M'),
+  Gender = factor(Gender, levels = c("F", "M","N", "U")), Age_band = factor(Age_band, levels = c("0", "1-4","5-9","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49", "50-54","55-59","60-64","65-69","70-74","75-79","80-84", "85-89", "90-94", "95+")), WardCode = as.factor(WardCode),
+  SITE_CODE = as.factor(SITE_CODE)
+  ) %>% mutate(Gender = fct_recode(Gender, Female = "F", Male = "M", "Not Specified" = "N", "Not Specified" = "U"))
+
+
+```
+
+```{r new-features}
+adm_method_mapping <- readr::read_csv('../hospitalflow/data/AdmMethod.csv',
+                                      col_types = cols(
+                                        Admission.Method = col_character(),
+                                        Admission.Type = col_character()
+                                        )
+                                      )
+
+qeh_ip_st_cc <- qeh_ip_st %>% hospitalflow::make_adm_type_col(adm_method_mapping) %>%
+  hospitalflow::make_adm_disch_cols() %>% mutate(Admission.Type = as.factor(Admission.Type),
+                                                 PatientType = as.factor(PatientType))
+qeh_aw_st_cc <- qeh_aw_st %>% hospitalflow::make_adm_type_col(adm_method_mapping) %>%
+  hospitalflow::make_adm_disch_cols()
+qeh_ncf_st_cc <- qeh_ncf_st %>% hospitalflow::make_adm_type_col(adm_method_mapping) %>%
+  hospitalflow::make_adm_disch_cols()
+uhl_ip_st_cc <- uhl_ip_st %>% hospitalflow::make_adm_type_col(adm_method_mapping) %>%
+  hospitalflow::make_adm_disch_cols()
+uhl_aw_st_cc <- uhl_aw_st %>% hospitalflow::make_adm_type_col(adm_method_mapping) %>%
+  hospitalflow::make_adm_disch_cols()
+```
+
+## Consistency of patient ID and spellnumber across extracts
+
+In order to understand whether ID and spell number are consistent across extracts, look up patient pseudo ID from the QEH ED data for spell numbers that are in both IP and ED data, and check it is consistent with the ID in the IP data. In other words, for each spell in the IP data, ask 'does this spell number occur in the ED data? And if so, is the pseudo ID recorded for this spell number in the ED data the same as that recorded in the IP data?' 
+
+```{r spell-consistency}
+library(pander)
+
+qeh_ed_ID_SPELL <- qeh_ed_st %>% select(IDcol, `Spell Number`) %>% distinct(`Spell Number`, .keep_all = TRUE)
+qeh_ip_spell_consistency <- qeh_ip_st %>% left_join(qeh_ed_ID_SPELL, by = c('Spell Number' = 'Spell Number')) %>% mutate(idConsistentED = IDcol.x == IDcol.y) %>% distinct(`Spell Number`, .keep_all = TRUE)
+consistencyTable <- table(qeh_ip_spell_consistency$idConsistentED, useNA = 'always')
+pandoc.table(consistencyTable)
+```
+So we conclude that, of the spell numbers in the QEH IP data, `r consistencyTable['FALSE']` appear also in the ED data, and these had a *different* pseudo ID in each extract. There were `r if_else(is.na(consistencyTable['TRUE']),0L,consistencyTable['TRUE'])` spell numbers in both extracts for which the pseudo IDs matched. There were also `r tail(consistencyTable,1)` spell numbers that did not appear in the ED data. The fact that the IDs do not match for the same spell number is counterintuitive and needs to be resolved.
+
+Since we cannot resolve this yet, it does not make sense to do anything that mixes or links these extracts in any way. So for now I will save the R objects created, and load them into the master (or other) branch for analysis.
+
+```{r export-data}
+save(qeh_ed_st, file = '../lgt-data/data-extract-201901/partially-cleaned-data/qeh_ed_st.rda')
+save(qeh_ip_st_cc, file = '../lgt-data/data-extract-201901/partially-cleaned-data/qeh_ip_st_cc.rda')
+save(qeh_aw_st_cc, file = '../lgt-data/data-extract-201901/partially-cleaned-data/qeh_aw_st_cc.rda')
+save(qeh_ncf_st_cc, file = '../lgt-data/data-extract-201901/partially-cleaned-data/qeh_ncf_st_cc.rda')
+save(uhl_ed_st, file = '../lgt-data/data-extract-201901/partially-cleaned-data/uhl_ed_st.rda')
+save(uhl_ip_st_cc, file = '../lgt-data/data-extract-201901/partially-cleaned-data/uhl_ip_st_cc.rda')
+save(uhl_aw_st_cc, file = '../lgt-data/data-extract-201901/partially-cleaned-data/uhl_aw_st_cc.rda')
+```
