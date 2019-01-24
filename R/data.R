@@ -23,7 +23,7 @@
 #'   \item{triage_category}{The triage category factor variable recorded as per NHS data dictionary coding system
 #'   \url{https://www.datadictionary.nhs.uk/data_dictionary/attributes/a/a_and_e_initial_assessment_triage_category_de.asp?shownav=1}}
 #'   \item{diagnosis_string}{A character variable  with a coding system based on NHS data dictionary?}
-#'   \url{https://www.datadictionary.nhs.uk/web_site_content/supporting_information/clinical_coding/accident_and_emergency_diagnosis_tables.asp?shownav=1}
+#'   \url{https://www.datadictionary.nhs.uk/web_site_content/supporting_information/clinical_coding/accident_and_emergency_diagnosis_tables.asp?shownav=1}}
 #'   \item{hrg_string}{Need to check with Tom}
 #'   \item{postcode_sector}{The postcode character variable of the patient's home, up to sector level}
 #'   \item{arrival_mode}{The means of arrival of the patient at the ED department, variable recorded as factor.}
@@ -36,4 +36,4 @@
 #'
 #'
 #'   }
-"ed_data_data_example"
+"ed_data_example"
