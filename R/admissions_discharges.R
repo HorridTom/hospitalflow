@@ -143,8 +143,7 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
   melt_for_plt <- tidyr::gather(total_adm_disch_non_emerg, key = "Event", value = Value, Avg_admissions, Avg_discharges,Non_emergency_admissions) #
 
   # Set the title
-  title_stub <- " hospital: Admissions and Discharges by days of the week, "
-  hospital_name <- "Chelsea & Westminster"
+  title_stub <- ": Admissions and Discharges by days of the week,\n"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
