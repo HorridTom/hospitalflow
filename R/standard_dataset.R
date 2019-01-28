@@ -43,8 +43,8 @@ scratch_data_standardis <- function(data) {
 #' lgt_col_mapping()
 #'
 lgt_col_mapping <- function() {
-  lgt_col_mapping <- tibble::tibble(dataCol = c('PAT_CODE', 'Admissions', 'Discharges', 'PatientType', 'Episode Number', 'WARD_CODE', 'Column1', 'SEX'),
-                                    analysisCol = c('IDcol', 'Admissions', 'Discharges', 'PatientType', 'EpisodeNumber', 'WardCode', 'AGE_BAND', 'SEX'))
+  lgt_col_mapping <- tibble::tibble(provided = c('PAT_CODE', 'START_DATETIME', 'END_DATETIME', 'SEX', 'agegroup'),
+                                    standard = c('pseudo_id', 'start_datetime', 'end_datetime', 'gender', 'age_band_start'))
   lgt_col_mapping
 }
 
@@ -125,9 +125,9 @@ spell_type <- function(spell_episode_types) {
 #' standardise_column_names(data = dataset, colname_mapping = lgt_col_mapping())
 #' }
 standardise_column_names <- function(data, colname_mapping) {
-  oldnames <- colname_mapping %>% pull(dataCol)
-  newnames <- colname_mapping %>% pull(analysisCol)
-  data %>% rename_at(vars(oldnames), ~ newnames)
+  oldnames <- colname_mapping %>% dplyr::pull(provided)
+  newnames <- colname_mapping %>% dplyr::pull(standard)
+  data %>% dplyr::rename_at(dplyr::vars(oldnames), ~ newnames)
 }
 
 # Process used to put LGT A&E data into C&W format 2018-12-17
