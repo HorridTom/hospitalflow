@@ -7,10 +7,10 @@
 import_and_standardise(data_import_list)
 }
 \arguments{
-\item{data_paths}{list of paths to csv files for data import}
-
-\item{config_paths}{list of paths to directories containing csv config files for respective element of
-data_paths}
+\item{data_import_list}{list of named lists, each named list has two elements called
+data_path and config_path, whose values are character strings specifying the paths
+to i) a csv file to import data from and ii) a folder containing hospitalflow config
+files.}
 }
 \value{
 list of tibbles, each containing standardised import of one data file from data_paths

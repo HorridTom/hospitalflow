@@ -10,7 +10,9 @@ get_import_col_types(config_path)
 \item{config_path}{path to the config files for a given dataset}
 }
 \value{
-a column specification to be used for parsing the dataset
+a column specification to be used for parsing the dataset, as a named vector of
+expressions. The expressions are readr collectors, and the names specify the columns they
+will parse.
 }
 \description{
 get_import_col_types
