@@ -27,26 +27,36 @@ recode_factors <- function(provided_data, config_path) {
 #' @examples
 get_import_col_types <- function(config_path) {
 
+  # Specify the standard ordering of the standard column names
+  ordered_standard_column_names <- tibble(standard = c(
+    "pseudo_id",
+    "gender",
+    "age_band_start"
+  ))
+
+  # Read in the mapping from provided column names to standard column names...
+  column_mapping <- readRDS(file.path(config_path, "column_mapping.rds"))
+  # ...and make a vector of the provided names ordered as per the standard order above
+  colImportNames <- ordered_standard_column_names %>%
+    dplyr::left_join(column_mapping, by="standard") %>%
+    dplyr::pull(provided)
+
+  # Set up the provided levels of any factor variables
   gender_levels <- readRDS(file.path(config_path, "gender_levels.rds"))
-  provided_gender_levels <- rlang::expr(gender_levels %>% pull(provided))
+  provided_gender_levels <- gender_levels %>% pull(provided)
 
-  # Temporary hard-coded example
-  # NEEDS REWRITING TO CREATE OUTPUT FROM CONFIG FILES
-
+  # Set up the column types, in the standard order as per above
+  # NOTE: the order of column types here must be precisely
+  # as per the standard order specified above
   colImportTypes <- rlang::exprs(
-    readr::col_character(),
-    readr::col_factor(levels = !!eval(provided_gender_levels)),
-    readr::col_character()
+    readr::col_character(), #pseudo_id
+    readr::col_factor(levels = !!eval(rlang::expr(provided_gender_levels))), #gender
+    readr::col_character() #age_band_start
     )
 
-  colImportNames <- c(
-    "PAT_CODE",
-    "SEX",
-    "agegroup"
-  )
-
+  # Label the types with the respective column names and return this as a named
+  # vector
   colImportTypes <- rlang::set_names(colImportTypes, colImportNames)
-
   colImportTypes
 }
 
@@ -60,9 +70,10 @@ get_import_col_types <- function(config_path) {
 #'
 #' @examples
 get_colname_mapping <- function(config_path) {
-  # Temporary hard-coded example
-  # NEEDS REWRITING TO CREATE OUTPUT FROM CONFIG FILES
-  col_mapping_tbl <- lgt_col_mapping()
+  # Read in the mapping from provided column names to standard column names...
+  column_mapping <- readRDS(file.path(config_path, "column_mapping.rds"))
+
+  column_mapping
 }
 
 #' import_and_standardise
@@ -107,3 +118,10 @@ import_and_standardise <- function(data_import_list) {
   # Extract the data as a tibble for each imported file, and return as a list of these tibbles.
   lapply(data_config_list, function(x) x$data)
 }
+
+
+
+# example_data_import_list <- list(list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_ED.csv",
+#                                       config_path = "lgt-config/"),
+#                                  list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_ED.csv",
+#                                       config_path = "lgt-config/"))
