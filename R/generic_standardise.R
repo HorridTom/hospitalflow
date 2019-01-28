@@ -27,14 +27,15 @@ recode_factors <- function(provided_data, config_path) {
 #' @examples
 get_import_col_types <- function(config_path) {
 
+  gender_levels <- readRDS(file.path(config_path, "gender_levels.rds"))
+  provided_gender_levels <- rlang::expr(gender_levels %>% pull(provided))
+
   # Temporary hard-coded example
   # NEEDS REWRITING TO CREATE OUTPUT FROM CONFIG FILES
 
-  provided_gender_levels <- rlang::expr(c("F", "M","N", "U", "Not Known", "Not Specified"))
-
   colImportTypes <- rlang::exprs(
     readr::col_character(),
-    readr::col_factor(levels = !!provided_gender_levels),
+    readr::col_factor(levels = !!eval(provided_gender_levels)),
     readr::col_character()
     )
 
