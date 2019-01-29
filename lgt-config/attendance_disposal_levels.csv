@@ -1,0 +1,15 @@
+provided,standard
+01,Admitted 
+02,Discharged 
+03,Discharged
+04,Referred to A&E clinic
+05,Referred to Fracture Clinic
+06,Referred to other Out-Patient Clinic
+07,Transferred to other Health Care Provider
+10,Died in Department
+11,Referred to other health Care Professional
+12,Left Department before being seeing for treatment
+13,Left Department having refused treatment
+14,Other
+,
+,

@@ -1,0 +1,31 @@
+provided ,standard
+1,contusion
+2,abrasion
+1,head Injury/concussion
+2,head Injury/ other head injury
+1,dislocation
+2,open fracture
+3,closed fracture
+4,joint injury
+5,amputation
+1,burns and scalds/electric
+2,burns and scalds/thermal
+3,burns and scalds/chemical
+4,burns and scalds/radiation
+1,poisoning/prescriptive drugs
+2,poisoning/proprietary dtrugx
+3,poisoning/controlled drugs
+4,poisoning/other including alcohol
+1,infectious disease/ notifiable disease
+2,infectious disease/non-notifiable disease
+1,cardiac conditions /myocardial ischaemia  & infarction
+2,cardiac conditions/other non-ischaemia
+1,respiratory condictions/bronchial asthma
+2,respiratory condictions/other non-asthma
+1,central nervous system conditions/ epilepsy
+2,central nervous system conditions/other non-epilepsy 
+1,gastrointestinal conditions / haemorrhage
+2,gastrointestinal conditions / acute abdominal pain
+3,gastrointestinal conditions / other
+1,diabetes and other endocrinological conditions / diabetic
+2,diabetes and other endocrinological conditions / other non-diabetic
