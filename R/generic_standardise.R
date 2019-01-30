@@ -28,7 +28,7 @@ recode_factors <- function(provided_data, config_path) {
 get_import_col_types <- function(config_path) {
 
   # Specify the standard ordering of the standard column names
-  ordered_standard_column_names <- tibble(standard = c(
+  ordered_standard_column_names <- tibble::tibble(standard = c(
     "pseudo_id",
     "gender",
     "age_band_start"
@@ -43,7 +43,7 @@ get_import_col_types <- function(config_path) {
 
   # Set up the provided levels of any factor variables
   gender_levels <- readRDS(file.path(config_path, "gender_levels.rds"))
-  provided_gender_levels <- gender_levels %>% pull(provided)
+  provided_gender_levels <- gender_levels %>% dplyr::pull(provided)
 
   # Set up the column types, in the standard order as per above
   # NOTE: the order of column types here must be precisely
