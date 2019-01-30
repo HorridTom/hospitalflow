@@ -12,7 +12,7 @@ library(readr)
 ```
 
 ```{r data-load}
-
+provided_gender_levels <- c("F", "M","N", "U", "Not Known", "Not Specified")
 colImportTypes <- cols(
   `Ethnic Origin Code` = col_character(),
   `Ethnic Code Description` = col_character(),
@@ -47,7 +47,7 @@ colImportTypes <- cols(
   DISCHARGE_TO = col_character(),
   GP_PRACTICE_CODE = col_character(),
   PC_SECTOR_RES = col_character(),
-  SEX = col_character(),
+  SEX = col_factor(levels = provided_gender_levels),
   DATE_OF_DEATH = col_character(),
   `A&E Arrival Mode` = col_character(),
   `A&E Attendance Disposal Code` = col_character(),
