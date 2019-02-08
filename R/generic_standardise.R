@@ -31,7 +31,8 @@ get_import_col_types <- function(config_path) {
   ordered_standard_column_names <- tibble::tibble(standard = c(
     "pseudo_id",
     "gender",
-    "age_band_start"
+    "age_band_start",
+    "start_datetime"
   ))
 
   # Read in the mapping from provided column names to standard column names...
@@ -45,13 +46,24 @@ get_import_col_types <- function(config_path) {
   gender_levels <- readRDS(file.path(config_path, "gender_levels.rds"))
   provided_gender_levels <- gender_levels %>% dplyr::pull(provided)
 
+  # Set up datetime formats
+  datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
+
+  start_datetime_provided_colname <- column_mapping %>%
+    dplyr::filter(standard == "start_datetime") %>%
+    dplyr::pull(provided)
+  start_datetime_provided_format <- datetime_formats %>%
+    dplyr::filter(column_name == start_datetime_provided_colname) %>%
+    dplyr::pull(datetime_format)
+
   # Set up the column types, in the standard order as per above
   # NOTE: the order of column types here must be precisely
   # as per the standard order specified above
   colImportTypes <- rlang::exprs(
     readr::col_character(), #pseudo_id
     readr::col_factor(levels = !!eval(rlang::expr(provided_gender_levels))), #gender
-    readr::col_character() #age_band_start
+    readr::col_character(), #age_band_start
+    readr::col_datetime(format = !!eval(rlang::expr(start_datetime_provided_format))) #start_datetime
     )
 
   # Label the types with the respective column names and return this as a named
