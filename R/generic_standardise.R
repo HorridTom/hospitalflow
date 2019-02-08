@@ -31,7 +31,13 @@ get_import_col_types <- function(config_path) {
   ordered_standard_column_names <- tibble::tibble(standard = c(
     "pseudo_id",
     "gender",
-    "age_band_start"
+    "age_band_start",
+    "ethnic_category",
+    "attendance_category",
+    "arrival_mode",
+   # "attendance_disposal",
+    "triage_category",
+    "referral_source"
   ))
 
   # Read in the mapping from provided column names to standard column names...
@@ -45,13 +51,40 @@ get_import_col_types <- function(config_path) {
   gender_levels <- readRDS(file.path(config_path, "gender_levels.rds"))
   provided_gender_levels <- gender_levels %>% dplyr::pull(provided)
 
+  age_band_start_levels <- readRDS(file.path(config_path, "age_band_levels.rds"))
+  provided_age_band_start_levels <- age_band_start_levels %>% dplyr::pull(provided)
+
+  ethnic_category_levels <- readRDS(file.path(config_path, "ethnic_category_levels.rds"))
+  provided_ethnic_category_levels <- ethnic_category_levels %>% dplyr::pull(provided)
+
+  attendance_category_levels <- readRDS(file.path(config_path, "attendance_category_levels.rds"))
+  provided_attendance_category_levels <- attendance_category_levels %>% dplyr::pull(provided)
+
+  arrival_mode_levels <- readRDS(file.path(config_path, "arrival_mode_levels.rds"))
+  provided_arrival_mode_levels <- arrival_mode_levels %>% dplyr::pull(provided)
+
+  #attendance_disposal_levels <- readRDS(file.path(config_path, "attendance_disposal_levels.rds"))
+  #provided_attendance_disposal_levels < attendance_disposal_levels %>% dplyr::pull(provided)
+
+  triage_category_levels <- readRDS(file.path(config_path, "triage_category_levels.rds"))
+  provided_triage_category_levels <- triage_category_levels %>% dplyr::pull(provided)
+
+  referral_source_levels <- readRDS(file.path(config_path, "referal_source_levels.rds"))
+  provided_referral_source_levels <- referral_source_levels %>% dplyr::pull(provided)
+
   # Set up the column types, in the standard order as per above
   # NOTE: the order of column types here must be precisely
   # as per the standard order specified above
   colImportTypes <- rlang::exprs(
     readr::col_character(), #pseudo_id
-    readr::col_factor(levels = !!eval(rlang::expr(provided_gender_levels))), #gender
-    readr::col_character() #age_band_start
+    readr::col_factor(levels = !!eval(rlang::expr(provided_gender_levels))), # gender
+    readr::col_factor(levels = !!eval(rlang::expr(provided_age_band_start_levels))), # age_band_start
+    readr::col_factor(levels = !!eval(rlang::expr(provided_ethnic_category_levels))), #ethnic_category
+    readr::col_factor(levels = !!eval(rlang::expr(provided_attendance_category_levels))), # attendance_category
+    readr::col_factor(levels = !!eval(rlang::expr(provided_arrival_mode_levels))), #arrival_mode_levels
+    #readr::col_factor(levels = !!eval(rlang::expr(provided_attendance_disposal_levels))),  #attendance_disposal_levels
+    readr::col_factor(levels = !!eval(rlang::expr(provided_triage_category_levels))), # triage_category
+    readr::col_factor(levels = !!eval(rlang::expr(provided_referral_source_levels)))#referal_source
     )
 
   # Label the types with the respective column names and return this as a named
@@ -120,8 +153,7 @@ import_and_standardise <- function(data_import_list) {
 }
 
 
-
 # example_data_import_list <- list(list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_ED.csv",
-#                                       config_path = "lgt-config/"),
+#                                      config_path = "lgt-config/"),
 #                                  list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_ED.csv",
 #                                       config_path = "lgt-config/"))
