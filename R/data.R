@@ -33,7 +33,7 @@
 #'   \url{https://www.datadictionary.nhs.uk/data_dictionary/attributes/a/acc/accident_and_emergency_attendance_disposal_de.asp?shownav=1}}
 #'   \item{referal_source}{Varaible type: factor; The source of referral; recorded as per NHS data dictionary coding system; see link:
 #'   \url{https://www.datadictionary.nhs.uk/data_dictionary/attributes/s/smo/source_of_referral_for_a_and_e_de.asp?shownav=1}}
-#'   \item{specialty}{Variable type: factor; Specialty of the consultant.Recorded as per NHS data dictionary; see link:
+#'   \item{specialty}{Variable type: character; Specialty of the consultant.Recorded as per NHS data dictionary; see link:
 #'   \url{https://www.datadictionary.nhs.uk/data_dictionary/attributes/m/main_specialty_code_de.asp}}
 #'   \item{episode_id}{Variable type: interger; Unique identifier for the ED episode within this dataset, Equivalent to a
 #'   database primary key for the table}
