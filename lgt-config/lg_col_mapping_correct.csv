@@ -2,9 +2,9 @@ provided,standard
 PAT_CODE,pseudo_id
 SEX,gender
 agegroup,age_band_start
-Ethnnic Origin Code,ethnic_category
+Ethnic Origin Code,ethnic_category
 A&E Patient Category Desc,attendance_category
 A&E Arrival Mode,arrival_mode
 A&E Attendance Disposal Code,attendance_disposal
 TRIAGE_CAT,triage_category
-A&E Source of Regerral,referral_source
+A&E Source of Referral,referral_source
