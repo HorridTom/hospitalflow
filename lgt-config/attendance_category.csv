@@ -1,8 +1,10 @@
 provided,standard
 New Problem/First Attendance,First Attendance
-Unplanned F/Up - This ED,Follow-up Unplanned
-Unplanned F/Up - Another ED,Follow-up Unplanned
-Planned F/UP -This ED,Follow-up Planned
-DOA,
-Planned -Follow Up Attendance ,Follow-up Planned
-Unplanned - Follow Up Attendance,Follow-up Unplanned
+1 New Problem/First Attendance,First Attendance
+4 Planned F/Up - This ED,Follow up - Planned
+2 Unplanned F/Up  - This ED,Follow up - Un-planned
+Unplanned - Follow Up Attendance,Follow up - Un-planned
+Planned - Follow Up Attendance,Follow up - Planned
+NA ,NA
+3 Unplanned F/Up - Another ED,Follow-up Un-planned
+5 DOA,Death on Arrival

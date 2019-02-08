@@ -1,16 +1,20 @@
 provided,standard
-Own Transport / Walk-In,Other *to be revied
-Public Transport / Taxi,Other *to be revied
-Emergency Ambulance,Emergency Ambulance
-Emergency Ambulance w/ Med Escort,Emergency Ambulance
-Emergency Ambulance w/ Med Escort,Emergency Ambulance
-Helicopter,Other *to be revied
-Custodial Services (Prison/Deten Cent),Other *to be revied
-Police Transport,Other *to be revied
+Walk,Walk-in 
+Ambulance,Ambulance
+Private Transport,Walk-in
+Other,Walk-in
+Public Transport,Walk-in
+3 Emergency Ambulance,Emergency Ambulance
+1 Own Transport / Walk-In,Walk-in
+2 Public Transport / Taxi,Walk-in
+9 Police Transport,Police
+8 Custodial Services (Prison/Deten Cent,Other *to be revied
+NA,NA
+Police Vehicle,Police
+8 Custodial Services (Prison/Deten Cent),Other *to be revied
+4 Emergency Ambulance w/ Med Escort,Emergency Ambulance
+5 Non-Emergency Ambulance,Other *to be revied
 Air Ambulance,Other *to be revied
-Ambulance,Other *to be revied
-Other,Other *to be revied
-Police Vehicle,Other *to be revied
-Private Transport,Other *to be revied
-Public Transport,Other *to be revied
-Walk,Other *to be revied
+Unknown,NA
+7 Fixed Wing / Repatriation by Air,Other *to be revied
+6 Helicopter,Other *to be revied
