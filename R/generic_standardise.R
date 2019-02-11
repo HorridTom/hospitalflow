@@ -37,7 +37,9 @@ get_import_col_types <- function(config_path) {
     "arrival_mode",
     "attendance_disposal",
     "triage_category",
-    "referral_source"
+    "referral_source",
+    "start_datetime",
+    "end_datetime"
   ))
 
   # Read in the mapping from provided column names to standard column names...
@@ -72,6 +74,28 @@ get_import_col_types <- function(config_path) {
   referral_source_levels <- readRDS(file.path(config_path, "referral_source_levels.rds"))
   provided_referral_source_levels <- referral_source_levels %>% dplyr::pull(provided)
 
+  # Set up datetime formats
+  datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
+
+  # extract the format of the provided start_datetime data
+  # from the config files
+  start_datetime_provided_colname <- column_mapping %>%
+    dplyr::filter(standard == "start_datetime") %>%
+    dplyr::pull(provided)
+  start_datetime_provided_format <- datetime_formats %>%
+    dplyr::filter(column_name == start_datetime_provided_colname) %>%
+    dplyr::pull(datetime_format)
+
+  # extract the format of the provided end_datetime data
+  # from the config files
+  end_datetime_provided_colname <- column_mapping %>%
+    dplyr::filter(standard == "end_datetime") %>%
+    dplyr::pull(provided)
+  end_datetime_provided_format <- datetime_formats %>%
+    dplyr::filter(column_name == end_datetime_provided_colname) %>%
+    dplyr::pull(datetime_format)
+
+
   # Set up the column types, in the standard order as per above
   # NOTE: the order of column types here must be precisely
   # as per the standard order specified above
@@ -84,7 +108,9 @@ get_import_col_types <- function(config_path) {
     readr::col_factor(levels = !!eval(rlang::expr(provided_arrival_mode_levels))), #arrival_mode_levels
     readr::col_factor(levels = !!eval(rlang::expr(provided_attendance_disposal_levels))),  #attendance_disposal_levels
     readr::col_factor(levels = !!eval(rlang::expr(provided_triage_category_levels))), # triage_category
-    readr::col_factor(levels = !!eval(rlang::expr(provided_referral_source_levels)))#referal_source
+    readr::col_factor(levels = !!eval(rlang::expr(provided_referral_source_levels))), #referal_source
+    readr::col_datetime(format = !!eval(rlang::expr(start_datetime_provided_format))), #start_datetime
+    readr::col_datetime(format = !!eval(rlang::expr(end_datetime_provided_format))) #end_datetime
     )
 
   # Label the types with the respective column names and return this as a named
