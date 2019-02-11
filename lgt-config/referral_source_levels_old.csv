@@ -3,57 +3,57 @@ Self Referral,Self Referral
 Emergency Services,Emergency Services
 Other,Other
 Educational Establishment,Educational Establishment
-Health Care Provider(Same or Other),Other - see with Tom
-Health  Care  Provider(Same  or  Other),Ambulance - see with Tom
-Ambulance  Service   (Patient  In  Transit)  ,
-Ambulance Service (Patient In Transit),
-Urgent Care Service,See with Tom 
-UCC,Emergency Department - see with Tom
+Health Care Provider(Same or Other),Health Care Provider: same or other
+Health  Care  Provider(Same  or  Other),Health Care Provider: same or other
+Ambulance  Service   (Patient  In  Transit)  ,Health Care Provider: same or other - ***to be checked 
+Ambulance Service (Patient In Transit),Health Care Provider: same or other - ***to be checked 
+Urgent Care Service,Emergency Services *** to be checked 
+UCC,Emergency Services *** to be checked 
 GP  /  Practice Nurse,General Medical Practitioner
 GP /  Practice Nurse,General Medical Practitioner
 GP / Practice Nurse,General Medical Practitioner
 Self/Family/Friends/Education/Work,Self Referral
 General  Practitioner,General Medical Practitioner
-General Practitioner,
-Advanced  Care  Practitioner,Other - see with Tom
-Advanced Care Practitioner,Other - see with Tom
+General Practitioner,General Medical Practitioner
+Advanced  Care  Practitioner,Health Care Provider: same or other - ***to be checked
+Advanced Care Practitioner,Health Care Provider: same or other - ***to be checked
 Police  /  Forensic Medical Officer,Police
-Police / Forensic Medical Officer,
-Custodial  Services  :  Prison,
-Search And Rescue,
-Work,
-Emergency Department,
-Local  Authority  Social  Services,
-NHS Telephone / Internet Advice e.g. 111,
-Police,See with Tom 
-Community Dental Service,
-Social  Services,
-Midwife,Other
-Custodial  Services  :  Detention Centre,See with Tom 
-Out Of Hours GP Service,See with Tom 
-Carer (External not Family/Friend),
-Fire Service,See with Tom 
-111,See with Tom 
-NA,See with Tom 
-GENERAL MEDICAL PRACTITIONER,NA
-Health care provider: same or other,General Medical Practitioner
-GENERAL MEDICAL PRACTITIONER (GP),Health Care Provider
-Local Authority/Social Services,General Medical Practitioner
-GENERAL DENTAL PRACTITIONER,Other
-Dentist,Other
-Outpatient Service inc. Ambulatory Care,General Dentist Provider
-Mental Health Assessment Team,See with Tom 
-Inpatient,See with Tom 
-Optician / Optometrist,See with Tom 
-Community Nurse (Not Practice Nurse),See with Tom 
-Health Visitor,Health Care Provider
-Pharmacist (Including Community),See with Tom 
-Dentist (Including Community),See with Tom 
-Community Mental Health Nurse,General Dentist Provider
-School Nurse,See with Tom 
-Private Specialist,See with Tom 
-Homeless Persons Drop In Centre,See with Tom 
-Non-NHS Telephone / Internet Advice,See with Tom 
-Coastguard,See with Tom 
-Older Persons Day Care Centre,See with Tom 
-Urgent  Care  Service,
+Police / Forensic Medical Officer,Police
+Custodial  Services  :  Prison,Other
+Search And Rescue,Other
+Work,Work
+Emergency Department,Emergency Department
+Local  Authority  Social  Services,Local Authority Social Services
+NHS Telephone / Internet Advice e.g. 111,Other ***to be checked
+Police,Police
+Community Dental Service,Community Dental Services
+Social  Services,Local Authority Social Services
+Midwife,Health Care Provider *** to be checked 
+Custodial  Services  :  Detention Centre,Other
+Out Of Hours GP Service,Health Care Provider  *** to be checked
+Carer (External not Family/Friend),Other *** to be checked
+Fire Service,Other ***to be checked
+111,Other *** to be checked
+NA,NA
+GENERAL MEDICAL PRACTITIONER,General Medical Practitioner
+Health care provider: same or other,Health Care Provider: same or other
+GENERAL MEDICAL PRACTITIONER (GP),General Medical Practitioner
+Local Authority/Social Services,Local Authority Social Services
+GENERAL DENTAL PRACTITIONER,General Dental Practitioner
+Dentist,General Dental Practitioner
+Outpatient Service inc. Ambulatory Care,Health Care Provider: same or other
+Mental Health Assessment Team,Other***to be checked 
+Inpatient,Health Care Provider: same or other***to be checked 
+Optician / Optometrist,Health Care Provider: same or other ***to be checked 
+Community Nurse (Not Practice Nurse),Health Care Provider: same or other ***to be checked 
+Health Visitor,Other
+Pharmacist (Including Community),Other
+Dentist (Including Community),General Dentist Practitioner
+Community Mental Health Nurse,Other
+School Nurse,Health Care Provider: same or other ***to be checked 
+Private Specialist,Health Care Provider: same or other ***to be checked 
+Homeless Persons Drop In Centre,Other
+Non-NHS Telephone / Internet Advice,Other
+Coastguard,Other
+Older Persons Day Care Centre,Other
+Urgent  Care  Service,Emergency Department *** to be checked 
