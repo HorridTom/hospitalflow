@@ -20,8 +20,9 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2012-01-01",
                                               end_date = as.Date("2015-01-01", tz = "Europe/London"),
                                               data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
-  #start_date <- as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London")
-  #end_date <- as.POSIXct( "2019-01-05 00:00:00", tz = "Europe/London")
+  #start_date <- as.POSIXct("2012-01-01 00:00:00", tz = "Europe/London")
+  #end_date <- as.POSIXct( "2015-03-01 00:00:00", tz = "Europe/London")
+
 
   dt <- data %>%
     dplyr::filter(Admissions <= end_date & Discharges >= start_date) %>%
@@ -72,13 +73,14 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2012-01-01",
                   y = "Attendances and Admissions, n", x = "Age Group", caption = "Source: CLAHRC NWL") +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.title.y = ggplot2::element_text(margin = ggplot2::margin(t = 0, r = 21, b = 0, l = 0)),
-                   axis.text.x = element_text(angle = 45, hjust = 1),
+                   axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
                    plot.title = ggplot2::element_text(size = 12, face = "bold"),
                    plot.subtitle = ggplot2::element_text(size = 10),
                    legend.position = "bottom", legend.box = "horizontal") +
     ggplot2::scale_x_discrete(drop = FALSE)
 
   plot_test
+
 
 
   # Things to consider - StartDate and EndDate does not do what it should do -> it plots all the date from 2011-2015
