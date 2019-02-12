@@ -70,7 +70,7 @@ test_that("Attendances and Admissions by age-Sex, Jan, 2012 - March, 2015",{
     result_data$Group <- as.factor(result_data$Group)
     result_data$Age_band <- forcats::fct_relevel(result_data$Age_band)
 
-
+    result_data <- result_data %>% dplyr::select(Gender, Age_band, Value, Group)
 
     str(result_data)
     #Test results are correct
@@ -148,7 +148,7 @@ test_that("Admission and Attendances by age-Sex, for improvised data",{
   result_data$Group <- as.factor(result_data$Group)
   result_data$Gender <- as.factor(result_data$Gender)
   result_data$Age_band <- forcats::fct_relevel(result_data$Age_band)
-
+  result_data <- result_data %>% dplyr::select(Gender, Age_band, Value, Group)
 
   str(result_data)
   #Test results are correct
