@@ -183,3 +183,5 @@ import_and_standardise <- function(data_import_list) {
                                      #config_path = "lgt-config/"),
                                  #list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_ED.csv",
                                       #config_path = "lgt-config/"))
+
+#cw_data_import_list <- list(list(data_path = "../cw-data/cw_ae_anonim.csv", config_path = "../cw_config_files/"))
