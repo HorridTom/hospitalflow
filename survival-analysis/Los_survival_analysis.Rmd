@@ -1,0 +1,84 @@
+---
+title: "Length of Stay Survival Analysis"
+output: html_notebook
+---
+
+Based on [this](http://dwoll.de/rexrepos/posts/survivalKM.html) article.
+
+```{r}
+library(survival)
+library(tidyverse)
+library(ggfortify)
+```
+
+```{r}
+#surv_data <- readRDS(file = "../data/ed_ex.rds")
+surv_data <- readRDS(file = "../../cw-data/cw_ip_spells.rds")
+surv_data <- surv_data %>% mutate(los = difftime(end_datetime, start_datetime)) %>% filter(!is.na(los))
+units(surv_data$los) <- "hours"
+eventT <- surv_data %>% filter(!is.na(los) & los >= 0) %>% pull(los) 
+obsLen <- 365*24                  # length of observation time (censoring time = end of study)
+obsT   <- pmin(eventT, obsLen)  # observed censored event times
+status <- eventT <= obsLen     # has event occured?
+dfSurv <- data.frame(eventT, obsT, status)          # data frame
+```
+
+```{r}
+ggplot(dfSurv, aes(eventT)) + stat_ecdf(geom = "step") +
+  scale_x_continuous(breaks = scales::pretty_breaks(n=12), limits = c(0, 30L*24L)) +
+  ggtitle("Cumulative time since arrival distribution") +
+  xlab("Time from arrival (t)") + ylab("F(t)") +
+  geom_vline(xintercept = obsLen, colour = "blue") #+
+  #geom_vline(xintercept = 4, colour = "green", linetype = "longdash")
+```
+
+```{r}
+KM0 <- survfit(Surv(obsT, status) ~ 1,  type="kaplan-meier", conf.type="log", data=dfSurv)
+```
+
+```{r}
+
+autoplot(KM0) + ggtitle(expression(paste("Kaplan-Meier estimate ", hat(S)(t), " with CI"))) +
+  xlab("Time from arrival (t)") + ylab(expression(paste(hat(S)(t), ": % remaining in hospital"))) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n=12), limits = c(0, obsLen*1.1)) +
+  geom_vline(xintercept = obsLen, colour = "blue") +
+  scale_x_continuous(breaks = scales::pretty_breaks(n=12), limits = c(0, 30L*24L)) #+
+  #geom_vline(xintercept = 4, colour = "green", linetype = "longdash")
+```
+
+```{r}
+KM0t <- tibble(time = KM0$time, n.risk = KM0$n.risk, n.event = KM0$n.event, n.censor = KM0$n.censor, surv = KM0$surv)
+```
+
+```{r}
+cond_surv_from_km <- function(t0, KM) {
+t1 <- c(t0:(30L*24L))
+St0 <- KM %>% filter(time == t0) %>% pull(surv)
+condSurv <- tibble(t1 = t1)
+condSurv <- condSurv %>% left_join(KM %>% select(time, surv), by = c("t1" = "time")) %>%
+  mutate(condSurvival = surv/St0)
+condSurv %>% mutate(t0 = t0)
+}
+
+condSurvs <- lapply(seq(24L, 24L*7L, by = 24L), cond_surv_from_km, KM0t)
+
+condSurv <- dplyr::bind_rows(condSurvs)
+
+ggplot(condSurv, aes(t1, condSurvival)) + geom_line(aes(group = factor(t0))) + ggtitle(paste("Probability of remaining in hospital after time t1, given in hospital after time t0 = ", t0)) +
+  xlab("Time from arrival (t)") + ylab("Probability still in hospital at t1") +
+  scale_x_continuous(breaks = seq(0, 30L*24L, by = 24L), limits = c(0, 30L*24L)) +
+  geom_vline(xintercept = obsLen, colour = "blue") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))#+
+  #geom_vline(xintercept = 4, colour = "green", linetype = "longdash")
+```
+
+```{r}
+#t0 <- c(60,120,180,240,300)
+#t1 <- c(61:(60*24))
+#St0 <- KM0t %>% filter(time == t0) %>% pull(surv)
+```
+
+Next we should estimate the variability of this for typical medical population e.g. 180 medical pts.
+H: with full info can predict e.g. 3day horizon given 2day; but not for e.g. 100days.
+
+
