@@ -135,8 +135,12 @@ get_import_col_types_inpatient <- function(config_path) {
   ordered_standard_column_names <- tibble::tibble(standard = c(
     "pseudo_id",
     "gender",
-    #"age_band_start",
-    "ethnic_category"#,
+    "age_band_start",
+    "ethnic_category",
+    "main_specialty",
+    "discharge_method",
+    "discharge_destination",
+    "admission_method"
     #"start_datetime",
     #"end_datetime"
   ))
@@ -152,11 +156,23 @@ get_import_col_types_inpatient <- function(config_path) {
   gender_levels <- readRDS(file.path(config_path, "gender_levels.rds"))
   provided_gender_levels <- gender_levels %>% dplyr::pull(provided)
 
-  #age_band_start_levels <- readRDS(file.path(config_path, "age_band_levels.rds"))
-  #provided_age_band_start_levels <- age_band_start_levels %>% dplyr::pull(provided)
+  age_band_start_levels <- readRDS(file.path(config_path, "age_band_levels.rds"))
+  provided_age_band_start_levels <- age_band_start_levels %>% dplyr::pull(provided)
 
   ethnic_category_levels <- readRDS(file.path(config_path, "ethnic_category_levels.rds"))
   provided_ethnic_category_levels <- ethnic_category_levels %>% dplyr::pull(provided)
+
+  main_specialty_levels <- readRDS(file.path(config_path, "main_specialty_levels.rds"))
+  provided_main_specialty_levels <- main_specialty_levels %>% dplyr::pull(provided)
+
+  discharge_method_levels <- readRDS(file.path(config_path, "discharge_method_levels.rds"))
+  provided_discharge_method_levels <- discharge_method_levels %>% dplyr::pull(provided)
+
+  discharge_destination_levels <- readRDS(file.path(config_path, "discharge_destination_levels.rds"))
+  provided_discharge_destination_levels <- discharge_destination_levels %>% dplyr::pull(provided)
+
+  admission_method_levels <- readRDS(file.path(config_path, "admission_method_levels.rds"))
+  provided_admission_method_levels <- admission_method_levels %>% dplyr::pull(provided)
 
   # Set up datetime formats
   #datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
@@ -175,6 +191,7 @@ get_import_col_types_inpatient <- function(config_path) {
   # end_datetime_provided_colname <- column_mapping %>%
   #   dplyr::filter(standard == "end_datetime") %>%
   #   dplyr::pull(provided)
+  #
   # end_datetime_provided_format <- datetime_formats %>%
   #   dplyr::filter(column_name == end_datetime_provided_colname) %>%
   #   dplyr::pull(datetime_format)
@@ -186,10 +203,14 @@ get_import_col_types_inpatient <- function(config_path) {
   colImportTypes <- rlang::exprs(
     readr::col_character(), #pseudo_id
     readr::col_factor(levels = !!eval(rlang::expr(provided_gender_levels))), # gender
-    #readr::col_factor(levels = !!eval(rlang::expr(provided_age_band_start_levels))), # age_band_start
-    readr::col_factor(levels = !!eval(rlang::expr(provided_ethnic_category_levels)))#, #ethnic_category
+    readr::col_factor(levels = !!eval(rlang::expr(provided_age_band_start_levels))), # age_band_start
+    readr::col_factor(levels = !!eval(rlang::expr(provided_ethnic_category_levels))), #, #ethnic_category
+    readr::col_factor(levels = !!eval(rlang::expr(provided_main_specialty_levels))), # main_specialty
+    readr::col_factor(levels = !!eval(rlang::expr(provided_discharge_method_levels))), # discharge_method
+    readr::col_factor(levels = !!eval(rlang::expr(provided_discharge_destination_levels))), # discharge_destination
+    readr::col_factor(levels = !!eval(rlang::expr(provided_admission_method_levels))) # admission_method
     # readr::col_datetime(format = !!eval(rlang::expr(start_datetime_provided_format))), #start_datetime
-    # readr::col_datetime(format = !!eval(rlang::expr(end_datetime_provided_format))) #end_datetime
+    #readr::col_datetime(format = !!eval(rlang::expr(end_datetime_provided_format)))#end_datetime
   )
 
   # Label the types with the respective column names and return this as a named
