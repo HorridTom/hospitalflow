@@ -81,4 +81,51 @@ ggplot(condSurv, aes(t1, condSurvival)) + geom_line(aes(group = factor(t0))) + g
 Next we should estimate the variability of this for typical medical population e.g. 180 medical pts.
 H: with full info can predict e.g. 3day horizon given 2day; but not for e.g. 100days.
 
+So lets say we have 30 (or 300) patients who have been in hospital already for (random exponentially distributed) times (in hours):
+```{r}
+times_in_hospital_1 <- floor(rexp(30, 1/51.6))
+times_in_hospital_2 <- floor(rexp(300, 1/51.6))
+times_in_hospital_1
+times_in_hospital_2
+```
+Now use the survival function from above to estimate the probability each patient will still be in after a further 48 hours.
+```{r}
+probabilities_still_in_48h_1 <- sapply(times_in_hospital_1, hospitalflow::get_discharge_probability, KM0t, 48)
+probabilities_still_in_48h_1
+probabilities_still_in_48h_2 <- sapply(times_in_hospital_2, hospitalflow::get_discharge_probability, KM0t, 48)
+probabilities_still_in_48h_2
+```
+These are the parameters of individual bernoulli trials, the sum of which yields a Poisson Binomial distribution. It is possible to calculate this distribution via the discrete Fourier transform of the following vector:
+```{r}
+p1 <- probabilities_still_in_48h_1
+x1 <- (1/(length(p1)+1)) * hospitalflow::get_poisson_binomial_characteristic_values(p1)
+p2 <- probabilities_still_in_48h_2
+x2 <- (1/(length(p2)+1)) * hospitalflow::get_poisson_binomial_characteristic_values(p2)
+```
+The Poisson Binomial distribution mass function is now given by (for the sample of 30):
+```{r}
+pb_dist1 <- fft(x1)
+pb_dist1 <- tibble::tibble(prob = Re(pb_dist1)) %>% tibble::rowid_to_column("k") %>% mutate(k = k-1)
+expected_k1 <- pb_dist1 %>% dplyr::mutate(prod = prob*k) %>%
+  summarise(expectation = sum(prod)) %>% pull(expectation)
+ggplot(data = pb_dist1, aes(x = k, y = prob)) + geom_bar(stat = "identity") + geom_vline(xintercept = expected_k1, colour = "green")
+expected_k1
+```
+
+The Poisson Binomial distribution mass function is now given by (for the sample of 300):
+```{r}
+pb_dist2 <- fft(x2)
+pb_dist2 <- tibble::tibble(prob = Re(pb_dist2)) %>% tibble::rowid_to_column("k") %>% mutate(k = k-1)
+expected_k2 <- pb_dist2 %>% dplyr::mutate(prod = prob*k) %>%
+  summarise(expectation = sum(prod)) %>% pull(expectation)
+ggplot(data = pb_dist2, aes(x = k, y = prob)) + geom_bar(stat = "identity") + geom_vline(xintercept = expected_k2, colour = "green")
+expected_k2
+```
+
+
+Next step is to write a function to run this on patients actually in hospital/ward at a specified time t.
+
+```{r}
+
+```
 
