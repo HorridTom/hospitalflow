@@ -140,7 +140,10 @@ get_import_col_types_inpatient <- function(config_path) {
     "main_specialty",
     "discharge_method",
     "discharge_destination",
-    "admission_method"
+    "admission_method",
+    "source_of_admission",
+    "patient_classification",
+    "hospital_site"
     #"start_datetime",
     #"end_datetime"
   ))
@@ -174,9 +177,17 @@ get_import_col_types_inpatient <- function(config_path) {
   admission_method_levels <- readRDS(file.path(config_path, "admission_method_levels.rds"))
   provided_admission_method_levels <- admission_method_levels %>% dplyr::pull(provided)
 
+  source_of_admission_levels <- readRDS(file.path(config_path, "source_of_admission.rds"))
+  provided_source__of_admission_levels <- source_of_admission_levels %>% dplyr::pull(provided)
+
+  patient_classification_levels <- readRDS(file.path(config_path, "patient_classification.rds"))
+  provided_patient_classification_levels <- patient_classification_levels %>% dplyr::pull(provided)
+
+  hospital_site_levels <- readRDS(file.path(config_path, "hospital_site.rds"))
+  provided_hospital_site_levels <- hospital_site_levels %>% dplyr::pull(provided)
+
   # Set up datetime formats
   #datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
-
   # extract the format of the provided start_datetime data
   # from the config files
   # start_datetime_provided_colname <- column_mapping %>%
@@ -208,8 +219,11 @@ get_import_col_types_inpatient <- function(config_path) {
     readr::col_factor(levels = !!eval(rlang::expr(provided_main_specialty_levels))), # main_specialty
     readr::col_factor(levels = !!eval(rlang::expr(provided_discharge_method_levels))), # discharge_method
     readr::col_factor(levels = !!eval(rlang::expr(provided_discharge_destination_levels))), # discharge_destination
-    readr::col_factor(levels = !!eval(rlang::expr(provided_admission_method_levels))) # admission_method
-    # readr::col_datetime(format = !!eval(rlang::expr(start_datetime_provided_format))), #start_datetime
+    readr::col_factor(levels = !!eval(rlang::expr(provided_admission_method_levels))), # admission_method
+    readr::col_factor(levels = !!eval(rlang::expr(provided_source__of_admission_levels))), # source_of_admission
+    readr::col_factor(levels = !!eval(rlang::expr(provided_patient_classification_levels))), # patient_classification
+    readr::col_factor(levels = !!eval(rlang::expr(provided_hospital_site_levels))) #hospital_site_levels
+    #readr::col_datetime(format = !!eval(rlang::expr(start_datetime_provided_format))), #start_datetime
     #readr::col_datetime(format = !!eval(rlang::expr(end_datetime_provided_format)))#end_datetime
   )
 
