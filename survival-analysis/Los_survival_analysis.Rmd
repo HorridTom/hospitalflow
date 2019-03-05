@@ -64,7 +64,7 @@ condSurvs <- lapply(seq(24L, 24L*7L, by = 24L), cond_surv_from_km, KM0t)
 
 condSurv <- dplyr::bind_rows(condSurvs)
 
-ggplot(condSurv, aes(t1, condSurvival)) + geom_line(aes(group = factor(t0))) + ggtitle(paste("Probability of remaining in hospital after time t1, given in hospital after time t0 = ", t0)) +
+ggplot(condSurv, aes(t1, condSurvival)) + geom_line(aes(group = factor(t0))) + ggtitle("Probability of remaining in hospital after time t1, given in hospital after time t0 = ") +
   xlab("Time from arrival (t)") + ylab("Probability still in hospital at t1") +
   scale_x_continuous(breaks = seq(0, 30L*24L, by = 24L), limits = c(0, 30L*24L)) +
   geom_vline(xintercept = obsLen, colour = "blue") +
