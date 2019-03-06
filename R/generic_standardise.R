@@ -40,6 +40,7 @@ get_import_col_types <- function(config_path) {
     "referral_source",
     "start_datetime",
     "end_datetime"
+
   ))
 
   # Read in the mapping from provided column names to standard column names...
@@ -143,9 +144,19 @@ get_import_col_types_inpatient <- function(config_path) {
     "admission_method",
     "source_of_admission",
     "patient_classification",
-    "hospital_site"
+    "hospital_site",
     #"start_datetime",
-    #"end_datetime"
+    "end_datetime",
+    "spell_number",
+    "hrg",
+    "consultant",
+    "local_subspecialty",
+    "ward_stay_number",
+    "episode_number",
+    "provider",
+    "diagnosis_code",
+    "diagnosis"
+
   ))
 
   # Read in the mapping from provided column names to standard column names...
@@ -159,7 +170,7 @@ get_import_col_types_inpatient <- function(config_path) {
   gender_levels <- readRDS(file.path(config_path, "gender_levels.rds"))
   provided_gender_levels <- gender_levels %>% dplyr::pull(provided)
 
-  age_band_start_levels <- readRDS(file.path(config_path, "age_band_levels.rds"))
+  age_band_start_levels <- readRDS(file.path(config_path, "age_band_start_levels.rds"))
   provided_age_band_start_levels <- age_band_start_levels %>% dplyr::pull(provided)
 
   ethnic_category_levels <- readRDS(file.path(config_path, "ethnic_category_levels.rds"))
@@ -177,17 +188,18 @@ get_import_col_types_inpatient <- function(config_path) {
   admission_method_levels <- readRDS(file.path(config_path, "admission_method_levels.rds"))
   provided_admission_method_levels <- admission_method_levels %>% dplyr::pull(provided)
 
-  source_of_admission_levels <- readRDS(file.path(config_path, "source_of_admission.rds"))
+  source_of_admission_levels <- readRDS(file.path(config_path, "source_of_admission_levels.rds"))
   provided_source__of_admission_levels <- source_of_admission_levels %>% dplyr::pull(provided)
 
-  patient_classification_levels <- readRDS(file.path(config_path, "patient_classification.rds"))
+  patient_classification_levels <- readRDS(file.path(config_path, "patient_classification_levels.rds"))
   provided_patient_classification_levels <- patient_classification_levels %>% dplyr::pull(provided)
 
-  hospital_site_levels <- readRDS(file.path(config_path, "hospital_site.rds"))
+  hospital_site_levels <- readRDS(file.path(config_path, "hospital_site_levels.rds"))
   provided_hospital_site_levels <- hospital_site_levels %>% dplyr::pull(provided)
 
   # Set up datetime formats
-  #datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
+  datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
+
   # extract the format of the provided start_datetime data
   # from the config files
   # start_datetime_provided_colname <- column_mapping %>%
@@ -197,16 +209,15 @@ get_import_col_types_inpatient <- function(config_path) {
   #   dplyr::filter(column_name == start_datetime_provided_colname) %>%
   #   dplyr::pull(datetime_format)
 
-  # extract the format of the provided end_datetime data
-  # from the config files
-  # end_datetime_provided_colname <- column_mapping %>%
-  #   dplyr::filter(standard == "end_datetime") %>%
-  #   dplyr::pull(provided)
-  #
-  # end_datetime_provided_format <- datetime_formats %>%
-  #   dplyr::filter(column_name == end_datetime_provided_colname) %>%
-  #   dplyr::pull(datetime_format)
+  #extract the format of the provided end_datetime data
+  #from the config files
+  end_datetime_provided_colname <- column_mapping %>%
+    dplyr::filter(standard == "end_datetime") %>%
+    dplyr::pull(provided)
 
+  end_datetime_provided_format <- datetime_formats %>%
+    dplyr::filter(column_name == end_datetime_provided_colname) %>%
+    dplyr::pull(datetime_format)
 
   # Set up the column types, in the standard order as per above
   # NOTE: the order of column types here must be precisely
@@ -222,9 +233,18 @@ get_import_col_types_inpatient <- function(config_path) {
     readr::col_factor(levels = !!eval(rlang::expr(provided_admission_method_levels))), # admission_method
     readr::col_factor(levels = !!eval(rlang::expr(provided_source__of_admission_levels))), # source_of_admission
     readr::col_factor(levels = !!eval(rlang::expr(provided_patient_classification_levels))), # patient_classification
-    readr::col_factor(levels = !!eval(rlang::expr(provided_hospital_site_levels))) #hospital_site_levels
+    readr::col_factor(levels = !!eval(rlang::expr(provided_hospital_site_levels))), #hospital_site_levels
     #readr::col_datetime(format = !!eval(rlang::expr(start_datetime_provided_format))), #start_datetime
-    #readr::col_datetime(format = !!eval(rlang::expr(end_datetime_provided_format)))#end_datetime
+    readr::col_datetime(format = !!eval(rlang::expr(end_datetime_provided_format))),
+    readr::col_character(), #spell_number
+    readr::col_character(), # hrg
+    readr::col_character(), #consultant
+    readr::col_character(), #local_sub_specialty
+    readr::col_integer(), # ward_stay_number
+    readr::col_integer(), #episode_number
+    readr::col_character(), #provider
+    readr::col_character(), #diagnosis_code
+    readr::col_character() # diagnosis
   )
 
   # Label the types with the respective column names and return this as a named
@@ -338,7 +358,7 @@ import_and_standardise_inpatient <- function(data_import_list) {
 
 #example_data_import_list <- list(list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_ED.csv",
                                      #config_path = "lgt-config/"),
-                                 #list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_ED.csv",m                                     #config_path = "lgt-config/"))
+                                 #list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_ED.csv",m                                    #config_path = "lgt-config/"))
 
 #cw_data_import_list <- list(list(data_path = "../cw-data/cw_ae_anonim.csv", config_path = "../cw_config_files/ed/"))
 
