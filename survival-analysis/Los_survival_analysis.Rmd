@@ -3,6 +3,8 @@ title: "Length of Stay Survival Analysis"
 output: html_notebook
 ---
 
+# Estimating the Survival Function for Discharge
+
 Based on [this](http://dwoll.de/rexrepos/posts/survivalKM.html) article.
 
 ```{r}
@@ -81,6 +83,8 @@ ggplot(condSurv, aes(t1, condSurvival)) + geom_line(aes(group = factor(t0))) + g
 Next we should estimate the variability of this for typical medical population e.g. 180 medical pts.
 H: with full info can predict e.g. 3day horizon given 2day; but not for e.g. 100days.
 
+# Estimating distribution of residual occupancy
+
 So lets say we have 30 (or 300) patients who have been in hospital already for (random exponentially distributed) times (in hours):
 ```{r}
 times_in_hospital_1 <- floor(rexp(30, 1/51.6))
@@ -126,6 +130,85 @@ expected_k2
 Next step is to write a function to run this on patients actually in hospital/ward at a specified time t.
 
 ```{r}
-
+T1 <- strptime("2018-06-08 12:43:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
+ipss1 <- hospitalflow::get_inpatient_snapshot(df = surv_data, t = T1) %>% filter(!is.na(stay_duration))
+# Hack - TODO: should write get_discharge_probability to take a vector time_in as input.
+h_gdp <- Vectorize(hospitalflow::get_discharge_probability, vectorize.args = "time_in")
+ipss1 <- ipss1 %>% mutate(prob_here_48h = h_gdp(stay_duration, KM0t, 48))
+x_vect1 <- (1/(nrow(ipss1)+1)) * hospitalflow::get_poisson_binomial_characteristic_values(ipss1 %>% pull(prob_here_48h))
+pb_dist_T1 <- fft(x_vect1)
+pb_dist_T1 <- tibble::tibble(prob = Re(pb_dist_T1)) %>% tibble::rowid_to_column("k") %>% mutate(k = k-1)
+expected_k_T1 <- pb_dist_T1 %>% dplyr::mutate(prod = prob*k) %>%
+  summarise(expectation = sum(prod)) %>% pull(expectation)
+ggplot(data = pb_dist_T1, aes(x = k, y = prob)) + geom_bar(stat = "identity") + geom_vline(xintercept = expected_k_T1, colour = "green")
+expected_k_T1
 ```
 
+Now let's see how accurate that prediction is
+
+```{r}
+ipss1_48h <- hospitalflow::get_inpatient_snapshot(df = surv_data, t = T1 + 48*60*60) %>% mutate(residual = SPELLNUMBER %in% ipss1$SPELLNUMBER)
+residual_T1 <- ipss1_48h %>% filter(residual == TRUE) %>% nrow()
+paste("Predicted residual occupancy: ", expected_k_T1, ". Actual residual occupancy: ", residual_T1)
+paste("Error: ", expected_k_T1 - residual_T1, ". Relative error: ", (expected_k_T1 - residual_T1)/residual_T1)
+```
+
+Note this is still using the full survival function from the whole data - in reality this could only be calculated from data prior to T1.
+
+For now let's carry on and hack together a means of getting the prediction for a range of times, to get a better feel for the distribution of error.
+
+# Predicting Residual Occupancy
+
+```{r}
+predict_residual_occupancy <- function(df, t, KM, delta_t) {
+  ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
+  # Hack - TODO: should write get_discharge_probability to take a vector time_in as input.
+  h_gdp <- Vectorize(hospitalflow::get_discharge_probability, vectorize.args = "time_in")
+  ipss1 <- ipss1 %>% mutate(prob_here_48h = h_gdp(stay_duration, KM, delta_t))
+  ipss1 %>% pull(prob_here_48h) %>% sum()
+}
+
+get_residual_occupancy <- function(df, t, KM, delta_t) {
+  ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
+  ipss1_48h <- hospitalflow::get_inpatient_snapshot(df = df, t = t + delta_t*60*60) %>% mutate(residual = SPELLNUMBER %in% ipss1$SPELLNUMBER)
+  ipss1_48h %>% filter(residual == TRUE) %>% nrow()
+}
+
+predict_residual_occupancy(df = surv_data, t = T1, KM = KM0t, delta_t = 48)
+get_residual_occupancy(df = surv_data, t = T1, KM = KM0t, delta_t = 48)
+
+pred_res_occ_v <- Vectorize(predict_residual_occupancy, vectorize.args = "t")
+get_res_occ_v <- Vectorize(get_residual_occupancy, vectorize.args = "t")
+
+dates <- seq(lubridate::ymd_hm('2018-05-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2018-07-31 12:00', tz = "Europe/London"), by = '1 day')
+predictions <- tibble::tibble(dates = dates)
+
+predictions <- predictions %>% dplyr::mutate(predicted = pred_res_occ_v(df = surv_data, dates, KM = KM0t, delta_t = 48)) %>%
+  dplyr::mutate(actual = get_res_occ_v(df = surv_data, dates, KM = KM0t, delta_t = 48)) %>%
+  dplyr::mutate(error = predicted - actual, rel_error = error/actual)
+
+predictions <- predictions %>% dplyr::mutate(abs_error = abs(error), abs_rel_error = abs(rel_error))
+mean(predictions$abs_error)
+mean(predictions$abs_rel_error)
+```
+
+```{r}
+prediction_comparison <- predictions %>% select(dates, predicted, actual) %>% gather(key = "type", value = "residual_occ", predicted, actual)
+ggplot2::ggplot(data = prediction_comparison, mapping = aes(dates, residual_occ)) + ggplot2::geom_point(aes(group = type, colour = type)) + geom_line(aes(group = type, colour = type)) + ggtitle("48h residual occupancy: predictions versus actual, Chelsea and Westminster Hospital") +
+  xlab("Date of prediction") + ylab("Residual occupancy")
+```
+
+```{r}
+ggplot2::ggplot(data = predictions, mapping = aes(dates, error)) + ggplot2::geom_point() + geom_line() + ggtitle("48h residual occupancy: errors in predictions versus actual, Chelsea and Westminster Hospital") +
+  xlab("Date of prediction") + ylab("Error")
+```
+
+```{r}
+ggplot2::ggplot(data = predictions, mapping = aes(dates, rel_error)) + ggplot2::geom_point() + geom_line() + ggtitle("48h residual occupancy: relative errors in predictions versus actual, Chelsea and Westminster Hospital") +
+  xlab("Date of prediction") + ylab("Relative Error")
+```
+
+
+The errors clearly show (as expected) the effect of weekends on this model - this naive model does not take into account any weekend effect. 
+
+Next steps will be to generalise the model to include this weekly effect.

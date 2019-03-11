@@ -51,3 +51,18 @@ get_discharge_probability <- function(time_in, KM, delta_t) {
   p <- St1/St0
   p
 }
+
+
+#' get_inpatient_snapshot
+#'
+#' @param df spell data including start_datetime and end_datetime
+#' @param t time to take snapshot
+#'
+#' @return df restricted to all spells in hospital at time t
+#' @export
+#'
+#' @examples
+get_inpatient_snapshot <- function(df, t) {
+  df %>% filter(start_datetime <= t, end_datetime > t) %>%
+    mutate(stay_duration = difftime(t, start_datetime, units = "hours"))
+}
