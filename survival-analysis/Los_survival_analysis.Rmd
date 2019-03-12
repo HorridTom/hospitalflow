@@ -212,3 +212,10 @@ ggplot2::ggplot(data = predictions, mapping = aes(dates, rel_error)) + ggplot2::
 The errors clearly show (as expected) the effect of weekends on this model - this naive model does not take into account any weekend effect. 
 
 Next steps will be to generalise the model to include this weekly effect.
+
+Medical patients only
+~0% non-emergency medical
+
+AAU - more consistency 7 day
+Downstream - much less so - could assume no weekend discharges?
+
