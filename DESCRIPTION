@@ -21,5 +21,6 @@ Imports:
     lazyeval,
     qicharts2,
     readr,
-    rlang
+    rlang,
+    purrr
 VignetteBuilder: knitr

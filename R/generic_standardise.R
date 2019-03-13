@@ -35,9 +35,9 @@ get_import_col_types <- function(config_path) {
   config_file_list <- Sys.glob(paste0(config_path, "*.rds"))
 
   # add column for file names of factor level config files in the config path
-  column_mapping <- column_mapping %>% mutate(config_file_name = paste0(config_path, standard, "_levels.rds"),
-                            factor_config_file = if_else(config_file_name %in% config_file_list, config_file_name, NA_character_)) %>%
-    select(-config_file_name)
+  column_mapping <- column_mapping %>% dplyr::mutate(config_file_name = paste0(config_path, standard, "_levels.rds"),
+                            factor_config_file = dplyr::if_else(config_file_name %in% config_file_list, config_file_name, NA_character_)) %>%
+    dplyr::select(-config_file_name)
 
   get_provided_levels <- function(fn) {
     if(is.na(fn)) {
@@ -49,11 +49,11 @@ get_import_col_types <- function(config_path) {
 
   gplv <- Vectorize(get_provided_levels)
 
-  column_mapping <- column_mapping %>% mutate(provided_levels = gplv(factor_config_file))
+  column_mapping <- column_mapping %>% dplyr::mutate(provided_levels = gplv(factor_config_file))
 
   # Set up datetime formats
   datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
-  column_mapping <- column_mapping %>% left_join(datetime_formats, by = c("provided" = "column_name"))
+  column_mapping <- column_mapping %>% dplyr::left_join(datetime_formats, by = c("provided" = "column_name"))
 
   # Convert the vectors of provided factor levels to readr::col_factor expressions
   make_factor_import_spec <- function(...) {
@@ -94,8 +94,8 @@ get_import_col_types <- function(config_path) {
 
   # Label the types with the respective column names and return this as a named
   # vector
-  colImportTypes <- column_mapping %>% pull(importType)
-  colImportNames <- column_mapping %>% pull(provided)
+  colImportTypes <- column_mapping %>% dplyr::pull(importType)
+  colImportNames <- column_mapping %>% dplyr::pull(provided)
   colImportTypes <- rlang::set_names(colImportTypes, colImportNames)
   colImportTypes
 }
