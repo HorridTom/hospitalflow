@@ -248,9 +248,10 @@ import_and_standardise <- function(data_import_list) {
 #                                       config_path = "lgt-config/ed/"),
 #                                  list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_ED.csv",config_path = "lgt-config/ed/"))
 #
-# cw_data_import_list <- list(list(data_path = "../cw-data/cw_ae_anonim.csv", config_path = "../cw_config_files/ed/"))
+# cw_data_import_list <- list(list(data_path = "../cw-data/cw_ae_anonim.csv", config_path = "cw-config/ed/"),
+# list(data_path = "../cw-data/cw_ip_anonim.csv", config_path = "cw-config/inpatient/"))
 #
-# cw_data_import_list_inpatient <- list(list(data_path = "../cw-data/cw_ip_anonim.csv", config_path = "../cw_config_files/inpatient/"))
+
 #
 # lgt_inpatient_data_import_list <- list(list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_IP.csv",
 #                                             config_path = "lgt-config/inpatient/"),
