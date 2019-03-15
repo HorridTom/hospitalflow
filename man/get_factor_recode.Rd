@@ -10,8 +10,11 @@ get_factor_recode(config_path)
 \item{config_path}{path to the directory containing the config files for this dataset}
 }
 \value{
-copy of imported_data with factor variables recoded to standard levels as
-per the config files
+a named vector of expressions. There is one element (expression) per factor specified in the config files.
+The expressions are calls to readr::fct_recode corresponding to the level recode mapping for specified in the
+config files. Their names are the standard column names of the factor.
+Thus when unquote-spliced into mutate, the returned vector generates a valid set of named arguments
+for a mutate call that will recode the factor variables in the way specified.
 }
 \description{
 get_factor_recode

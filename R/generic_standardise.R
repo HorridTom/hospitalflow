@@ -3,12 +3,18 @@
 #'
 #' @param config_path path to the directory containing the config files for this dataset
 #'
-#' @return copy of imported_data with factor variables recoded to standard levels as
-#' per the config files
+#' @return a named vector of expressions. There is one element (expression) per factor specified in the config files.
+#' The expressions are calls to readr::fct_recode corresponding to the level recode mapping for specified in the
+#' config files. Their names are the standard column names of the factor.
+#' Thus when unquote-spliced into mutate, the returned vector generates a valid set of named arguments
+#' for a mutate call that will recode the factor variables in the way specified.
 #' @export
 #'
 #' @examples
 get_factor_recode <- function(config_path) {
+
+  # This function builds up the required components of the returned vector gradually by adding
+  # columns to the column_mapping tibble specified in the config files.
 
   # Read in the mapping from provided column names to standard column names...
   column_mapping <- readRDS(file.path(config_path, "column_mapping.rds"))
@@ -21,6 +27,7 @@ get_factor_recode <- function(config_path) {
                                                      factor_config_file = dplyr::if_else(config_file_name %in% config_file_list, config_file_name, NA_character_)) %>%
     dplyr::select(-config_file_name)
 
+  # add column for the level recode mapping specified in the config files
   get_level_mapping <- function(fn) {
     if(is.na(fn)) {
       return(NA)
@@ -33,7 +40,7 @@ get_factor_recode <- function(config_path) {
 
   column_mapping <- column_mapping %>% dplyr::mutate(level_mapping = get_level_mapping_v(factor_config_file))
 
-  #iterate over factor columns, applying factor recode specified by the level_mapping column
+  # add a column containing a named vector that can be used to generate the arguments to fct_recode
   make_recode_vector <- function(level_mapping) {
     if(all(is.na(level_mapping))) {
       return(NA)
@@ -48,6 +55,9 @@ get_factor_recode <- function(config_path) {
 
   column_mapping <- column_mapping %>% dplyr::mutate(recode_vector = make_recode_vector_v(level_mapping))
 
+  # add a column of expressions that call fct_recode with the specified arguments.
+  # Modify this expression so that new (standard) levels that are missing (NA) get
+  # named "NULL". See documentation of readr::fct_recode.
   fix_factor_recode_nas <- function(recode_call) {
     call_arg_names <- names(recode_call)[3:length(recode_call)]
     call_arg_names[which(call_arg_names == "")] <- "NULL"
@@ -69,6 +79,8 @@ get_factor_recode <- function(config_path) {
 
   column_mapping <- column_mapping %>% dplyr::mutate(factor_recode_expr = purrr::pmap(., function(...) make_factor_recode_expr(...)))
 
+  # convert the column of fct_recode call expressions into a named vector
+  # ready to be unquote-spliced into mutate in import_and_standardise
   column_mapping <- column_mapping %>% dplyr::filter(!is.na(factor_recode_expr))
 
   rlang::set_names(column_mapping %>% dplyr::pull(factor_recode_expr), column_mapping %>% dplyr::pull(standard))
@@ -88,6 +100,9 @@ get_factor_recode <- function(config_path) {
 #' @examples
 get_import_col_types <- function(config_path) {
 
+  # This function builds up the required components of the returned vector gradually by adding
+  # columns to the column_mapping tibble specified in the config files.
+
   # Read in the mapping from provided column names to standard column names...
   column_mapping <- readRDS(file.path(config_path, "column_mapping.rds"))
 
@@ -98,6 +113,8 @@ get_import_col_types <- function(config_path) {
   column_mapping <- column_mapping %>% dplyr::mutate(config_file_name = paste0(config_path, standard, "_levels.rds"),
                             factor_config_file = dplyr::if_else(config_file_name %in% config_file_list, config_file_name, NA_character_)) %>%
     dplyr::select(-config_file_name)
+
+  # add a column containing vectors of provided levels for each factor.
 
   get_provided_levels <- function(fn) {
     if(is.na(fn)) {
