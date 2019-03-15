@@ -25,7 +25,7 @@ get_factor_recode <- function(config_path) {
     if(is.na(fn)) {
       return(NA)
     } else {
-      readRDS(fn) %>% dplyr::filter(!is.na(standard))
+      readRDS(fn)
     }
   }
 
@@ -48,13 +48,23 @@ get_factor_recode <- function(config_path) {
 
   column_mapping <- column_mapping %>% dplyr::mutate(recode_vector = make_recode_vector_v(level_mapping))
 
+  fix_factor_recode_nas <- function(recode_call) {
+    call_arg_names <- names(recode_call)[3:length(recode_call)]
+    call_arg_names[which(call_arg_names == "")] <- "NULL"
+    new_names <- c(names(recode_call)[1:2],call_arg_names)
+    names(recode_call) <- new_names
+    recode_call
+  }
+
   make_factor_recode_expr <- function(...) {
     standard <- list(...)[["standard"]]
     recode_vector <- list(...)[["recode_vector"]]
 
     if(all(is.na(recode_vector))) return(NA)
 
-    rlang::expr(forcats::fct_recode(!!rlang::sym(standard), !!!recode_vector))
+    call_fct <- rlang::expr(forcats::fct_recode(!!rlang::sym(standard), !!!recode_vector))
+
+    fix_factor_recode_nas(call_fct)
   }
 
   column_mapping <- column_mapping %>% dplyr::mutate(factor_recode_expr = purrr::pmap(., function(...) make_factor_recode_expr(...)))
@@ -93,7 +103,7 @@ get_import_col_types <- function(config_path) {
     if(is.na(fn)) {
       return(NA)
     } else {
-      readRDS(fn) %>% dplyr::filter(!is.na(standard)) %>% dplyr::pull(provided)
+      readRDS(fn) %>% dplyr::pull(provided)
     }
   }
 
