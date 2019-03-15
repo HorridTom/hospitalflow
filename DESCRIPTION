@@ -22,5 +22,7 @@ Imports:
     qicharts2,
     readr,
     rlang,
-    purrr
+    purrr,
+    tidyr,
+    forcats
 VignetteBuilder: knitr

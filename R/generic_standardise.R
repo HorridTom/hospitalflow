@@ -1,17 +1,67 @@
 
-#' recode_factors
+#' get_factor_recode
 #'
-#' @param provided_data a tibble containing the imported dataset included all standard columns parsed
-#' as the correct type
 #' @param config_path path to the directory containing the config files for this dataset
 #'
-#' @return copy of provided_data with factor variables recoded to standard levels as
+#' @return copy of imported_data with factor variables recoded to standard levels as
 #' per the config files
 #' @export
 #'
 #' @examples
-recode_factors <- function(provided_data, config_path) {
-  # TO BE IMPLEMENTED!
+get_factor_recode <- function(config_path) {
+
+  # Read in the mapping from provided column names to standard column names...
+  column_mapping <- readRDS(file.path(config_path, "column_mapping.rds"))
+
+  # get list of config files
+  config_file_list <- Sys.glob(paste0(config_path, "*.rds"))
+
+  # add column for file names of factor level config files in the config path
+  column_mapping <- column_mapping %>% dplyr::mutate(config_file_name = paste0(config_path, standard, "_levels.rds"),
+                                                     factor_config_file = dplyr::if_else(config_file_name %in% config_file_list, config_file_name, NA_character_)) %>%
+    dplyr::select(-config_file_name)
+
+  get_level_mapping <- function(fn) {
+    if(is.na(fn)) {
+      return(NA)
+    } else {
+      readRDS(fn) %>% dplyr::filter(!is.na(standard))
+    }
+  }
+
+  get_level_mapping_v <- Vectorize(get_level_mapping)
+
+  column_mapping <- column_mapping %>% dplyr::mutate(level_mapping = get_level_mapping_v(factor_config_file))
+
+  #iterate over factor columns, applying factor recode specified by the level_mapping column
+  make_recode_vector <- function(level_mapping) {
+    if(all(is.na(level_mapping))) {
+      return(NA)
+    } else {
+      # take the tibble specifying the mapping from provided to standard levels, and
+      # convert it to a named vector ready to be passed into forcats::fct_recode
+      rlang::set_names(level_mapping %>% dplyr::pull(provided), level_mapping %>% dplyr::pull(standard))
+    }
+  }
+
+  make_recode_vector_v <- Vectorize(make_recode_vector)
+
+  column_mapping <- column_mapping %>% dplyr::mutate(recode_vector = make_recode_vector_v(level_mapping))
+
+  make_factor_recode_expr <- function(...) {
+    standard <- list(...)[["standard"]]
+    recode_vector <- list(...)[["recode_vector"]]
+
+    if(all(is.na(recode_vector))) return(NA)
+
+    rlang::expr(forcats::fct_recode(!!rlang::sym(standard), !!!recode_vector))
+  }
+
+  column_mapping <- column_mapping %>% dplyr::mutate(factor_recode_expr = purrr::pmap(., function(...) make_factor_recode_expr(...)))
+
+  column_mapping <- column_mapping %>% dplyr::filter(!is.na(factor_recode_expr))
+
+  rlang::set_names(column_mapping %>% dplyr::pull(factor_recode_expr), column_mapping %>% dplyr::pull(standard))
 
 }
 
@@ -43,7 +93,7 @@ get_import_col_types <- function(config_path) {
     if(is.na(fn)) {
       return(NA)
     } else {
-      readRDS(fn) %>% dplyr::pull(provided)
+      readRDS(fn) %>% dplyr::filter(!is.na(standard)) %>% dplyr::pull(provided)
     }
   }
 
@@ -154,7 +204,13 @@ import_and_standardise <- function(data_import_list) {
                                     config_path = x$config_path)
                                })
 
-  # HERE NEED TO DEAL WITH FORMAT CONVERSIONS: DATETIMES, FACTORS, ETC.
+  # Recode factors
+  data_config_list <- lapply(data_config_list,
+                             function(x) {
+                               list(data = eval(rlang::call2(dplyr::mutate, .data = x$data,
+                                                             !!!get_factor_recode(x$config_path))),
+                               config_path = x$config_path)
+                             })
 
   # Extract the data as a tibble for each imported file, and return as a list of these tibbles.
   lapply(data_config_list, function(x) x$data)
