@@ -21,7 +21,7 @@ make_spell_table <- function(ed_data, inpatient_data) {
     dplyr::group_by(pseudo_id) %>%
     dplyr::mutate(episode_lag = difftime(start_datetime, dplyr::lag(end_datetime), units = "hours")) %>%
     dplyr::mutate(prev_episode_type = dplyr::lag(episode_type)) %>%
-    dplyr::mutate(new_spell = if_else(is.na(prev_episode_type) |
+    dplyr::mutate(new_spell = dplyr::if_else(is.na(prev_episode_type) |
                                         ((prev_episode_type == episode_type) & episode_lag > 1) |
                                         ((prev_episode_type != episode_type) & episode_lag > 4), TRUE, FALSE)) %>%
     dplyr::ungroup() %>%

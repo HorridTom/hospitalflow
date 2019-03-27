@@ -247,7 +247,7 @@ import_and_standardise <- function(data_import_list) {
 # lgt__data_import_list <- list(list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_ED.csv",
 #                                    config_path = "lgt-config/ed/"),
 #                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_ED.csv",config_path = "lgt-config/ed/"),
-#                               ist(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_IP.csv",
+#                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_IP.csv",
 #                                   config_path = "lgt-config/inpatient/"),
 #                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_IP.csv",config_path = "lgt-config/inpatient/"))
 
