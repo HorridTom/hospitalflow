@@ -41,7 +41,7 @@ test_that("Make a spell table function",{
                                    start_datetime,
                                    end_datetime)
 
-  result <- make_spell_table(ed_data, inpatient_data, min_episode_lag = 1, max_episode_lag = 4)
+  result <- make_spell_table(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 4)
 
   result$spell_number <- as.character(result$spell_number)
   result$number_of_episodes <- as.character(result$number_of_episodes)
