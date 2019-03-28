@@ -72,7 +72,7 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2012-01-01",
                   y = "Attendances and Admissions, n", x = "Age Group", caption = "Source: CLAHRC NWL") +
     ggplot2::theme_bw() +
     ggplot2::theme(axis.title.y = ggplot2::element_text(margin = ggplot2::margin(t = 0, r = 21, b = 0, l = 0)),
-                   axis.text.x = element_text(angle = 45, hjust = 1),
+                   axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
                    plot.title = ggplot2::element_text(size = 12, face = "bold"),
                    plot.subtitle = ggplot2::element_text(size = 10),
                    legend.position = "bottom", legend.box = "horizontal") +
