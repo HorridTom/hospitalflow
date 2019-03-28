@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-make_spell_table <- function(ed_data, inpatient_data) {
+make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 6) {
 
   ed_episodes <- ed_data %>% dplyr::select(pseudo_id, start_datetime, end_datetime) %>%
     dplyr::mutate(episode_type = "ED")
@@ -22,8 +22,8 @@ make_spell_table <- function(ed_data, inpatient_data) {
     dplyr::mutate(episode_lag = difftime(start_datetime, dplyr::lag(end_datetime), units = "hours")) %>%
     dplyr::mutate(prev_episode_type = dplyr::lag(episode_type)) %>%
     dplyr::mutate(new_spell = dplyr::if_else(is.na(prev_episode_type) |
-                                        ((prev_episode_type == episode_type) & episode_lag > 1) |
-                                        ((prev_episode_type != episode_type) & episode_lag > 4), TRUE, FALSE)) %>%
+                                        ((prev_episode_type == episode_type) & episode_lag > same_type_episode_lag) |
+                                        ((prev_episode_type != episode_type) & episode_lag > different_type_episode_lag), TRUE, FALSE)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(spell_number = cumsum(new_spell))
 
