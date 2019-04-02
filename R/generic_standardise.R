@@ -240,7 +240,16 @@ import_and_standardise <- function(data_import_list) {
                              })
 
   # Extract the data as a tibble for each imported file, and return as a list of these tibbles.
-  lapply(data_config_list, function(x) x$data)
+  data_list <- lapply(data_config_list, function(x) x$data)
+
+  # Label this list of tibbles with the names of the files they came from
+  data_filenames <- sapply(data_import_list, function(x) {
+    tools::file_path_sans_ext(basename(x[["data_path"]]))
+    })
+  data_list <- setNames(data_list, data_filenames)
+
+  # Return named list of tibbles
+  data_list
 }
 
 
