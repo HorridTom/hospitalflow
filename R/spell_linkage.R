@@ -7,12 +7,14 @@
 #' @export
 #'
 #' @examples
-make_spell_table <- function(ed_data, inpatient_data) {
+make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 6) {
 
-  ed_episodes <- ed_data %>% dplyr::select(pseudo_id, start_datetime, end_datetime) %>%
+  ed_episodes <- ed_data %>%
+    dplyr::select(pseudo_id, start_datetime, end_datetime, gender, age_band_start) %>%
     dplyr::mutate(episode_type = "ED")
 
-  ip_episodes <- inpatient_data %>% dplyr::select(pseudo_id, start_datetime, end_datetime) %>%
+  ip_episodes <- inpatient_data %>%
+    dplyr::select(pseudo_id, start_datetime, end_datetime, gender, age_band_start) %>%
     dplyr::mutate(episode_type = "IP")
 
   all_episodes <- dplyr::bind_rows(ed_episodes, ip_episodes) %>%
@@ -21,15 +23,20 @@ make_spell_table <- function(ed_data, inpatient_data) {
     dplyr::group_by(pseudo_id) %>%
     dplyr::mutate(episode_lag = difftime(start_datetime, dplyr::lag(end_datetime), units = "hours")) %>%
     dplyr::mutate(prev_episode_type = dplyr::lag(episode_type)) %>%
-    dplyr::mutate(new_spell = if_else(is.na(prev_episode_type) |
-                                        ((prev_episode_type == episode_type) & episode_lag > 1) |
-                                        ((prev_episode_type != episode_type) & episode_lag > 4), TRUE, FALSE)) %>%
+    dplyr::mutate(new_spell = dplyr::if_else(is.na(prev_episode_type) |
+                                        ((prev_episode_type == episode_type) & episode_lag > same_type_episode_lag) |
+                                        ((prev_episode_type != episode_type) & episode_lag > different_type_episode_lag), TRUE, FALSE)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(spell_number = cumsum(new_spell))
 
-  spell_table <- all_episodes %>% dplyr::group_by(spell_number) %>%
-    dplyr::summarise(spell_start = min(start_datetime, na.rm = TRUE), spell_end = max(end_datetime, na.rm = TRUE), number_of_episodes = n())
-
+  spell_table <- all_episodes %>%
+    dplyr::group_by(spell_number) %>%
+    dplyr::top_n(n = 1, wt = gender) %>%
+    dplyr::top_n(n = 1, wt = age_band_start) %>%
+    dplyr::mutate(spell_start = min(start_datetime, na.rm = TRUE),
+                     spell_end = max(end_datetime, na.rm = TRUE),
+                     number_of_episodes = n()) %>%
+    dplyr::select(pseudo_id, spell_number, gender, age_band_start, episode_type, spell_start, spell_end, number_of_episodes)
 
 
 }
