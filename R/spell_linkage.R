@@ -27,21 +27,30 @@ make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1,
     dplyr::ungroup() %>%
     dplyr::mutate(spell_number = cumsum(new_spell))
 
+  episode_lists <- all_episodes %>%
+    dplyr::group_by(spell_number) %>%
+    tidyr::nest() %>%
+    dplyr::mutate(constituent_ed_episodes = purrr::map(data,
+                                                       get_episode_id_list,
+                                                       episode_type_to_list = "ED"),
+                  constituent_ip_episodes = purrr::map(data,
+                                                       get_episode_id_list,
+                                                       episode_type_to_list = "IP")) %>%
+    dplyr::select(-data)
+
   spell_table <- all_episodes %>%
     dplyr::group_by(spell_number) %>%
     dplyr::summarise(spell_start = min(start_datetime, na.rm = TRUE),
                      spell_end = max(end_datetime, na.rm = TRUE),
                      number_of_episodes = n()) %>%
-    tidyr::nest() %>%
-    dplyr::mutate(constituent_ed_eps = purrr::map(data, get_episode_id_list)) %>%
-    tidyr::unnest()
+    dplyr::left_join(episode_lists, by = "spell_number")
 
 
 
 }
 
 
-get_episode_id_list <- function(episode_df, episode_type_to_list = "ED") {
+get_episode_id_list <- function(episode_df, episode_type_to_list) {
   ep_id_v <- episode_df %>% dplyr::filter(episode_type == episode_type_to_list) %>% dplyr::pull(episode_id)
   as.list(ep_id_v)
 }
