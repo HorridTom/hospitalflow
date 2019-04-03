@@ -242,6 +242,9 @@ import_and_standardise <- function(data_import_list) {
   # Extract the data as a tibble for each imported file, and return as a list of these tibbles.
   data_list <- lapply(data_config_list, function(x) x$data)
 
+  # Add episode ids to each tibble
+  data_list <- lapply(data_list, make_episode_ids)
+
   # Label this list of tibbles with the names of the files they came from
   data_filenames <- sapply(data_import_list, function(x) {
     tools::file_path_sans_ext(basename(x[["data_path"]]))
@@ -250,6 +253,19 @@ import_and_standardise <- function(data_import_list) {
 
   # Return named list of tibbles
   data_list
+}
+
+
+#' make_episode_ids
+#'
+#' @param episode_data
+#'
+#' @return episode_data with a new index column
+#' @export
+#'
+#' @examples
+make_episode_ids <- function(episode_data) {
+  episode_data %>% dplyr::mutate(episode_id = dplyr::row_number())
 }
 
 
