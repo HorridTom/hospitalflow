@@ -9,10 +9,10 @@
 #' @examples
 make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 6) {
 
-  ed_episodes <- ed_data %>% dplyr::select(pseudo_id, start_datetime, end_datetime, episode_id) %>%
+  ed_episodes <- ed_data %>% dplyr::select(pseudo_id, start_datetime, end_datetime, episode_id, gender) %>%
     dplyr::mutate(episode_type = "ED")
 
-  ip_episodes <- inpatient_data %>% dplyr::select(pseudo_id, start_datetime, end_datetime, episode_id) %>%
+  ip_episodes <- inpatient_data %>% dplyr::select(pseudo_id, start_datetime, end_datetime, episode_id, gender) %>%
     dplyr::mutate(episode_type = "IP")
 
   all_episodes <- dplyr::bind_rows(ed_episodes, ip_episodes) %>%
@@ -36,7 +36,8 @@ make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1,
                   constituent_ip_episodes = purrr::map(data,
                                                        get_episode_id_list,
                                                        episode_type_to_list = "IP")) %>%
-    dplyr::select(-data)
+    dplyr::mutate(gender = purrr::map(data, get_latest_gender)) %>%
+    dplyr::select(-data) %>% tidyr::unnest()
 
   spell_table <- all_episodes %>%
     dplyr::group_by(spell_number) %>%
@@ -52,5 +53,19 @@ make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1,
 
 get_episode_id_list <- function(episode_df, episode_type_to_list) {
   ep_id_v <- episode_df %>% dplyr::filter(episode_type == episode_type_to_list) %>% dplyr::pull(episode_id)
-  as.list(ep_id_v)
+  list(as.list(ep_id_v))
 }
+
+
+get_latest_gender <- function(gender_df) {
+  ordered_gender_records <- gender_df %>% dplyr::filter(!is.na(gender)) %>%
+    dplyr::arrange(dplyr::desc(start_datetime)) %>%
+    dplyr::pull(gender)
+
+  ordered_gender_records[1]
+}
+
+
+
+
+
