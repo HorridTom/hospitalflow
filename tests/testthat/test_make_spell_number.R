@@ -2,16 +2,10 @@ context("Make a spell table function")
 library(tidyverse)
 
 
-test_that("Make a spell table function",{
+test_that("spell_number is correctly generated",{
 
-  correct_answers <- tibble::tibble(
-
-    spell_number = as.character(c("1", "2", "3", "4", "5", "6", "7", "8", "9")),
-    spell_start = as.POSIXct(c("2019-01-02 17:00", "2019-01-03 08:00", "2019-01-03 19:00", "2019-01-01 17:00", "2019-01-02 08:00", "2019-01-03 08:00", "2019-01-04 14:00", "2019-01-05 06:00", "2019-01-04 14:00")),
-    spell_end = as.POSIXct(c("2019-01-02 21:30", "2019-01-03 10:00", "2019-01-03 21:00", "2019-01-02 00:00", "2019-01-02 10:00", "2019-01-03 11:00", "2019-01-05 03:00", "2019-01-05 13:00", "2019-01-04 17:00")),
-    number_of_episodes = as.character(c("2", "1", "1", "1", "1", "1", "2", "1", "1"))
-
-  )
+  correct_answers <- readRDS(file = "testdata/test_make_spell_number.rds") %>%
+    dplyr::select(-typ)
 
 
   pseudo_id <- as.character(c("112", "113", "114", "115"))
@@ -41,10 +35,8 @@ test_that("Make a spell table function",{
                                    start_datetime,
                                    end_datetime)
 
-  result <- make_spell_table(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 4)
-
-  result$spell_number <- as.character(result$spell_number)
-  result$number_of_episodes <- as.character(result$number_of_episodes)
+  result <- make_spell_number(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 6) %>%
+    dplyr::select(pseudo_id, start_datetime, end_datetime, spell_number)
 
   #Test results are correct
   expect_equal(result, correct_answers)

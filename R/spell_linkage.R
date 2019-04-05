@@ -1,18 +1,22 @@
-#' make_spell_table
+#' make_spell_number
 #'
 #' @param ed_data standard ED data
 #' @param inpatient_data standard inpatient data
+#' @param same_type_episode_lag the maximum amount of time two episodes of the same type
+#' can be separated by and still be classified as part of the same spell.
+#' @param different_type_episode_lag the maximum amount of time two episodes of different type
+#' can be separated by and still be classified as part of the same spell.
 #'
 #' @return spell table
 #' @export
 #'
 #' @examples
-make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 6) {
+make_spell_number <- function(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 6) {
 
-  ed_episodes <- ed_data %>% dplyr::select(pseudo_id, start_datetime, end_datetime, episode_id, gender) %>%
+  ed_episodes <- ed_data %>%
     dplyr::mutate(episode_type = "ED")
 
-  ip_episodes <- inpatient_data %>% dplyr::select(pseudo_id, start_datetime, end_datetime, episode_id, gender) %>%
+  ip_episodes <- inpatient_data %>%
     dplyr::mutate(episode_type = "IP")
 
   all_episodes <- dplyr::bind_rows(ed_episodes, ip_episodes) %>%
@@ -27,6 +31,21 @@ make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1,
     dplyr::ungroup() %>%
     dplyr::mutate(spell_number = cumsum(new_spell))
 
+  all_episodes
+
+}
+
+
+#' spell_variables
+#'
+#' @param all_episodes all ED and Inpatient episodes, with spell_number.
+#' This should be the return value of a call to make_spell_number
+#'
+#' @return the spell table
+#' @export
+#'
+#' @examples
+spell_variables <- function(all_episodes) {
   episode_lists <- all_episodes %>%
     dplyr::group_by(spell_number) %>%
     tidyr::nest() %>%
@@ -46,8 +65,7 @@ make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1,
                      number_of_episodes = n()) %>%
     dplyr::left_join(episode_lists, by = "spell_number")
 
-
-
+  spell_table
 }
 
 
