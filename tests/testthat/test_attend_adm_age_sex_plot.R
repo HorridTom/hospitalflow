@@ -50,8 +50,6 @@ test_that("Attendances and Admissions by age-Sex, Jan, 2012 - March, 2015",{
    correct_answers_1 <- correct_answers_1 %>%
      dplyr::mutate(Gender = factor(Gender, levels = c("Female", "Male","Not Specified")))
 
-    str(correct_answers_1)
-
 
     #Run Admission Discharges graph
     result <- ae_attendances_admissions_age_sex(start_date = "2012-01-01 00:00:00", end_date = "2015-01-01 00:00:00", data = test_data_age_sex_att_adm, plot_chart = TRUE, hospital_name = "Chelsea & Westminster")
@@ -72,7 +70,6 @@ test_that("Attendances and Admissions by age-Sex, Jan, 2012 - March, 2015",{
 
     result_data <- result_data %>% dplyr::select(Gender, Age_band, Value, Group)
 
-    str(result_data)
     #Test results are correct
     expect_equal(as.data.frame(result_data), as.data.frame(correct_answers_1), tolerance = 0.1)
 
@@ -150,10 +147,8 @@ test_that("Admission and Attendances by age-Sex, for improvised data",{
   result_data$Age_band <- forcats::fct_relevel(result_data$Age_band)
   result_data <- result_data %>% dplyr::select(Gender, Age_band, Value, Group)
 
-  str(result_data)
   #Test results are correct
   expect_equal(as.data.frame(result_data), as.data.frame(correct_answers_1), tolerance = 0.1)
 
- str(result_data)
 
 })
