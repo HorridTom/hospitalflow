@@ -1,4 +1,4 @@
-#' make_spell_number
+#' make_spell_table
 #'
 #' @param ed_data standard ED data
 #' @param inpatient_data standard inpatient data
@@ -8,6 +8,25 @@
 #' can be separated by and still be classified as part of the same spell.
 #'
 #' @return spell table
+#' @export
+#'
+#' @examples
+make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 6) {
+  all_episodes <- make_spell_number(ed_data, inpatient_data, same_type_episode_lag, different_type_episode_lag)
+  spell_variables(all_episodes)
+}
+
+
+#' make_spell_number
+#'
+#' @param ed_data standard ED data
+#' @param inpatient_data standard inpatient data
+#' @param same_type_episode_lag the maximum amount of time two episodes of the same type
+#' can be separated by and still be classified as part of the same spell.
+#' @param different_type_episode_lag the maximum amount of time two episodes of different type
+#' can be separated by and still be classified as part of the same spell.
+#'
+#' @return table of all episodes with spell_number
 #' @export
 #'
 #' @examples
@@ -56,6 +75,7 @@ spell_variables <- function(all_episodes) {
                                                        get_episode_id_list,
                                                        episode_type_to_list = "IP")) %>%
     dplyr::mutate(gender = purrr::map(data, get_latest_gender)) %>%
+    dplyr::mutate(episode_class_sequence = purrr::map(data, get_episode_class_sequence)) %>%
     dplyr::select(-data) %>% tidyr::unnest()
 
   spell_table <- all_episodes %>%
@@ -63,7 +83,9 @@ spell_variables <- function(all_episodes) {
     dplyr::summarise(spell_start = min(start_datetime, na.rm = TRUE),
                      spell_end = max(end_datetime, na.rm = TRUE),
                      number_of_episodes = n()) %>%
-    dplyr::left_join(episode_lists, by = "spell_number")
+    dplyr::left_join(episode_lists, by = "spell_number") %>%
+    dplyr::mutate(starts_with_ed = stringr::str_detect(episode_class_sequence, pattern = "^E.*$")) %>%
+    dplyr::mutate(admitted = stringr::str_count(episode_class_sequence, pattern = "I") > 0)
 
   spell_table
 }
@@ -83,7 +105,13 @@ get_latest_gender <- function(gender_df) {
   ordered_gender_records[1]
 }
 
+get_episode_class_sequence <- function(episode_df) {
+  class_vector <- episode_df %>% dplyr::select(start_datetime, episode_type) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::mutate(episode_type = stringr::str_sub(episode_type, start = 1, end = 1)) %>%
+    dplyr::pull(episode_type)
 
-
+  paste(class_vector, sep = "", collapse = "")
+}
 
 
