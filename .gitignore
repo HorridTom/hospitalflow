@@ -35,3 +35,6 @@ inst/doc
 
 # Temporarily ignore whole vignette folder as caches contain data
 /vignettes
+
+# html output from survival analysis
+survival-analysis/*.html
