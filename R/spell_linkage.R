@@ -75,6 +75,7 @@ spell_variables <- function(all_episodes) {
                                                        get_episode_id_list,
                                                        episode_type_to_list = "IP")) %>%
     dplyr::mutate(gender = purrr::map(data, get_latest_gender)) %>%
+    dplyr::mutate(age_band_start = purrr::map(data, get_age_band_start)) %>%
     dplyr::mutate(episode_class_sequence = purrr::map(data, get_episode_class_sequence)) %>%
     dplyr::select(-data) %>% tidyr::unnest()
 
@@ -84,8 +85,11 @@ spell_variables <- function(all_episodes) {
                      spell_end = max(end_datetime, na.rm = TRUE),
                      number_of_episodes = n()) %>%
     dplyr::left_join(episode_lists, by = "spell_number") %>%
-    dplyr::mutate(starts_with_ed = stringr::str_detect(episode_class_sequence, pattern = "^E.*$")) %>%
-    dplyr::mutate(admitted = stringr::str_count(episode_class_sequence, pattern = "I") > 0)
+    dplyr::mutate(starts_with_ed = stringr::str_detect(episode_class_sequence, pattern = "^E.*$"),
+                  ed_non_adm = stringr::str_detect(episode_class_sequence, pattern = "^E$"),
+                  ed_comp_non_adm = stringr::str_detect(episode_class_sequence, pattern = "^EE+$"),
+                  ed_admission = stringr::str_detect(episode_class_sequence, pattern = "EI")) %>%
+    dplyr::mutate(direct_admitted = stringr::str_count(episode_class_sequence, pattern = "I") > 0)
 
   spell_table
 }
@@ -103,6 +107,15 @@ get_latest_gender <- function(gender_df) {
     dplyr::pull(gender)
 
   ordered_gender_records[1]
+}
+
+get_age_band_start <- function(age_band_df){
+  ordered_age_band <- age_band_df %>% dplyr::filter(!is.na(age_band_start)) %>%
+    dplyr::group_by(pseudo_id) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::pull(age_band_start)
+
+  ordered_age_band[1]
 }
 
 get_episode_class_sequence <- function(episode_df) {
