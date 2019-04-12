@@ -16,7 +16,7 @@ convert_rds_cols_to_char <- function(path) {
   config_file_list <- Sys.glob(paste0(path, "*.rds"))
   lapply(config_file_list, function(x) {
     config_tibble <- readRDS(x)
-    config_tibble <- config_tibble %>% mutate_all(as.character)
+    config_tibble <- config_tibble %>% dplyr::mutate_all(as.character)
     saveRDS(config_tibble, x)
   })
 }
