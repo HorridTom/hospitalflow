@@ -284,7 +284,9 @@ make_episode_ids <- function(episode_data) {
 #                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_AW.csv",
 #                                    config_path = "lgt-config/aw/"))
 
-# cw_data_import_list <- list(list(data_path = "../cw-data/cw_ip_anonim.csv", config_path = "cw-config/inpatient/"),
-#                             list(data_path = "../cw-data/cw_ucc_anonim.csv", config_path = "cw-config/ucc/"))
+# cw_data_import_list <- list(
+#   list(data_path = "../cw-data/cw_ed_anonim.csv", config_path = "cw-config/inpatient/"),
+#   list(data_path = "../cw-data/cw_ip_anonim.csv", config_path = "cw-config/inpatient/"),
+#   list(data_path = "../cw-data/cw_ucc_anonim.csv", config_path = "cw-config/ucc/"),
+#   list(data_path = "../cw-data/cw_ed_anonim.csv", config_path = "cw-config/ed/"))
 
-# list(data_path = "../cw-data/cw_ed_anonim.csv", config_path = "cw-config/ed/")
