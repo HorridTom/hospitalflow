@@ -76,6 +76,7 @@ spell_variables <- function(all_episodes) {
                                                        episode_type_to_list = "IP")) %>%
     dplyr::mutate(gender = purrr::map(data, get_latest_gender)) %>%
     dplyr::mutate(age_band_start = purrr::map(data, get_age_band_start)) %>%
+    # dplyr::mutate(episode_type = purrr::map(data, get_episode_type)) %>%
     dplyr::mutate(episode_class_sequence = purrr::map(data, get_episode_class_sequence)) %>%
     dplyr::select(-data) %>% tidyr::unnest()
 
@@ -88,10 +89,16 @@ spell_variables <- function(all_episodes) {
     dplyr::mutate(starts_with_ed = stringr::str_detect(episode_class_sequence, pattern = "^E.*$"),
                   ed_non_adm = stringr::str_detect(episode_class_sequence, pattern = "^E$"),
                   ed_comp_non_adm = stringr::str_detect(episode_class_sequence, pattern = "^EE+$"),
-                  ed_admission = stringr::str_detect(episode_class_sequence, pattern = "EI")) %>%
-    dplyr::mutate(direct_admitted = stringr::str_count(episode_class_sequence, pattern = "I") > 0)
+                  ed_admission = stringr::str_detect(episode_class_sequence, pattern = "EI"),
+                  ed_comp_adm = stringr::str_detect(episode_class_sequence, pattern = "^EI+$"),
+                  direct_comp_adm = stringr::str_detect(episode_class_sequence, pattern = "^II+$")) %>%
+    dplyr::mutate(direct_admission = stringr::str_count(episode_class_sequence, pattern = "I") > 0) %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(spell_class_col = spell_class(starts_with_ed, ed_non_adm, ed_comp_non_adm, ed_admission, ed_comp_adm, direct_admission, direct_comp_adm)) %>%
+    dplyr::ungroup()
 
   spell_table
+
 }
 
 
@@ -118,6 +125,14 @@ get_age_band_start <- function(age_band_df){
   ordered_age_band[1]
 }
 
+# get_episode_type <- function(episode_type_df) {
+#   episode_type <- episode_type_df %>%
+#     dplyr::filter(!is.na(episode_type)) %>%
+#     dplyr::pull(episode_type)
+#
+# }
+
+
 get_episode_class_sequence <- function(episode_df) {
   class_vector <- episode_df %>% dplyr::select(start_datetime, episode_type) %>%
     dplyr::arrange(start_datetime) %>%
@@ -128,3 +143,18 @@ get_episode_class_sequence <- function(episode_df) {
 }
 
 
+spell_class <- function(starts_with_ed, ed_non_adm, ed_comp_non_adm, ed_admission, ed_comp_adm, direct_admission, direct_comp_adm) {
+  if(starts_with_ed & ed_non_adm) {
+    "ed_non_admission"
+  } else if (starts_with_ed & ed_comp_non_adm) {
+    "ed_comp_non_admission"
+  } else if (starts_with_ed & ed_admission) {
+    "ed_admission"
+  } else if (starts_with_ed & ed_comp_adm) {
+    "ed_comp_admission"
+  } else if  (direct_admission) {
+    "direct_admission"
+  } else {
+    "direct_comp_admission"
+  }
+}
