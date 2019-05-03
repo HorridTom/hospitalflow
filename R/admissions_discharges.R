@@ -63,7 +63,7 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
   # Place the new list, with dates, into a tibble and format it accordingly.
   # DO the same as with the adm column by finding the weekday, and merged with the admission table
 
-  df_adm_date <- tibble::as_tibble(df_period, name = NULL)
+  df_adm_date <- tibble::as.tibble(df_period)
 
   df_adm_wkday <- df_adm_date  %>%
     dplyr::rename(adm  = "value") %>%
@@ -98,7 +98,7 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
 
 
   #creating a period
-  df_disch_date <- tibble::as_tibble(df_period, name = NULL)
+  df_disch_date <- tibble::as.tibble(df_period)
 
   # creating new variables Weekday, Day in the period generated above
   df_disch_wkday <- df_disch_date  %>%
@@ -148,7 +148,6 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
 
   # Set the title
   title_stub <- ": Admissions and Discharges by days of the week,\n"
-  hospital_name <- "Chelsea & Westminster"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
