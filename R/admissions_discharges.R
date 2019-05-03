@@ -31,24 +31,26 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
                                   end_date = as.Date("2018-12-23",tz = "Europe/London"),
                                   data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
-  #start_date = as.Date("2015-12-10", tz = "Europe/London")
-  #end_date = as.Date("2018-12-23",tz = "Europe/London")
+  # start_date = as.Date("2017-01-01", tz = "Europe/London")
+  # end_date = as.Date("2017-02-01",tz = "Europe/London")
 
   #selecting the variables needed, with new variables created
   admission_discharge <- data  %>%
-    dplyr::select(spell_number, spell_start, spell_end, episode_type) %>%
+    dplyr::select(spell_number, spell_start, spell_end, spell_class_col) %>%
     dplyr::filter(spell_start < end_date, spell_end > start_date) %>%
     dplyr::mutate(adm_period = dplyr::if_else(spell_start >= start_date, TRUE, FALSE),
                   disch_period = dplyr::if_else(spell_end <= end_date, TRUE, FALSE),
                   adm = as.Date(spell_start),
                   disch = as.Date(spell_end)) %>%
-    dplyr::mutate(same_day_non_emerg = dplyr::if_else(episode_type != "ED" & adm == disch, TRUE, FALSE))
+    dplyr::mutate(non_emerg = dplyr::if_else(spell_class_col == "direct_admission" | spell_class_col == "direct_comp_admission", TRUE, FALSE),
+                  same_day_non_emerg = dplyr::if_else(non_emerg == TRUE & adm == disch, TRUE, FALSE),
+                  non_admitted_ed_attend = dplyr::if_else(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission", TRUE, FALSE))
 
 
   # calculating the Admissions by Adm date, Weekday and Day
   dt_adm <- admission_discharge  %>%
-    dplyr::select(spell_number, spell_start, spell_end, episode_type, adm, disch, adm_period, same_day_non_emerg) %>%
-    dplyr::filter(same_day_non_emerg == FALSE & adm_period == TRUE) %>%
+    dplyr::select(spell_number, spell_start, spell_end,  adm, disch, adm_period, same_day_non_emerg, non_admitted_ed_attend) %>%
+    dplyr::filter(same_day_non_emerg == FALSE & adm_period == TRUE & non_admitted_ed_attend == FALSE) %>%
     dplyr::mutate(Day = lubridate::day(adm),
                   Weekday = lubridate::wday(adm, label = TRUE)) %>%
     dplyr::group_by(adm, Weekday, Day) %>%
@@ -61,7 +63,7 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
   # Place the new list, with dates, into a tibble and format it accordingly.
   # DO the same as with the adm column by finding the weekday, and merged with the admission table
 
-  df_adm_date <- tibble::as.tibble(df_period)
+  df_adm_date <- tibble::as_tibble(df_period, name = NULL)
 
   df_adm_wkday <- df_adm_date  %>%
     dplyr::rename(adm  = "value") %>%
@@ -86,8 +88,8 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
 
   # Calculating the Discharges by Discharge Date, Weekday, and Day
   dt_disch <- admission_discharge %>%
-    dplyr::select(spell_start, spell_end, episode_type, disch, disch_period, same_day_non_emerg) %>%
-    dplyr::filter(same_day_non_emerg == FALSE & disch_period == TRUE) %>%
+    dplyr::select(spell_start, spell_end, spell_class_col, disch, disch_period, same_day_non_emerg, non_admitted_ed_attend) %>%
+    dplyr::filter(same_day_non_emerg == FALSE & disch_period == TRUE, non_admitted_ed_attend == FALSE) %>%
     dplyr::mutate(Day = lubridate::day(disch),
                   Weekday = lubridate::wday(disch, label = TRUE)) %>%
     dplyr::group_by(disch, Weekday, Day) %>%
@@ -96,7 +98,7 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
 
 
   #creating a period
-  df_disch_date <- tibble::as.tibble(df_period)
+  df_disch_date <- tibble::as_tibble(df_period, name = NULL)
 
   # creating new variables Weekday, Day in the period generated above
   df_disch_wkday <- df_disch_date  %>%
@@ -122,8 +124,8 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
 
   # Process followed for non-emergency admissions as well
   non_emergency_adm <- admission_discharge  %>%
-    dplyr::select(spell_number, adm,  adm_period, episode_type, same_day_non_emerg) %>%
-    dplyr::filter(episode_type != "ED") %>%
+    dplyr::select(spell_number, adm,  adm_period, spell_class_col, same_day_non_emerg, non_emerg, non_admitted_ed_attend) %>%
+    dplyr::filter(non_emerg == TRUE) %>%
     dplyr::filter(same_day_non_emerg == FALSE & adm_period == TRUE) %>%
     dplyr::mutate(Weekday = lubridate::wday(adm, label = TRUE),
                   Day = lubridate::day(adm)) %>%

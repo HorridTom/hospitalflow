@@ -24,9 +24,9 @@ test_that("Admission numbers by day of the Week for improvised data",{
   disch <- c("2018-12-12 09:30:00", "2018-12-10 09:30:00", "2018-12-12 09:30:00", "2018-12-12 09:30:00", "2018-12-13 09:30:00", "2018-12-13 09:30:00","2018-12-14 08:00:00", "2018-12-14 08:00:00", "2018-12-15 08:00:00","2018-12-15 08:00:00", "2018-12-16 09:30:00", "2018-12-16 09:30:00", "2018-12-17 08:00:00", "2018-12-17 08:00:00", "2018-12-17 09:00:00")
 
 
-  episode_type <- c("ED", "Elective","ED", "Elective", "ED",
-                    "Elective", "ED", "Maternity","ED", "Elective",
-                    "ED", "Maternity", "ED", "ED", "Other Babies")
+  spell_class_col <- c("ed_admission", "direct_admission","ed_admission", "direct_admission", "ed_admission",
+                    "direct_comp_admission", "ed_admission", "direct_admission","ed_admission", "direct_admission",
+                    "ed_admission", "direct_comp_admission", "ed_admission", "ed_admission", "direct_admission")
 
 
   spell_start <- as.POSIXct(adm, tz = "Europe/London")
@@ -34,7 +34,7 @@ test_that("Admission numbers by day of the Week for improvised data",{
 
   test_avg_adm_disch <- tibble::tibble(spell_number = 101:115,
                                        spell_start,
-                                       spell_end,  episode_type)
+                                       spell_end,  spell_class_col)
 
   #Run Admission Discharges graph
   result <- admissions_discharges(start_date = as.Date("2018-12-10", tz = "Europe/London"),
