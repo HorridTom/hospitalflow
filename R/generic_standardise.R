@@ -242,6 +242,9 @@ import_and_standardise <- function(data_import_list) {
   # Extract the data as a tibble for each imported file, and return as a list of these tibbles.
   data_list <- lapply(data_config_list, function(x) x$data)
 
+  # Add episode ids to each tibble
+  data_list <- lapply(data_list, make_episode_ids)
+
   # Label this list of tibbles with the names of the files they came from
   data_filenames <- sapply(data_import_list, function(x) {
     tools::file_path_sans_ext(basename(x[["data_path"]]))
@@ -253,14 +256,37 @@ import_and_standardise <- function(data_import_list) {
 }
 
 
+#' make_episode_ids
+#'
+#' @param episode_data
+#'
+#' @return episode_data with a new index column
+#' @export
+#'
+#' @examples
+make_episode_ids <- function(episode_data) {
+  episode_data %>% dplyr::mutate(episode_id = dplyr::row_number())
+}
+
+
 # lgt__data_import_list <- list(list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_ED.csv",
 #                                    config_path = "lgt-config/ed/"),
-#                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_ED.csv",config_path = "lgt-config/ed/"),
+#                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_AW.csv",
+#                                    config_path =  "lgt-config/aw/"),
+#                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_NCF.csv",
+#                                    config_path = "../lgt-config/ncf"),
+#                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_ED.csv",
+#                                    config_path = "lgt-config/ed/"),
 #                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_IP.csv",
 #                                   config_path = "lgt-config/inpatient/"),
-#                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_IP.csv",config_path = "lgt-config/inpatient/"))
+#                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_IP.csv",
+#                                    config_path = "lgt-config/inpatient/"),
+#                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_AW.csv",
+#                                    config_path = "lgt-config/aw/"))
 
-# cw_data_import_list <- list(list(data_path = "../cw-data/cw_ae_anonim.csv", config_path = "cw-config/ed/"),
-# list(data_path = "../cw-data/cw_ip_anonim.csv", config_path = "cw-config/inpatient/"))
-
+# cw_data_import_list <- list(
+#   list(data_path = "../cw-data/cw_ed_anonim.csv", config_path = "cw-config/inpatient/"),
+#   list(data_path = "../cw-data/cw_ip_anonim.csv", config_path = "cw-config/inpatient/"),
+#   list(data_path = "../cw-data/cw_ucc_anonim.csv", config_path = "cw-config/ucc/"),
+#   list(data_path = "../cw-data/cw_ed_anonim.csv", config_path = "cw-config/ed/"))
 
