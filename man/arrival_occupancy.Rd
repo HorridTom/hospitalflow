@@ -4,8 +4,9 @@
 \alias{arrival_occupancy}
 \title{arrival_occupancy}
 \usage{
-arrival_occupancy(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-  end_date = as.Date("2015-01-01", tz = "Europe/London"), data, plot_chart,
+arrival_occupancy(start_date = as.Date("2017-01-01", tz =
+  "Europe/London"), end_date = as.Date("2017-02-01", tz =
+  "Europe/London"), data, plot_chart,
   hospital_name = "Chelsea & Westminster")
 }
 \arguments{
