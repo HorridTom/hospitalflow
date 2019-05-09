@@ -18,25 +18,27 @@
 ####################################################################################################################
 ###3.A&E Arrivals and Occupancy, 3rd of March to 27th of April, 2015 ###############################################
 ####################################################################################################################
-arrival_occupancy <- function(start_date = as.POSIXct("2012-01-01 00:00", tz = "Europe/London"),
-                              end_date = as.POSIXct("2015-01-01 00:00", tz = "Europe/London"),
+arrival_occupancy <- function(start_date = as.Date("2017-01-01", tz = "Europe/London"),
+                              end_date = as.Date("2017-02-01", tz = "Europe/London"),
                               data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
 
-  dt_date <-  data %>%
-      dplyr::filter(Admissions > start_date & Discharges < end_date) %>%
-      dplyr::select(IDcol, Admissions, Discharges)
+
+  dt_date <- data %>%
+    dplyr::select(spell_number, spell_start, spell_end) %>%
+    dplyr::filter(spell_start >= start_date & spell_end <= end_date)
 
   # using gather function to create a new column with date; and filter only by Emergency Department
   arrivals_occupancy_jan_march <-  dt_date %>%
-    tidyr::gather(key = Type, Time, Admissions:Discharges) %>%
-    dplyr::mutate(Change = dplyr::if_else(Type == "Admissions", 1, -1)) %>%
+    tidyr::gather(key = Type, Time, spell_start:spell_end) %>%
+    dplyr::mutate(Change = dplyr::if_else(Type == "spell_start", 1, -1)) %>%
     dplyr::group_by(time_hr = lubridate::floor_date(Time, "1 hour")) %>%
-    dplyr::summarise(Arrivals = sum(Type == "Admissions"),
+    dplyr::summarise(Arrivals = sum(Type == "spell_start"),
               Change = sum(Change)) %>%
     padr::pad(start_val = start_date, end_val = end_date) %>%
     tidyr::replace_na(list(Arrivals = 0, Change = 0)) %>%
-    dplyr::mutate(Occupancy = cumsum(Change))
+    dplyr::mutate(Occupancy = cumsum(Change)) %>%
+    tidyr::drop_na(time_hr)
 
 
   avg_arriv_occup_jan_march <- arrivals_occupancy_jan_march %>%
@@ -44,7 +46,6 @@ arrival_occupancy <- function(start_date = as.POSIXct("2012-01-01 00:00", tz = "
     dplyr::group_by(Hour) %>%
     dplyr::summarize(Average_arrivals = mean(Arrivals),
                      Average_occupancy = mean(Occupancy))
-
 
   # Set the title
   title_stub <- " hospital: Hourly A&E occupancy and arrival profile, "
@@ -80,7 +81,7 @@ arrival_occupancy <- function(start_date = as.POSIXct("2012-01-01 00:00", tz = "
 
   }else{
 
-    plt_occ_percent$data %>% select(Hour, Average_arrivals , Average_occupancy)
+    plt_occ_percent$data %>% dplyr::select(Hour, Average_arrivals , Average_occupancy)
 
   }
 

@@ -14,6 +14,7 @@ test_that("Arrivals_Occupancy_test",{
     Average_occupancy = as.numeric(c(0.5, 0.5, 0.5, 0.5, 0.5, 0.5,  0.5, 0.0, 0.5, 0.5, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,  0.5, 0.5, 0.5,  0.5, 0.5)))
 
 
+  str(correct_answers_arriv_occ)
   #creating a dataset
 
 
@@ -21,25 +22,25 @@ test_that("Arrivals_Occupancy_test",{
 
   dt2 <- c("2018-12-10 12:30:00", "2018-12-11 07:45:00", "2018-12-11 09:05-00")
 
-  Admissions <- as.POSIXct(dt1, tz = "Europe/London")
-  Discharges <- as.POSIXct(dt2,tz = "Europe/London")
+  spell_start <- as.POSIXct(dt1, tz = "Europe/London")
+  spell_end <- as.POSIXct(dt2,tz = "Europe/London")
 
-  test_arrivals_occupancy <- tibble::tibble(IDcol = 101:103,
-                                            Admissions,
-                                            Discharges)
+  test_arrivals_occupancy <- tibble::tibble(spell_number = 101:103,
+                                            spell_start,
+                                            spell_end)
 
 
   #Run Admission Discharges graph
 
   result_arriv_occ_jan_march <- arrival_occupancy(start_date = as.POSIXct("2018-12-10 00:00",tz = "Europe/London"), end_date = as.POSIXct("2018-12-11 23:00",tz = "Europe/London"),
-                                                  data = test_arrivals_occupancy, plot_chart = TRUE, hospital_name = "Chelsea & Westminster")
+                                                  data = test_arrivals_occupancy, plot_chart = FALSE, hospital_name = "Chelsea & Westminster")
 
-  result_ariv_occ_data_jm <- result_arriv_occ_jan_march$data
-  result_ariv_occ_data_jm$Hour <- as.character(result_ariv_occ_data_jm$Hour)
+  #result_ariv_occ_data_jm <- result_arriv_occ_jan_march$data
+  result_arriv_occ_jan_march$Hour <- as.character(result_arriv_occ_jan_march$Hour)
 
 
   #Test results are correct
-  expect_equal(as.data.frame(correct_answers_arriv_occ), as.data.frame(result_ariv_occ_data_jm), tolerance = 0.01)
+  expect_equal(as.data.frame(correct_answers_arriv_occ), as.data.frame(result_arriv_occ_jan_march), tolerance = 0.01)
 
 
 })
