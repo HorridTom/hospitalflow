@@ -42,3 +42,4 @@ rsconnect/
 /tests/testthat/testdata
 # Data-out
 /data-out
+/data
