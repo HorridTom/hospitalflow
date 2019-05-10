@@ -65,6 +65,7 @@ make_spell_number <- function(ed_data, inpatient_data, same_type_episode_lag = 1
 #'
 #' @examples
 spell_variables <- function(all_episodes) {
+
   episode_lists <- all_episodes %>%
     dplyr::group_by(spell_number) %>%
     tidyr::nest() %>%
@@ -78,7 +79,9 @@ spell_variables <- function(all_episodes) {
     dplyr::mutate(age_band_start = purrr::map(data, get_age_band_start)) %>%
     # dplyr::mutate(episode_type = purrr::map(data, get_episode_type)) %>%
     dplyr::mutate(episode_class_sequence = purrr::map(data, get_episode_class_sequence)) %>%
-    dplyr::select(-data) %>% tidyr::unnest()
+    dplyr::mutate(admission_method_type = purrr::map(data, admission_method_class)) %>%
+    dplyr::select(-data) %>%
+    tidyr::unnest()
 
   spell_table <- all_episodes %>%
     dplyr::group_by(spell_number) %>%
@@ -157,4 +160,25 @@ spell_class <- function(starts_with_ed, ed_non_adm, ed_comp_non_adm, ed_admissio
   } else {
     "direct_comp_admission"
   }
+}
+
+admission_method_class <- function(admission_method_df) {
+
+  ordered_admission_method <- admission_method_df %>%
+    dplyr::select(start_datetime, admission_method) %>%
+    dplyr::filter(!is.na(admission_method)) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::mutate(admission_method_type = dplyr::case_when(
+      admission_method == "Waiting list" | admission_method == "Booked" | admission_method == "Planned" ~ "Elective Admissions",
+      admission_method == "Accident and emergency" | admission_method == "General Practitioner" | admission_method == "Bed bureau" ~ "Emergency Admissions",
+      admission_method == "Consultant Clinic" | admission_method == "Mental Health Crisis Resolution Team" | admission_method == "Accident and Emergency Department" ~ "Emergency Admissions",
+      admission_method == "Transfer from another Hospital Provider" | admission_method == "Intended home birth" | admission_method == "Other emergency admission" ~ "Emergency Admissions",
+      admission_method == "Other means" ~ "Emergency Admissions",
+      admission_method == "Admitted ante-partum" | admission_method == "Admitted post-partum"  ~ "Maternity Admissions",
+      admission_method == "Birth-this provider" | admission_method == "Birth-outside provider(not intended home)" | admission_method == "Transfer from other provider(non-emergency)" ~ "Other Admissions")) %>%
+    dplyr::pull(admission_method_type)
+
+  ordered_admission_method[1]
+
+
 }
