@@ -1,5 +1,4 @@
 # Length of stay distribution for elective and emergency patients
-#
 
 #' los_distrib_elect_emerg_discharge
 #'
@@ -13,36 +12,36 @@
 #' @export
 #'
 #' @examples
-los_distrib_elect_emerg_discharge <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-                                                   end_date = as.Date("2015-01-01", tz = "Europe/London"),
-                                                   data, plot_chart, hospital_name = "Chelsea & Westminster"){
+los_distrib_elect_emerg_discharge <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"), end_date = as.Date("2015-01-01", tz = "Europe/London"),
+                                              data, plot_chart, hospital_name = "Chelsea & Westminster"){
+
+
 
 
   #subseting data set#
 
   dt <-  data %>%
-    dplyr::filter(Admissions < end_date  &  Discharges > start_date) %>%
-    dplyr::filter(Episode_number == 1) %>%
+    dplyr::filter(spell_start < end_date  &  spell_end > start_date) %>%
     dplyr::mutate(
-      Admitted_date = as.Date(Admissions),
-      Discharge_date = as.Date(Discharges),
-      Same_day_discharge = dplyr::if_else(Admitted_date == Discharge_date, TRUE, FALSE),
-      Adm_period = dplyr::if_else(Admissions > start_date, TRUE, FALSE)
+      admitted_date = as.Date(spell_start),
+      discharge_date = as.Date(spell_end),
+      same_day_discharge = dplyr::if_else(admitted_date == discharge_date, TRUE, FALSE),
+      adm_period = dplyr::if_else(spell_start > start_date, TRUE, FALSE)
     ) %>%
-    dplyr::select(IDcol, Admissions, Discharges, Admission_type, Ward_code, Episode_number, Admitted_date, Discharge_date, Same_day_discharge, Spell_type, Adm_period)
+    dplyr::select(spell_number, spell_start, spell_end, admission_method_type, admitted_date, discharge_date, same_day_discharge, adm_period)
 
   # calculating total time by using difftime - length of stay
   # getting rid of the same day non-emergency
 
   dt_los <- dt %>%
-    dplyr::filter(Same_day_discharge == FALSE ) %>% #| Spell_type != "Emergency"
-    dplyr::mutate(LOS = as.numeric(difftime(Discharges, Admissions, units = c("days")))) %>% # or minutes?
-    dplyr::select(IDcol, Admissions, Discharges, Admission_type, LOS, Ward_code, Same_day_discharge, Spell_type, Adm_period) %>%
+    dplyr::filter(same_day_discharge == FALSE ) %>% #| Spell_type != "Emergency"
+    dplyr::mutate(lOS = as.numeric(difftime(spell_end, spell_start, units = c("days")))) %>% # or minutes?
+    dplyr::select(spell_number, spell_start, spell_end, admission_method_type, lOS, same_day_discharge, adm_period) %>%
     na.omit()
 
   # Selecting bins from the Los
   ###########################
-  los <-  dt_los$LOS
+  los <-  dt_los$lOS
   ##########################
   # Need to transform los into numeric
   ###########################
@@ -64,7 +63,7 @@ los_distrib_elect_emerg_discharge <- function(start_date = as.Date("2012-01-01",
 
   ###########################
 
-  dt_los$losbinned <- cut(dt_los$LOS,
+  dt_los$losbinned <- cut(dt_los$lOS,
                           breaks = breaks,
                           labels = c("0hrs", "8hrs", "16hrs",
                                      "1 d", "1 d 8hrs", "1 d 16hrs",
@@ -78,9 +77,9 @@ los_distrib_elect_emerg_discharge <- function(start_date = as.Date("2012-01-01",
 
 
   df_wrd_c <- dt_los %>%
-    dplyr::filter(Spell_type == "Emergency" | Spell_type == "Elective") %>%
-    dplyr::filter(Adm_period == TRUE) %>%
-    dplyr::group_by(Spell_type, losbinned) %>%
+    #dplyr::filter(admission_method_type == "Emergency Admissi" | Spell_type == "Elective") %>%
+    dplyr::filter(adm_period == TRUE) %>%
+    dplyr::group_by(admission_method_type, losbinned) %>%
     dplyr::summarise(Count = n()) %>%
     na.omit()
 
