@@ -1,4 +1,4 @@
-# Length of stay distribution for elective and emergency patients
+# Length of stay distribution
 
 #' los_distrib_elect_emerg_discharge
 #'
