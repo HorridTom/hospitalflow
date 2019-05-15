@@ -17,12 +17,12 @@ los_distrib_method_admission <- function(start_date = as.Date("2012-01-01", tz =
                                          data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
 
-  start_date = as.Date("2015-01-01", tz = "Europe/London")
-  end_date = as.Date("2018-01-01", tz = "Europe/London")
+  # start_date = as.Date("2015-01-01", tz = "Europe/London")
+  # end_date = as.Date("2018-01-01", tz = "Europe/London")
 
   #subseting data set#
 
-  dt <-  queh_data %>%
+  dt <-  data %>%
     dplyr::filter(spell_start < end_date  &  spell_end > start_date) %>%
     dplyr::mutate(
       admitted_date = as.Date(spell_start),
