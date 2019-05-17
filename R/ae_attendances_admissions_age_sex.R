@@ -1,4 +1,3 @@
-
 #' ae_attendances_admissions_age_sex
 #'
 #' @param start_date date of earliest discharge to be included in the analysis

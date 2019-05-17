@@ -1,5 +1,5 @@
-# Admission and Discharges Function
-# data isn't  standardised
+#' Admission and Discharges Function
+#' data isn't  standardised
 
 #' admission_discharges
 #'

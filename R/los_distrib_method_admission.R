@@ -1,6 +1,5 @@
-#' Length of stay distribution
-#' los_distrib_elect_emerg_discharge
-#'
+#' Length of stay distribution los_distrib_elect_emerg_discharge
+
 #' @param start_date
 #' @param end_date
 #' @param data
@@ -11,17 +10,16 @@
 #' @export
 #'
 #' @examples
-#'
 los_distrib_method_admission <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"), end_date = as.Date("2015-01-01", tz = "Europe/London"),
-                                         data, plot_chart, hospital_name = "Chelsea & Westminster"){
+                                         data, plot_chart, hospital_name = "Hospital Name"){
 
 
-  # start_date = as.Date("2015-01-01", tz = "Europe/London")
-  # end_date = as.Date("2018-01-01", tz = "Europe/London")
+  # start_date = as.Date("2019-01-01", tz = "Europe/London")
+  # end_date = as.Date("2019-01-07", tz = "Europe/London")
 
   #subseting data set#
 
-  dt <-  data %>%
+  dt <-  test_los_admission %>%
     dplyr::filter(spell_start < end_date  &  spell_end > start_date) %>%
     dplyr::mutate(
       admitted_date = as.Date(spell_start),
@@ -88,19 +86,18 @@ los_distrib_method_admission <- function(start_date = as.Date("2012-01-01", tz =
   title_stub <- " Hospital LoS distribution for admitted patients, "
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
-  hospital_name <- "Queh"
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
 
   # Plotting the lenght of stay by the ward  - check for dual axis graphs
 
   plot_elect_emerg <- ggplot2::ggplot(df_wrd_c, ggplot2::aes(x = losbinned, y = Count, group = admission_method_type,  fill = admission_method_type)) +   #alpha= ward.type - this gives a ligther version of the colours I choose   # changing the size of the bars for each categ change the parameter width, and in between the stacked categories the white colour is passed on the color command, with the width of the line 0.5
-    geom_bar(stat = "identity",width = 0.5,colour= "white", lwd = 0.5 ) +
-    scale_fill_brewer(palette= "Oranges") +
+    ggplot2::geom_bar(stat = "identity",width = 0.5,colour= "white", lwd = 0.5 ) +
+    ggplot2::scale_fill_brewer(palette= "Oranges") +
     # scale_y_continuous(breaks = c(0, 50, 100, 150, 200, 250, 300, 350, 400)) +
     ggplot2::theme_bw() +
     #scale_y_continuous("Cumulative hospital addmissions, %", sec.axis = ) +
     ggplot2::labs(title = chart_title,
-                  subtitle = "Hospital discharges, excl. same-day non-emergency, 1st of March to 31st of March,2015; cummulative hospital LoS in 8 hr bins to 7 d, 7 d bins to28 d, > 28 d \nNote:(i)LoS calculated in days, incl. trolleyed ED LoS and excl transit areas;(ii) results are intended for management information only",
+                  subtitle = "Hospital discharges, excl. same-day non-emergency, 1st of January, 2016 to 1st of Jan,2017; cummulative hospital LoS in 8 hr bins to 7 d, 7 d bins to28 d, > 28 d \nNote:(i)LoS calculated in days, incl. trolleyed ED LoS and excl transit areas;(ii) results are intended for management information only",
                   y = "Hospital admissions*, n", x = "Hospital LoS, d (8 hr bins to 7d, 7d bins to 28d, >28 d) ", caption = "Source: CLAHRC NWL")+
     ggplot2::theme(axis.title.y = ggplot2::element_text(margin = ggplot2::margin(t = 0, r = 21, b = 0, l = 0)),
                    plot.title = ggplot2::element_text(size = 11, face = "bold"), # changing the parameters in this box will give a different size of the title, with bold passed as a parameter
@@ -119,7 +116,7 @@ los_distrib_method_admission <- function(start_date = as.Date("2012-01-01", tz =
 
   }else{
 
-    plot_elect_emerg$data %>% select(Spell_type, losbinned, Count)
+    plot_elect_emerg$data %>% dplyr::select(losbinned,admission_method_type, Count)
 
 
   }
