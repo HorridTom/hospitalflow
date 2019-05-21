@@ -18,37 +18,49 @@
 ####################################################################################################################
 ###3.A&E Arrivals and Occupancy, 3rd of March to 27th of April, 2015 ###############################################
 ####################################################################################################################
-arrival_occupancy <- function(start_date = as.Date("2017-01-01", tz = "Europe/London"),
-                              end_date = as.Date("2017-02-01", tz = "Europe/London"),
-                              data, plot_chart, hospital_name = "Chelsea & Westminster"){
+arrival_occupancy_fct <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
+                                  end_date = as.Date("2015-01-01", tz = "Europe/London"),
+                                  data, plot_chart, hospital_name = "Chelsea & Westminster"){
+
+  # start_date = as.Date("2015-04-01", tz = "Europe/London")
+  # end_date = as.Date("2016-04-01", tz = "Europe/London")
+
+  dt_los <- queh_data %>%
+    dplyr::select(spell_number, spell_start, spell_end, spell_class_col) %>%
+    dplyr::mutate(Same_day_discharge = as.numeric(difftime(spell_end, spell_start, unit = c("min")))) %>%
+    dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission")
 
 
+  dt_calc <- dt_los %>%
+    dplyr::mutate(Same_day_discharge = dplyr::if_else(as.Date(spell_start) == as.Date(spell_end),  TRUE, FALSE),
+                  Los = as.numeric(difftime(spell_end, spell_start, unit = c("hour"))),
+                  Discharged_24hr = if_else(Los < 24, TRUE, FALSE)) %>%
+    dplyr::filter(Discharged_24hr == TRUE & Los <= 24) %>%
+    dplyr::filter(spell_start > start_date & spell_end < end_date)
 
-  dt_date <- data %>%
-    dplyr::select(spell_number, spell_start, spell_end) %>%
-    dplyr::filter(spell_start >= start_date & spell_end <= end_date)
 
   # using gather function to create a new column with date; and filter only by Emergency Department
-  arrivals_occupancy_jan_march <-  dt_date %>%
-    tidyr::gather(key = Type, Time, spell_start:spell_end) %>%
-    dplyr::mutate(Change = dplyr::if_else(Type == "spell_start", 1, -1)) %>%
-    dplyr::group_by(time_hr = lubridate::floor_date(Time, "1 hour")) %>%
-    dplyr::summarise(Arrivals = sum(Type == "spell_start"),
-              Change = sum(Change)) %>%
+  arrivals_occupancy <-  dt_calc %>%
+    tidyr::gather(key = type, time, spell_start:spell_end) %>%
+    dplyr::mutate(change = if_else(type == "spell_start", 1, -1)) %>%
+    dplyr::group_by(time_hr = lubridate::floor_date(time, "1 hour")) %>%
+    dplyr::summarise(arrivals = sum(type == "spell_start"), change = sum(change)) %>%
     padr::pad(start_val = start_date, end_val = end_date) %>%
-    tidyr::replace_na(list(Arrivals = 0, Change = 0)) %>%
-    dplyr::mutate(Occupancy = cumsum(Change)) %>%
-    tidyr::drop_na(time_hr)
+    tidyr::replace_na(list(arrivals = 0, change = 0)) %>%
+    dplyr::mutate(occupancy = cumsum(change)) %>%
+    drop_na()
 
 
-  avg_arriv_occup_jan_march <- arrivals_occupancy_jan_march %>%
+  avg_arriv_occup <- arrivals_occupancy  %>%
     dplyr::mutate(Hour = lubridate::hour(time_hr)) %>%
     dplyr::group_by(Hour) %>%
-    dplyr::summarize(Average_arrivals = mean(Arrivals),
-                     Average_occupancy = mean(Occupancy))
+    summarize(Average_arrivals = mean(arrivals),
+              Average_occupancy = mean(occupancy))
+
 
   # Set the title
   title_stub <- " hospital: Hourly A&E occupancy and arrival profile, "
+  hospital_name <- "Chelsea & Westminster"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
@@ -81,7 +93,7 @@ arrival_occupancy <- function(start_date = as.Date("2017-01-01", tz = "Europe/Lo
 
   }else{
 
-    plt_occ_percent$data %>% dplyr::select(Hour, Average_arrivals , Average_occupancy)
+    plt_occ_percent$data %>% select(Hour, Average_arrivals , Average_occupancy)
 
   }
 
