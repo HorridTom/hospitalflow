@@ -1,5 +1,5 @@
 #' Length of stay distribution los_distrib_elect_emerg_discharge
-
+#'
 #' @param start_date
 #' @param end_date
 #' @param data
@@ -19,7 +19,7 @@ los_distrib_method_admission <- function(start_date = as.Date("2012-01-01", tz =
 
   #subseting data set#
 
-  dt <-  test_los_admission %>%
+  dt <-  data %>%
     dplyr::filter(spell_start < end_date  &  spell_end > start_date) %>%
     dplyr::mutate(
       admitted_date = as.Date(spell_start),
