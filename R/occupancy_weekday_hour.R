@@ -71,7 +71,7 @@ occupancy_weekday_hour <- function(start_date = as.Date("2015-04-01", tz = "Euro
 
 
   Weekdays <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-  tbl_avg_occ_2 <-arrange(transform(tbl_avg_occ, day = factor(Wday, levels = Weekdays)), Wday)
+  tbl_avg_occ_2 <- dplyr::arrange(transform(tbl_avg_occ, day = factor(Wday, levels = Weekdays)), Wday)
 
   # Set the title
   title_stub <- ": Attendances and Admissions by Age and Gender,\n"
