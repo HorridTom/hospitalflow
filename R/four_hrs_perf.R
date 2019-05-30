@@ -12,13 +12,9 @@
 #' @examples
 four_hrs_perf <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
                                end_date = as.Date("2015-01-01", tz = "Europe/London"),
-                               data, plot_chart, hospital_name = "Chelsea & Westminster"){
+                               data, plot_chart, hospital_name = "Hospital_Name"){
 
-  start_date = as.Date("2015-04-01", tz = "Europe/London")
-
-  end_date = as.Date("2015-09-01", tz = "Europe/London")
-
-  dt_select <- queh_ed %>%
+  dt_select <- data %>%
     dplyr::select(pseudo_id, start_datetime, end_datetime) %>%
     dplyr::filter(start_datetime <= end_date & end_datetime >= start_date)
 
@@ -30,7 +26,7 @@ four_hrs_perf <- function(start_date = as.Date("2012-01-01", tz = "Europe/London
 
   dt_los <-  dt_select  %>%
     dplyr::mutate(Los = difftime(end_datetime, start_datetime, units = c("min")),
-                  Hr_perf = case_when(
+                  Hr_perf = dplyr::case_when(
                     Los <= 240 ~ "under_4hrs",
                     Los >= 240 ~ "above_4hrs"),
                   Time = as.Date(start_datetime),
@@ -46,10 +42,11 @@ four_hrs_perf <- function(start_date = as.Date("2012-01-01", tz = "Europe/London
 
   # Set the title
   title_stub <- " Hospital LoS distribution for admitted patients, "
-  #hospital_name <- "Chelsea & Westminster"
+  hospital_name <- "Chelsea & Westminster"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
+
 
   # function to plot the 4 hrs emergency performance
   # Plot all days - see Tom's AE APP
@@ -63,7 +60,7 @@ four_hrs_perf <- function(start_date = as.Date("2012-01-01", tz = "Europe/London
                          #freeze = 1,
                          #part = 11,
                          #multiply= 100,
-                         #x.format = "%d-%m-%Y",
+                         x.format = "%d-%m-%Y",
                          x.angle = 45,
                          xlab = " Compliance with 4hr emergency care standard",
                          title = chart_title)
