@@ -14,13 +14,7 @@ los_att_adm_ae <- function(start_date = as.POSIXct("2012-01-01 00:00", tz = "Eur
                            end_date = as.POSIXct("2013-01-01 00:00", tz = "Europe/London"),
                            data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
-  start_date <- as.Date("2015-01-01", tz = "Europe/London")
-  end_date <- as.Date("2015-04-01", tz = "Europe/London")
-  #I need to exclude the planned reviews and ED ward stays
-  #subseting data set
-
-  # renaming the variables I am interested in
-  df <- queh_data %>%
+  df <- data %>%
     dplyr::select(spell_number, spell_start, spell_end, spell_class_col) %>%
     dplyr::filter(spell_start >= end_date | spell_end <= start_date) %>%
     dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission" | spell_class_col == "ed_admission") %>%
