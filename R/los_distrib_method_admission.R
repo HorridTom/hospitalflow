@@ -14,11 +14,7 @@ los_distrib_method_admission <- function(start_date = as.Date("2012-01-01", tz =
                                          data, plot_chart, hospital_name = "Hospital Name"){
 
 
-  # start_date = as.Date("2019-01-01", tz = "Europe/London")
-  # end_date = as.Date("2019-01-07", tz = "Europe/London")
-
-  #subseting data set#
-
+  #subseting data set
   dt <-  data %>%
     dplyr::filter(spell_start < end_date  &  spell_end > start_date) %>%
     dplyr::mutate(
