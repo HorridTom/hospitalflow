@@ -43,7 +43,7 @@ test_that("Length of stay for admitted patients, for improvised data",{
 
 
   #Run Admission Discharges graph
-  result <- hospitalflow::los_distrib_method_admission(start_date = "2019-01-01 00:00:00", end_date = "2019-01-07 00:00:00", data = test_los_admission, plot_chart = FALSE, hospital_name = "Queh")
+  result <- los_distrib_method_admission(start_date = "2019-01-01 00:00:00", end_date = "2019-01-07 00:00:00", data = test_los_admission, plot_chart = FALSE, hospital_name = "Queh")
 
   result$admission_method_type <- as.character(result$admission_method_type)
   result$Count <- as.integer(result$Count)
