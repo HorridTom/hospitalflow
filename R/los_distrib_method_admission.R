@@ -52,7 +52,7 @@ los_distrib_method_admission <- function(start_date = as.Date("2012-01-01", tz =
               4.80, 4.16, 5.00,
               5.80, 5.16, 6.00,
               6.80, 6.16, 7.00,
-              14.00, 21.00, 28.00, max(los, na.rm = TRUE)) #, , na.rm = FALSE
+              14.00, 21.00, 28.00, max(append(35,los), na.rm = TRUE)) #, , na.rm = FALSE
 
 
 
