@@ -45,7 +45,7 @@ test_that("Length of stay for admitted patients, for improvised data",{
 
 
   #Run Admission Discharges graph
-  result <- hospitalflow::los_distrib_method_admission(start_date = "2019-01-01 00:00:00", end_date = "2019-01-07 00:00:00", data = test_los_admission, plot_chart = FALSE, hospital_name = "Queh")
+  result <- hospitalflow::los_distrib_method_admission(start_date = "2019-01-01 00:00:00", end_date = "2019-01-08 00:00:00", data = test_los_admission, plot_chart = FALSE, hospital_name = "Queh")
 
   # result$admission_method_type <- as.character(result$admission_method_type)
   result$Count <- as.numeric(result$Count)
@@ -54,6 +54,40 @@ test_that("Length of stay for admitted patients, for improvised data",{
 
   #Test results are correct
   expect_equal(result_data, correct_answers, tolerance = 0.1)
+
+
+})
+
+
+test_that("Length of stay for admitted patients, for real data",{
+
+  #Specify correct results
+
+  load("D:/Rprojects/hospitalflow/tests/testthat/testdata/los_distrib_queh_sample_tests/queh_ip_sample.rda")
+
+
+
+  queh_ip_sample$spell_number <- as.character(queh_ip_sample$spell_number)
+
+
+  correct_answers <- readr::read_csv("D:/Rprojects/hospitalflow/tests/testthat/testdata/los_distrib_queh_sample_tests/correct_answers.csv")
+
+  correct_answers <- correct_answers %>%
+    dplyr::select(losbinned, admission_method_type, Count)
+
+
+  #Run Admission Discharges graph - with min and max dates chosen based on spell_Start and spell_end
+  result <- hospitalflow::los_distrib_method_admission(start_date = as.Date("2015-04-01", tz = "Europe/London"), end_date = as.Date("2018-12-30", tz= "Europe/London"),
+                                                       data = queh_ip_sample,
+                                                       plot_chart = FALSE, hospital_name = "Queh")
+
+  # result$admission_method_type <- as.character(result$admission_method_type)
+  result$Count <- as.numeric(result$Count)
+  result$losbinned <- as.character(result$losbinned)
+
+
+  #Test results are correct
+  expect_equal(result, correct_answers, tolerance = 0.1)
 
 
 })

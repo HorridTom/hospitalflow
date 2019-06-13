@@ -29,7 +29,6 @@ los_distrib_method_admission <- function(start_date = as.Date("2012-01-01", tz =
   # getting rid of the same day non-emergency
 
   dt_los <- dt %>%
-    dplyr::filter(same_day_discharge == FALSE) %>%
     dplyr::mutate(length_of_stay = as.numeric(difftime(spell_end, spell_start, units = c("days")))) %>% # or minutes?
     dplyr::select(spell_number, spell_start, spell_end, admission_method_type, length_of_stay, same_day_discharge, adm_period) %>%
     na.omit()
@@ -72,8 +71,7 @@ los_distrib_method_admission <- function(start_date = as.Date("2012-01-01", tz =
 
 
   df_wrd_c <- dt_los %>%
-    #dplyr::filter(admission_method_type == "Elective Admissions" | admission_method_type == "Emergency Admissions") %>%
-    dplyr::filter(adm_period == TRUE) %>%
+    dplyr::filter(adm_period == TRUE & same_day_discharge == FALSE) %>%
     dplyr::group_by(losbinned, admission_method_type) %>%
     dplyr::summarise(Count = n()) %>%
     na.omit()
