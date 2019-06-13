@@ -30,13 +30,13 @@ los_distrib_method_admission <- function(start_date = as.Date("2012-01-01", tz =
 
   dt_los <- dt %>%
     dplyr::filter(same_day_discharge == FALSE) %>%
-    dplyr::mutate(lOS = as.numeric(difftime(spell_end, spell_start, units = c("days")))) %>% # or minutes?
-    dplyr::select(spell_number, spell_start, spell_end, admission_method_type, lOS, same_day_discharge, adm_period) %>%
+    dplyr::mutate(length_of_stay = as.numeric(difftime(spell_end, spell_start, units = c("days")))) %>% # or minutes?
+    dplyr::select(spell_number, spell_start, spell_end, admission_method_type, length_of_stay, same_day_discharge, adm_period) %>%
     na.omit()
 
   # Selecting bins from the Los
   ###########################
-  los <-  dt_los$lOS
+  los <-  dt_los$length_of_stay
   ##########################
   # Need to transform los into numeric
   ###########################
@@ -58,7 +58,7 @@ los_distrib_method_admission <- function(start_date = as.Date("2012-01-01", tz =
 
   ###########################
 
-  dt_los$losbinned <- cut(dt_los$lOS,
+  dt_los$losbinned <- cut(dt_los$length_of_stay,
                           breaks = breaks,
                           labels = c("0hrs", "8hrs", "16hrs",
                                      "1 d", "1 d 8hrs", "1 d 16hrs",
