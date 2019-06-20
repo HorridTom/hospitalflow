@@ -66,3 +66,21 @@ get_inpatient_snapshot <- function(df, t) {
   df %>% filter(start_datetime <= t, end_datetime > t) %>%
     mutate(stay_duration = difftime(t, start_datetime, units = "hours"))
 }
+
+
+#' make_survival_function
+#'
+#' @param KM Kaplan-Meier output of survfit
+#'
+#' @return the Kaplan-Meier estimate as a stepfun
+#' @export
+#'
+#' @examples
+make_survival_function <- function(KM) {
+  KM0t <- tibble::tibble(time = KM$time,
+                 n.risk = KM$n.risk,
+                 n.event = KM$n.event,
+                 n.censor = KM$n.censor,
+                 surv = KM$surv)
+  stepfun(x = KM0t$time, y = c(1, KM0t$surv), right = TRUE)
+}
