@@ -183,9 +183,9 @@ get_res_occ_v <- Vectorize(get_residual_occupancy, vectorize.args = "t")
 dates <- seq(lubridate::ymd_hm('2018-05-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2018-07-31 12:00', tz = "Europe/London"), by = '1 day')
 predictions <- tibble::tibble(dates = dates)
 
-predictions <- predictions %>% dplyr::mutate(predicted = pred_res_occ_v(df = surv_data, dates, KM = KM0t, delta_t = 48)) %>%
+system.time(predictions <- predictions %>% dplyr::mutate(predicted = pred_res_occ_v(df = surv_data, dates, KM = KM0t, delta_t = 48)) %>%
   dplyr::mutate(actual = get_res_occ_v(df = surv_data, dates, KM = KM0t, delta_t = 48)) %>%
-  dplyr::mutate(error = predicted - actual, rel_error = error/actual)
+  dplyr::mutate(error = predicted - actual, rel_error = error/actual))
 
 predictions <- predictions %>% dplyr::mutate(abs_error = abs(error), abs_rel_error = abs(rel_error))
 mean(predictions$abs_error)
@@ -218,4 +218,31 @@ Medical patients only
 
 AAU - more consistency 7 day
 Downstream - much less so - could assume no weekend discharges?
+
+Before tacking this, we need a general framework within which these models can be deployed and evaluated.
+
+This should include:
+1. A structure to better represent (conditional) survival functions
+2. A function or function template for calculating these survival functions from (a specified, and eventually possibly rolling, "training" subset of) the data
+3. A function for applying these survival functions to the data at a given point in time to yield a delta-t horizon prediction for residual occupancy
+4. A function or functions to evaluate these predictions across a "test" range
+
+```{r}
+S_function <- make_survival_function(KM0)
+cond_S_function <- function(t0, t1, S_function) {
+  pmin(S_function(t1)/S_function(t0),1)
+}
+
+ggplot(data.frame(x=c(0,30L*24L)), aes(x)) +
+  stat_function(fun = S_function, geom = "line", aes(colour = "S(x)")) +
+  stat_function(fun = function(x) cond_S_function(1L*24L, x, S_function), geom = "line", aes(colour = "S(x|1d)")) +
+  stat_function(fun = function(x) cond_S_function(2L*24L, x, S_function), geom = "line", aes(colour = "S(x|2d)")) +
+  stat_function(fun = function(x) cond_S_function(4L*24L, x, S_function), geom = "line", aes(colour = "S(x|4d)")) +
+  stat_function(fun = function(x) cond_S_function(7L*24L, x, S_function), geom = "line", aes(colour = "S(x|7d)")) +
+  stat_function(fun = function(x) cond_S_function(14L*24L, x, S_function), geom = "line", aes(colour = "S(x|14d)"))
+
+
+```
+
+
 
