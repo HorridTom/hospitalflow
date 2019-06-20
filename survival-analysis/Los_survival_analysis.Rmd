@@ -18,7 +18,7 @@ library(ggfortify)
 surv_data <- readRDS(file = "../../cw-data/cw_ip_spells.rds")
 surv_data <- surv_data %>% mutate(los = difftime(end_datetime, start_datetime)) %>% filter(!is.na(los))
 units(surv_data$los) <- "hours"
-eventT <- surv_data %>% filter(!is.na(los) & los >= 0) %>% pull(los) 
+eventT <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2018-09-01 00:00')) %>% pull(los) 
 obsLen <- 365*24                  # length of observation time (censoring time = end of study)
 obsT   <- pmin(eventT, obsLen)  # observed censored event times
 status <- eventT <= obsLen     # has event occured?
@@ -153,52 +153,27 @@ For now let's carry on and hack together a means of getting the prediction for a
 # Predicting Residual Occupancy
 
 ```{r}
-predict_residual_occupancy <- function(df, t, S_function, delta_t) {
-  ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
-  ipss1 <- ipss1 %>% mutate(prob_here_after_dt = hospitalflow::get_discharge_probability(stay_duration, S_function, delta_t))
-  ipss1 %>% pull(prob_here_after_dt) %>% sum()
-}
 
-get_residual_occupancy <- function(df, t, delta_t) {
-  ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
-  ipss1_dt <- hospitalflow::get_inpatient_snapshot(df = df, t = t + delta_t*60*60) %>% mutate(residual = SPELLNUMBER %in% ipss1$SPELLNUMBER)
-  ipss1_dt %>% filter(residual == TRUE) %>% nrow()
-}
+hospitalflow::predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
+hospitalflow::get_residual_occupancy(df = surv_data, t = T1, delta_t = 48)
 
-predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
-get_residual_occupancy(df = surv_data, t = T1, delta_t = 48)
+dates <- seq(lubridate::ymd_hm('2018-09-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2018-10-31 12:00', tz = "Europe/London"), by = '1 day')
 
-pred_res_occ_v <- Vectorize(predict_residual_occupancy, vectorize.args = "t")
-get_res_occ_v <- Vectorize(get_residual_occupancy, vectorize.args = "t")
+model_output <- hospitalflow::run_S_func_model(df = surv_data, S_func = S_function, date_seq = dates)
 
-dates <- seq(lubridate::ymd_hm('2018-05-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2018-07-31 12:00', tz = "Europe/London"), by = '1 day')
-predictions <- tibble::tibble(dates = dates)
-
-system.time(predictions <- predictions %>% dplyr::mutate(predicted = pred_res_occ_v(df = surv_data, dates,
-                                                                                    S_function = S_function,
-                                                                                    delta_t = 48)) %>%
-  dplyr::mutate(actual = get_res_occ_v(df = surv_data, dates, delta_t = 48)) %>%
-  dplyr::mutate(error = predicted - actual, rel_error = error/actual))
-
-predictions <- predictions %>% dplyr::mutate(abs_error = abs(error), abs_rel_error = abs(rel_error))
-mean(predictions$abs_error)
-mean(predictions$abs_rel_error)
+summary(model_output$predictions)
 ```
 
 ```{r}
-prediction_comparison <- predictions %>% select(dates, predicted, actual) %>% gather(key = "type", value = "residual_occ", predicted, actual)
-ggplot2::ggplot(data = prediction_comparison, mapping = aes(dates, residual_occ)) + ggplot2::geom_point(aes(group = type, colour = type)) + geom_line(aes(group = type, colour = type)) + ggtitle("48h residual occupancy: predictions versus actual, Chelsea and Westminster Hospital") +
-  xlab("Date of prediction") + ylab("Residual occupancy")
+model_output$diagnostics$comp_plot
 ```
 
 ```{r}
-ggplot2::ggplot(data = predictions, mapping = aes(dates, error)) + ggplot2::geom_point() + geom_line() + ggtitle("48h residual occupancy: errors in predictions versus actual, Chelsea and Westminster Hospital") +
-  xlab("Date of prediction") + ylab("Error")
+model_output$diagnostics$err_plot
 ```
 
 ```{r}
-ggplot2::ggplot(data = predictions, mapping = aes(dates, rel_error)) + ggplot2::geom_point() + geom_line() + ggtitle("48h residual occupancy: relative errors in predictions versus actual, Chelsea and Westminster Hospital") +
-  xlab("Date of prediction") + ylab("Relative Error")
+model_output$diagnostics$rel_err_plot
 ```
 
 

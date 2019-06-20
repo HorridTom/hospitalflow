@@ -41,7 +41,9 @@ get_product_terms <- function(p, l) {
 #'
 #' @examples
 get_discharge_probability <- function(time_in, S_function, delta_t) {
-  S_function(time_in + delta_t)/S_function(time_in)
+  p <- S_function(time_in + delta_t)/S_function(time_in)
+  p[is.nan(p)] <- 1
+  p
 }
 
 
@@ -57,6 +59,40 @@ get_discharge_probability <- function(time_in, S_function, delta_t) {
 get_inpatient_snapshot <- function(df, t) {
   df %>% filter(start_datetime <= t, end_datetime > t) %>%
     mutate(stay_duration = difftime(t, start_datetime, units = "hours"))
+}
+
+
+#' predict_residual_occupancy
+#'
+#' @param df
+#' @param t
+#' @param S_function
+#' @param delta_t
+#'
+#' @return
+#' @export
+#'
+#' @examples
+predict_residual_occupancy <- function(df, t, S_function, delta_t) {
+  ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
+  ipss1 <- ipss1 %>% mutate(prob_here_after_dt = hospitalflow::get_discharge_probability(stay_duration, S_function, delta_t))
+  ipss1 %>% pull(prob_here_after_dt) %>% sum()
+}
+
+#' get_residual_occupancy
+#'
+#' @param df
+#' @param t
+#' @param delta_t
+#'
+#' @return
+#' @export
+#'
+#' @examples
+get_residual_occupancy <- function(df, t, delta_t) {
+  ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
+  ipss1_dt <- hospitalflow::get_inpatient_snapshot(df = df, t = t + delta_t*60*60) %>% mutate(residual = SPELLNUMBER %in% ipss1$SPELLNUMBER)
+  ipss1_dt %>% filter(residual == TRUE) %>% nrow()
 }
 
 
@@ -76,3 +112,57 @@ make_survival_function <- function(KM) {
                  surv = KM$surv)
   stepfun(x = KM0t$time, y = c(1, KM0t$surv), right = TRUE)
 }
+
+
+#' run_S_func_model
+#'
+#' @param df dataset of spells
+#' @param S_func survival function
+#' @param date_seq sequence of dates to predict for
+#' @param horizon how far ahead to predict (default 48h)
+#'
+#' @return object containing prediction table and diagnostics
+#' @export
+#'
+#' @examples
+run_S_func_model <- function(df, S_func, date_seq, horizon = 48) {
+
+  pred_res_occ_v <- Vectorize(hospitalflow::predict_residual_occupancy, vectorize.args = "t")
+  get_res_occ_v <- Vectorize(hospitalflow::get_residual_occupancy, vectorize.args = "t")
+
+  predictions <- tibble::tibble(dates = date_seq)
+  predictions <- predictions %>% dplyr::mutate(predicted = pred_res_occ_v(df = surv_data, dates,
+                                                                          S_function = S_function,
+                                                                          delta_t = horizon))
+  predictions <- predictions %>% dplyr::mutate(actual = get_res_occ_v(df = surv_data, dates, delta_t = horizon)) %>%
+    dplyr::mutate(error = predicted - actual, rel_error = error/actual,
+                  abs_error = abs(error), abs_rel_error = abs(rel_error))
+
+  prediction_comparison <- predictions %>% select(dates, predicted, actual) %>% gather(key = "type", value = "residual_occ", predicted, actual)
+  comp_plot <- ggplot2::ggplot(data = prediction_comparison, mapping = aes(dates, residual_occ)) + ggplot2::geom_point(aes(group = type, colour = type)) + geom_line(aes(group = type, colour = type)) + ggtitle("Residual occupancy: predictions versus actual") +
+    xlab("Date of prediction") + ylab("Residual occupancy")
+
+  err_plot <- ggplot2::ggplot(data = predictions, mapping = aes(dates, error)) + ggplot2::geom_point() + geom_line() + ggtitle("Residual occupancy: errors in predictions versus actual") +
+    xlab("Date of prediction") + ylab("Error")
+
+  rel_err_plot <- ggplot2::ggplot(data = predictions, mapping = aes(dates, rel_error)) + ggplot2::geom_point() + geom_line() + ggtitle("Residual occupancy: relative errors in predictions versus actual") +
+    xlab("Date of prediction") + ylab("Relative Error")
+
+  diagnostics <- list()
+  output <- list()
+
+  diagnostics$mean_error <- mean(predictions$error)
+  diagnostics$mean_rel_error <- mean(predictions$rel_error)
+  diagnostics$mean_abs_err <- mean(predictions$abs_error)
+  diagnostics$mean_abs_rel_err <- mean(predictions$abs_rel_error)
+  diagnostics$comp_plot <- comp_plot
+  diagnostics$err_plot <- err_plot
+  diagnostics$rel_err_plot <- rel_err_plot
+
+  output$diagnostics <- diagnostics
+  output$predictions <- predictions
+
+  output
+
+}
+
