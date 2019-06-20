@@ -155,14 +155,14 @@ For now let's carry on and hack together a means of getting the prediction for a
 ```{r}
 predict_residual_occupancy <- function(df, t, S_function, delta_t) {
   ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
-  ipss1 <- ipss1 %>% mutate(prob_here_48h = hospitalflow::get_discharge_probability(stay_duration, S_function, delta_t))
-  ipss1 %>% pull(prob_here_48h) %>% sum()
+  ipss1 <- ipss1 %>% mutate(prob_here_after_dt = hospitalflow::get_discharge_probability(stay_duration, S_function, delta_t))
+  ipss1 %>% pull(prob_here_after_dt) %>% sum()
 }
 
 get_residual_occupancy <- function(df, t, delta_t) {
   ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
-  ipss1_48h <- hospitalflow::get_inpatient_snapshot(df = df, t = t + delta_t*60*60) %>% mutate(residual = SPELLNUMBER %in% ipss1$SPELLNUMBER)
-  ipss1_48h %>% filter(residual == TRUE) %>% nrow()
+  ipss1_dt <- hospitalflow::get_inpatient_snapshot(df = df, t = t + delta_t*60*60) %>% mutate(residual = SPELLNUMBER %in% ipss1$SPELLNUMBER)
+  ipss1_dt %>% filter(residual == TRUE) %>% nrow()
 }
 
 predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
