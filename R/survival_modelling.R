@@ -33,23 +33,15 @@ get_product_terms <- function(p, l) {
 #' get_discharge_probability
 #'
 #' @param time_in the length of time elapsed so far
-#' @param KM
+#' @param S_function the survival function
 #' @param delta_t time interval
 #'
 #' @return probability still in after additional delta_t
 #' @export
 #'
 #' @examples
-get_discharge_probability <- function(time_in, KM, delta_t) {
-  # This is a hack - must be a better way to evaluate S(t) for arbitrary t from KM?
-  t0 <- DescTools::Closest(KM$time, time_in)[1]
-  t1 <- DescTools::Closest(KM$time, time_in + delta_t)[1]
-
-  St0 <- KM %>% dplyr::select(time, surv) %>% dplyr::filter(time == t0) %>% dplyr::pull(surv)
-  St1 <- KM %>% dplyr::select(time, surv) %>% dplyr::filter(time == t1) %>% dplyr::pull(surv)
-
-  p <- St1/St0
-  p
+get_discharge_probability <- function(time_in, S_function, delta_t) {
+  S_function(time_in + delta_t)/S_function(time_in)
 }
 
 

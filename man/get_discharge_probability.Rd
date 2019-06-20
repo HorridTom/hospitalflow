@@ -4,10 +4,12 @@
 \alias{get_discharge_probability}
 \title{get_discharge_probability}
 \usage{
-get_discharge_probability(time_in, KM, delta_t)
+get_discharge_probability(time_in, S_function, delta_t)
 }
 \arguments{
 \item{time_in}{the length of time elapsed so far}
+
+\item{S_function}{the survival function}
 
 \item{delta_t}{time interval}
 }

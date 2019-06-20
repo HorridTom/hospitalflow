@@ -39,45 +39,37 @@ KM0 <- survfit(Surv(obsT, status) ~ 1,  type="kaplan-meier", conf.type="log", da
 ```
 
 ```{r}
-
 autoplot(KM0) + ggtitle(expression(paste("Kaplan-Meier estimate ", hat(S)(t), " with CI"))) +
   xlab("Time from arrival (t)") + ylab(expression(paste(hat(S)(t), ": % remaining in hospital"))) +
-  scale_x_continuous(breaks = scales::pretty_breaks(n=12), limits = c(0, obsLen*1.1)) +
   geom_vline(xintercept = obsLen, colour = "blue") +
-  scale_x_continuous(breaks = scales::pretty_breaks(n=12), limits = c(0, 30L*24L)) #+
-  #geom_vline(xintercept = 4, colour = "green", linetype = "longdash")
+  scale_x_continuous(breaks = scales::pretty_breaks(n=12), limits = c(0, 30L*24L))
 ```
 
 ```{r}
-KM0t <- tibble(time = KM0$time, n.risk = KM0$n.risk, n.event = KM0$n.event, n.censor = KM0$n.censor, surv = KM0$surv)
-```
+S_function <- hospitalflow::make_survival_function(KM0)
 
-```{r}
-cond_surv_from_km <- function(t0, KM) {
-t1 <- c(t0:(30L*24L))
-St0 <- KM %>% filter(time == t0) %>% pull(surv)
-condSurv <- tibble(t1 = t1)
-condSurv <- condSurv %>% left_join(KM %>% select(time, surv), by = c("t1" = "time")) %>%
-  mutate(condSurvival = surv/St0)
-condSurv %>% mutate(t0 = t0)
+cond_S_function <- function(t0, t1, S_function) {
+  pmin(S_function(t1)/S_function(t0),1)
 }
 
-condSurvs <- lapply(seq(24L, 24L*7L, by = 24L), cond_surv_from_km, KM0t)
-
-condSurv <- dplyr::bind_rows(condSurvs)
-
-ggplot(condSurv, aes(t1, condSurvival)) + geom_line(aes(group = factor(t0))) + ggtitle("Probability of remaining in hospital after time t1, given in hospital after time t0 = ") +
-  xlab("Time from arrival (t)") + ylab("Probability still in hospital at t1") +
+ggplot(data.frame(x=c(0,30L*24L)), aes(x)) +
+  stat_function(fun = S_function, geom = "line", aes(colour = "S(x)")) +
+  stat_function(fun = function(x) cond_S_function(1L*24L, x, S_function),
+                geom = "line", aes(colour = "S(x|t0 = 1 day)")) +
+  stat_function(fun = function(x) cond_S_function(2L*24L, x, S_function),
+                geom = "line", aes(colour = "S(x|t0 = 2 days)")) +
+  stat_function(fun = function(x) cond_S_function(4L*24L, x, S_function),
+                geom = "line", aes(colour = "S(x|t0 = 4 days)")) +
+  stat_function(fun = function(x) cond_S_function(7L*24L, x, S_function),
+                geom = "line", aes(colour = "S(x|t0 = 7 days)")) +
+  stat_function(fun = function(x) cond_S_function(14L*24L, x, S_function),
+                geom = "line", aes(colour = "S(x|t0 = 14 days)")) +
+  ggtitle("Probability of remaining in hospital after time t1, given in hospital after time t0") +
+  xlab("Time from arrival (t) hours") + ylab("Probability still in hospital at time t") +
   scale_x_continuous(breaks = seq(0, 30L*24L, by = 24L), limits = c(0, 30L*24L)) +
   geom_vline(xintercept = obsLen, colour = "blue") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))#+
-  #geom_vline(xintercept = 4, colour = "green", linetype = "longdash")
-```
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-```{r}
-#t0 <- c(60,120,180,240,300)
-#t1 <- c(61:(60*24))
-#St0 <- KM0t %>% filter(time == t0) %>% pull(surv)
 ```
 
 Next we should estimate the variability of this for typical medical population e.g. 180 medical pts.
@@ -94,9 +86,9 @@ times_in_hospital_2
 ```
 Now use the survival function from above to estimate the probability each patient will still be in after a further 48 hours.
 ```{r}
-probabilities_still_in_48h_1 <- sapply(times_in_hospital_1, hospitalflow::get_discharge_probability, KM0t, 48)
+probabilities_still_in_48h_1 <- hospitalflow::get_discharge_probability(times_in_hospital_1, S_function, 48)
 probabilities_still_in_48h_1
-probabilities_still_in_48h_2 <- sapply(times_in_hospital_2, hospitalflow::get_discharge_probability, KM0t, 48)
+probabilities_still_in_48h_2 <- hospitalflow::get_discharge_probability(times_in_hospital_2, S_function, 48)
 probabilities_still_in_48h_2
 ```
 These are the parameters of individual bernoulli trials, the sum of which yields a Poisson Binomial distribution. It is possible to calculate this distribution via the discrete Fourier transform of the following vector:
@@ -132,10 +124,11 @@ Next step is to write a function to run this on patients actually in hospital/wa
 ```{r}
 T1 <- strptime("2018-06-08 12:43:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
 ipss1 <- hospitalflow::get_inpatient_snapshot(df = surv_data, t = T1) %>% filter(!is.na(stay_duration))
-# Hack - TODO: should write get_discharge_probability to take a vector time_in as input.
-h_gdp <- Vectorize(hospitalflow::get_discharge_probability, vectorize.args = "time_in")
-ipss1 <- ipss1 %>% mutate(prob_here_48h = h_gdp(stay_duration, KM0t, 48))
+
+ipss1 <- ipss1 %>% mutate(prob_here_48h = hospitalflow::get_discharge_probability(stay_duration, S_function, 48))
+
 x_vect1 <- (1/(nrow(ipss1)+1)) * hospitalflow::get_poisson_binomial_characteristic_values(ipss1 %>% pull(prob_here_48h))
+
 pb_dist_T1 <- fft(x_vect1)
 pb_dist_T1 <- tibble::tibble(prob = Re(pb_dist_T1)) %>% tibble::rowid_to_column("k") %>% mutate(k = k-1)
 expected_k_T1 <- pb_dist_T1 %>% dplyr::mutate(prod = prob*k) %>%
@@ -160,22 +153,20 @@ For now let's carry on and hack together a means of getting the prediction for a
 # Predicting Residual Occupancy
 
 ```{r}
-predict_residual_occupancy <- function(df, t, KM, delta_t) {
+predict_residual_occupancy <- function(df, t, S_function, delta_t) {
   ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
-  # Hack - TODO: should write get_discharge_probability to take a vector time_in as input.
-  h_gdp <- Vectorize(hospitalflow::get_discharge_probability, vectorize.args = "time_in")
-  ipss1 <- ipss1 %>% mutate(prob_here_48h = h_gdp(stay_duration, KM, delta_t))
+  ipss1 <- ipss1 %>% mutate(prob_here_48h = hospitalflow::get_discharge_probability(stay_duration, S_function, delta_t))
   ipss1 %>% pull(prob_here_48h) %>% sum()
 }
 
-get_residual_occupancy <- function(df, t, KM, delta_t) {
+get_residual_occupancy <- function(df, t, delta_t) {
   ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
   ipss1_48h <- hospitalflow::get_inpatient_snapshot(df = df, t = t + delta_t*60*60) %>% mutate(residual = SPELLNUMBER %in% ipss1$SPELLNUMBER)
   ipss1_48h %>% filter(residual == TRUE) %>% nrow()
 }
 
-predict_residual_occupancy(df = surv_data, t = T1, KM = KM0t, delta_t = 48)
-get_residual_occupancy(df = surv_data, t = T1, KM = KM0t, delta_t = 48)
+predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
+get_residual_occupancy(df = surv_data, t = T1, delta_t = 48)
 
 pred_res_occ_v <- Vectorize(predict_residual_occupancy, vectorize.args = "t")
 get_res_occ_v <- Vectorize(get_residual_occupancy, vectorize.args = "t")
@@ -183,8 +174,10 @@ get_res_occ_v <- Vectorize(get_residual_occupancy, vectorize.args = "t")
 dates <- seq(lubridate::ymd_hm('2018-05-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2018-07-31 12:00', tz = "Europe/London"), by = '1 day')
 predictions <- tibble::tibble(dates = dates)
 
-system.time(predictions <- predictions %>% dplyr::mutate(predicted = pred_res_occ_v(df = surv_data, dates, KM = KM0t, delta_t = 48)) %>%
-  dplyr::mutate(actual = get_res_occ_v(df = surv_data, dates, KM = KM0t, delta_t = 48)) %>%
+system.time(predictions <- predictions %>% dplyr::mutate(predicted = pred_res_occ_v(df = surv_data, dates,
+                                                                                    S_function = S_function,
+                                                                                    delta_t = 48)) %>%
+  dplyr::mutate(actual = get_res_occ_v(df = surv_data, dates, delta_t = 48)) %>%
   dplyr::mutate(error = predicted - actual, rel_error = error/actual))
 
 predictions <- predictions %>% dplyr::mutate(abs_error = abs(error), abs_rel_error = abs(rel_error))
@@ -227,22 +220,6 @@ This should include:
 3. A function for applying these survival functions to the data at a given point in time to yield a delta-t horizon prediction for residual occupancy
 4. A function or functions to evaluate these predictions across a "test" range
 
-```{r}
-S_function <- make_survival_function(KM0)
-cond_S_function <- function(t0, t1, S_function) {
-  pmin(S_function(t1)/S_function(t0),1)
-}
-
-ggplot(data.frame(x=c(0,30L*24L)), aes(x)) +
-  stat_function(fun = S_function, geom = "line", aes(colour = "S(x)")) +
-  stat_function(fun = function(x) cond_S_function(1L*24L, x, S_function), geom = "line", aes(colour = "S(x|1d)")) +
-  stat_function(fun = function(x) cond_S_function(2L*24L, x, S_function), geom = "line", aes(colour = "S(x|2d)")) +
-  stat_function(fun = function(x) cond_S_function(4L*24L, x, S_function), geom = "line", aes(colour = "S(x|4d)")) +
-  stat_function(fun = function(x) cond_S_function(7L*24L, x, S_function), geom = "line", aes(colour = "S(x|7d)")) +
-  stat_function(fun = function(x) cond_S_function(14L*24L, x, S_function), geom = "line", aes(colour = "S(x|14d)"))
-
-
-```
 
 
 
