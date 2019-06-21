@@ -16,13 +16,16 @@ library(ggfortify)
 ```{r}
 #surv_data <- readRDS(file = "../data/ed_ex.rds")
 surv_data <- readRDS(file = "../../cw-data/cw_ip_spells.rds")
-surv_data <- surv_data %>% mutate(los = difftime(end_datetime, start_datetime)) %>% filter(!is.na(los))
+surv_data <- surv_data %>% filter(substr(as.character(ADMISSIONMETHOD), 1, 1) == "2")
+surv_data <- surv_data %>% mutate(los = difftime(end_datetime, start_datetime), adm_wd = weekdays(start_datetime)) %>% filter(!is.na(los))
 units(surv_data$los) <- "hours"
-eventT <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2018-11-01 00:00')) %>% pull(los) 
+eventT <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2018-11-01 00:00')) %>% pull(los)
+adm_wd <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2018-11-01 00:00')) %>% pull(adm_wd)
 obsLen <- 365*24                  # length of observation time (censoring time = end of study)
 obsT   <- pmin(eventT, obsLen)  # observed censored event times
 status <- eventT <= obsLen     # has event occured?
 dfSurv <- data.frame(eventT, obsT, status)          # data frame
+dfSurv2 <- data.frame(eventT, obsT, status, adm_wd)
 ```
 
 ```{r}
@@ -36,10 +39,14 @@ ggplot(dfSurv, aes(eventT)) + stat_ecdf(geom = "step") +
 
 ```{r}
 KM0 <- survfit(Surv(obsT, status) ~ 1,  type="kaplan-meier", conf.type="log", data=dfSurv)
+KM1 <- survfit(Surv(obsT, status) ~ adm_wd,  type="kaplan-meier", conf.type="log", data=dfSurv2)
+
+CM1 <- coxph(Surv(obsT, status) ~ adm_wd, data = dfSurv2)
+KM1S <- survfit(CM1, newdata = data.frame(adm_wd = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")))
 ```
 
 ```{r}
-autoplot(KM0) + ggtitle(expression(paste("Kaplan-Meier estimate ", hat(S)(t), " with CI"))) +
+autoplot(KM1) + ggtitle(expression(paste("Kaplan-Meier estimate ", hat(S)(t), " with CI"))) +
   xlab("Time from arrival (t)") + ylab(expression(paste(hat(S)(t), ": % remaining in hospital"))) +
   geom_vline(xintercept = obsLen, colour = "blue") +
   scale_x_continuous(breaks = scales::pretty_breaks(n=12), limits = c(0, 30L*24L))
@@ -47,6 +54,9 @@ autoplot(KM0) + ggtitle(expression(paste("Kaplan-Meier estimate ", hat(S)(t), " 
 
 ```{r}
 S_function <- hospitalflow::make_survival_function(KM0)
+
+step_funs <- lapply(c(1:7), function(x) {hospitalflow::make_survival_function(KM1S[,x])})
+names(step_funs) <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
 cond_S_function <- function(t0, t1, S_function) {
   pmin(S_function(t1)/S_function(t0),1)
@@ -195,6 +205,6 @@ This should include:
 3. A function for applying these survival functions to the data at a given point in time to yield a delta-t horizon prediction for residual occupancy
 4. A function or functions to evaluate these predictions across a "test" range
 
-
+Idea: can I use the newdata argument of survfit to provide the actual covariates of snapshot data, to get a) S(t1 | covs) and b) S(t0 | covs), then compute their ratio to get the probability of still being in? If so this saves a lot of machinery in e.g. predict_residual_occupancy. Need to check the maths to see if this is valid - does it commute or something!?
 
 
