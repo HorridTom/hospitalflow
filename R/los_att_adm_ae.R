@@ -10,13 +10,13 @@
 #' @export
 #'
 #' @examples
-los_att_adm_ae <- function(start_date = as.POSIXct("2012-01-01 00:00", tz = "Europe/London"),
-                           end_date = as.POSIXct("2013-01-01 00:00", tz = "Europe/London"),
+los_att_adm_ae <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
+                           end_date = as.Date("2013-01-01", tz = "Europe/London"),
                            data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
   df <- data %>%
     dplyr::select(spell_number, spell_start, spell_end, spell_class_col) %>%
-    dplyr::filter(spell_start >= end_date | spell_end <= start_date) %>%
+    dplyr::filter(spell_start < end_date | spell_end > start_date) %>%
     dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission" | spell_class_col == "ed_admission") %>%
     tidyr::drop_na()
 
@@ -55,35 +55,40 @@ los_att_adm_ae <- function(start_date = as.POSIXct("2012-01-01 00:00", tz = "Eur
                                                  Time_spent == 445 | Time_spent <= 459 ~ '7:30',
                                                  Time_spent == 460 | Time_spent <= 474 ~ '7:45',
                                                  Time_spent == 475 | Time_spent <= 720 ~ '8-12 hrs',
-                                                 Time_spent >= 721 ~ '>12 hrs'))
-
+                                                 Time_spent >= 721 ~ '> 12 hrs'))
 
 
   # Calculate Attendances
   dt_attendances <- df_recode  %>%
     dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission") %>%
     dplyr::group_by(Time_binned) %>%
-    dplyr::summarise("Direct discharge" = n())
+    dplyr::mutate(Direct_discharge = n())
 
 
   dt_admissions <- df_recode  %>%
-    dplyr::filter(spell_class_col == "ed_admission") %>%
+    dplyr::filter(spell_class_col == "ed_admission" | spell_class_col == "ed_comp_non_admissions") %>%
     dplyr::group_by(Time_binned) %>%
-    dplyr::summarise("Hospital admissions" = n())
+    dplyr::mutate(Hospital_admissions = n())
 
 
-  dt_attend_admiss <- dplyr::left_join(dt_attendances, dt_admissions, by = c("Time_binned"))
+  dt_attend_admiss <- dplyr::bind_rows(dt_attendances, dt_admissions) %>%
+    tidyr::gather(key = "Variable", value = "Value", "Direct_discharge", "Hospital_admissions") %>%
+    tidyr::drop_na() %>%
+    dplyr::select(spell_number, Time_binned, Variable, Value) %>%
+    dplyr::group_by(Time_binned, Variable) %>%
+    dplyr::summarize("Value" = n()) %>%
+    dplyr::ungroup()
 
-  dt_melt <- reshape2::melt(dt_attend_admiss)
+
 
   # Set the title
   title_stub <- " Hospital LoS distribution for admitted patients, "
-  hospital_name <- "Chelsea & Westminster"
+  #hospital_name <- "Chelsea & Westminster"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
 
-  att_plot_t_binned <- ggplot2::ggplot(dt_melt, ggplot2::aes(Time_binned, value, group = variable, fill = variable)) + #shape = Event,  colour = Event
+  att_plot_t_binned <- ggplot2::ggplot(dt_attend_admiss, ggplot2::aes(Time_binned, Value, group = Variable, fill = Variable)) + #shape = Event,  colour = Event
     ggplot2::geom_bar(stat = "identity", position = "identity" ,  width = 0.5, lwd = 0.3, colour = "white") +
     #geom_line(aes(linetype = variable, color = variable), size = 1.0) +
     #geom_point(aes(shape = variable), size = 1.0) +
@@ -99,7 +104,7 @@ los_att_adm_ae <- function(start_date = as.POSIXct("2012-01-01 00:00", tz = "Eur
                   "5:00", "5:15", "5:30", "5:45",
                   "6:00", "6:15", "6:30", "6:45",
                   "7:00", "7:15", "7:30", "7:45",
-                  "8-12 hrs", ">12 hrs") +
+                  "8-12 hrs", "> 12 hrs") +
     ggplot2::labs(title = chart_title,
                   subtitle = "Unscheduled A&E attendances, n; ED LoS 15min bins to 8 hr, 8-12 hr, >12,
 Note: (i) results are intended for management information only",
@@ -118,7 +123,7 @@ Note: (i) results are intended for management information only",
 
   }else{
 
-    att_plot_t_binned$data %>% select(Time_binned, variable, value)
+    att_plot_t_binned$data %>% dplyr::select(Time_binned, Variable, Value)
 
   }
 

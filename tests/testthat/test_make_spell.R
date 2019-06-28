@@ -35,7 +35,8 @@ test_that("spell table is created correctly",{
                                     start_datetime,
                                     end_datetime,
                                     gender,
-                                    age_band_start)
+                                    age_band_start
+                                    )
 
 
   pseudo_id <- as.character(c("112", "112", "112", "113", "113", "114", "114"))
@@ -63,7 +64,7 @@ test_that("spell table is created correctly",{
                                            admission_method)
 
 
-  result <- make_spell_table(ed_data_age_sex, inpatient_data_age_sex, same_type_episode_lag = 1, different_type_episode_lag = 6) %>%
+  result <- hospitalflow::make_spell_table(ed_data_age_sex, inpatient_data_age_sex, same_type_episode_lag = 1, different_type_episode_lag = 6) %>%
     dplyr::select(spell_number, spell_start, spell_end, number_of_episodes, admission_method_type)
 
   result$spell_number <- as.character(result$spell_number)
