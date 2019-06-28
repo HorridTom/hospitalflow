@@ -1,4 +1,3 @@
-
 #' get_factor_recode
 #'
 #' @param config_path path to the directory containing the config files for this dataset
