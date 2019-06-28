@@ -1,4 +1,4 @@
-#' Length of stay distribution los_distrib_elect_emerg_discharge
+#' los_distrib_method_admission
 #'
 #' @param start_date
 #' @param end_date
