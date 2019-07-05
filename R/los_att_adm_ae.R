@@ -17,7 +17,7 @@ los_att_adm_ae <- function(start_date = as.Date("2012-01-01", tz = "Europe/Londo
   df <- data %>%
     dplyr::select(spell_number, spell_start, spell_end, spell_class_col) %>%
     dplyr::filter(spell_start < end_date | spell_end > start_date) %>%
-    dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission" | spell_class_col == "ed_admission") %>%
+    #dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission" | spell_class_col == "ed_admission") %>%
     tidyr::drop_na()
 
   df_recode <- df %>%
@@ -66,7 +66,7 @@ los_att_adm_ae <- function(start_date = as.Date("2012-01-01", tz = "Europe/Londo
 
 
   dt_admissions <- df_recode  %>%
-    dplyr::filter(spell_class_col == "ed_admission" | spell_class_col == "ed_comp_non_admissions") %>%
+    dplyr::filter(spell_class_col == "ed_admission" | spell_class_col == "ed_comp_admissions") %>%
     dplyr::group_by(Time_binned) %>%
     dplyr::mutate(Hospital_admissions = n())
 
