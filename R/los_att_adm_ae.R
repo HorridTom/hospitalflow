@@ -15,13 +15,13 @@ los_att_adm_ae <- function(start_date = as.Date("2012-01-01", tz = "Europe/Londo
                            data, plot_chart, hospital_name = "Chelsea & Westminster"){
 
   df <- data %>%
-    dplyr::select(spell_number, spell_start, spell_end, spell_class_col) %>%
+    dplyr::select(spell_number, spell_start, spell_end, spell_class_col, initial_ed_end_datetime) %>%
     dplyr::filter(spell_start < end_date | spell_end > start_date) %>%
-    #dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission" | spell_class_col == "ed_admission") %>%
+    dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission" | spell_class_col == "ed_admission") %>%
     tidyr::drop_na()
 
   df_recode <- df %>%
-    dplyr::mutate(Time_spent = as.numeric(difftime(spell_end,  spell_start), unit = c("mins"))) %>%
+    dplyr::mutate(Time_spent = as.numeric(difftime(initial_ed_end_datetime, spell_start), unit = c("mins"))) %>%
     dplyr::mutate(Time_binned = dplyr::case_when(Time_spent <= 14 ~ '00:00',
                                                  Time_spent == 15 | Time_spent <= 29 ~ '00:15',
                                                  Time_spent == 30 | Time_spent <= 44 ~ '00:30',
