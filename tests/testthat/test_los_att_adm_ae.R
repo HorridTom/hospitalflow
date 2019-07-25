@@ -28,15 +28,15 @@ test_that("length of stay is correctly analysed for attendances and admissions",
 
 test_that("length of stay is correctly analysed for attendances and admissions for real data",{
 
-  load("D:/Rprojects/hospitalflow/tests/testthat/testdata/los_att_adm_tests/sample_test_ed_los_att_adm.rda")
-  correct_answers <- readr::read_csv("D:/Rprojects/hospitalflow/tests/testthat/testdata/los_att_adm_tests/correct_answers.csv")
+  spell_table <- readr::read_rds("D:/Rprojects/hospitalflow/tests/testthat/testdata/los_att_adm_tests/spelltable_sample.rds")
+  correct_answers <- readr::read_rds("D:/Rprojects/hospitalflow/tests/testthat/testdata/los_att_adm_tests/correct_answers_real_data_los_att_adm.rds")
+
+  result <- hospitalflow::los_att_adm_ae(start_date = as.Date("2016-01-01", tz = "Europe/London"),
+                                         end_date = as.Date("2016-01-08", tz = "Europe/London"),
+                                         data = spell_table, plot_chart = FALSE, hospital_name = "Hospital_name")
 
 
-  result <- hospitalflow::los_att_adm_ae(start_date = as.Date("2016-12-14", tz = "Europe/London"),
-                                         end_date = as.Date("2017-02-28", tz = "Europe/London"),
-                                         data = df_recode, plot_chart = FALSE, hospital_name = "Hospital_name")
-
-
+  result <- result %>% dplyr::arrange(Variable)
   result <- result %>% dplyr::arrange(Variable)
   result$Value <- as.numeric(result$Value)
   #Test results are correct
