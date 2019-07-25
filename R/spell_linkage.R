@@ -80,6 +80,7 @@ spell_variables <- function(all_episodes) {
     # dplyr::mutate(episode_type = purrr::map(data, get_episode_type)) %>%
     dplyr::mutate(episode_class_sequence = purrr::map(data, get_episode_class_sequence)) %>%
     dplyr::mutate(admission_method_type = purrr::map(data, admission_method_class)) %>%
+    dplyr::mutate(initial_ed_end_datetime = purrr::map(data, get_initial_ed_episode_end_datetime)) %>%
     dplyr::select(-data) %>%
     tidyr::unnest()
 
@@ -180,5 +181,20 @@ admission_method_class <- function(admission_method_df) {
 
   ordered_admission_method[1]
 
+
+}
+
+get_initial_ed_episode_end_datetime <- function(spell_episodes_df) {
+  first_episode_of_spell <- spell_episodes_df %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::slice(1)
+
+  if(first_episode_of_spell %>% dplyr::pull(episode_type)=="ED"){
+    return(first_episode_of_spell %>% dplyr::pull(end_datetime))
+
+  }else{
+
+    NA
+  }
 
 }

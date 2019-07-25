@@ -1,4 +1,3 @@
-
 #' ae_attendances_admissions_age_sex
 #'
 #' @param start_date date of earliest discharge to be included in the analysis
@@ -18,7 +17,7 @@
 #' }
 ae_attendances_admissions_age_sex <- function(start_date = as.Date("2016-01-01", tz = "Europe/London"),
                                               end_date = as.Date("2017-01-01", tz = "Europe/London"),
-                                              data, plot_chart, hospital_name = "Queen Elizabeth Hospital"){
+                                              data, plot_chart, hospital_name = "Hospital name"){
 
   dt <- data %>%
     dplyr::filter(spell_start <= end_date & spell_end >= start_date) %>%
@@ -105,5 +104,5 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2016-01-01",
 age_sex <- function() {
   ae_attendances_admissions_age_sex(start_date = as.Date("2012-01-01", tz = "Europe/London"),
                                     end_date = as.Date("2015-01-01", tz = "Europe/London"),
-                                    data = hospitalflow::cw_disch_201201_201507_782cfa21_stddt_s, plot_chart = TRUE, hospital_name = "Chelsea & Westminster")
+                                    data = hospitalflow::cw_disch_201201_201507_782cfa21_stddt_s, plot_chart = TRUE, hospital_name = "Hospital name")
 }
