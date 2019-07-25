@@ -62,13 +62,13 @@ los_att_adm_ae <- function(start_date = as.Date("2012-01-01", tz = "Europe/Londo
   dt_attendances <- df_recode  %>%
     dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission") %>%
     dplyr::group_by(Time_binned) %>%
-    dplyr::mutate(Direct_discharge = n())
+    dplyr::mutate(Direct_discharge = dplyr::n())
 
 
   dt_admissions <- df_recode  %>%
     dplyr::filter(spell_class_col == "ed_admission" | spell_class_col == "ed_comp_admissions") %>%
     dplyr::group_by(Time_binned) %>%
-    dplyr::mutate(Hospital_admissions = n())
+    dplyr::mutate(Hospital_admissions = dplyr::n())
 
 
   dt_attend_admiss <- dplyr::bind_rows(dt_attendances, dt_admissions) %>%
@@ -76,7 +76,7 @@ los_att_adm_ae <- function(start_date = as.Date("2012-01-01", tz = "Europe/Londo
     tidyr::drop_na() %>%
     dplyr::select(spell_number, Time_binned, Variable, Value) %>%
     dplyr::group_by(Time_binned, Variable) %>%
-    dplyr::summarize("Value" = n()) %>%
+    dplyr::summarize("Value" = dplyr::n()) %>%
     dplyr::ungroup()
 
 
