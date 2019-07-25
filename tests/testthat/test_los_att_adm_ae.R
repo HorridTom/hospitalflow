@@ -37,7 +37,6 @@ test_that("length of stay is correctly analysed for attendances and admissions f
 
 
   result <- result %>% dplyr::arrange(Variable)
-  result <- result %>% dplyr::arrange(Variable)
   result$Value <- as.numeric(result$Value)
   #Test results are correct
   expect_equal(result, correct_answers)
