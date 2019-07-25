@@ -63,14 +63,14 @@ test_that("Length of stay for admitted patients, for real data",{
 
   #Specify correct results
 
-  load("D:/Rprojects/hospitalflow/tests/testthat/testdata/los_distrib_queh_sample_tests/queh_ip_sample.rda")
+  load("testdata/los_distrib_queh_sample_tests/queh_ip_sample.rda")
 
 
 
   queh_ip_sample$spell_number <- as.character(queh_ip_sample$spell_number)
 
 
-  correct_answers <- readr::read_csv("D:/Rprojects/hospitalflow/tests/testthat/testdata/los_distrib_queh_sample_tests/correct_answers.csv")
+  correct_answers <- readr::read_csv("testdata/los_distrib_queh_sample_tests/correct_answers.csv")
 
   correct_answers <- correct_answers %>%
     dplyr::select(losbinned, admission_method_type, Count)
