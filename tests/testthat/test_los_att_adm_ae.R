@@ -28,8 +28,8 @@ test_that("length of stay is correctly analysed for attendances and admissions",
 
 test_that("length of stay is correctly analysed for attendances and admissions for real data",{
 
-  spell_table <- readr::read_rds("D:/Rprojects/hospitalflow/tests/testthat/testdata/los_att_adm_tests/spelltable_sample.rds")
-  correct_answers <- readr::read_rds("D:/Rprojects/hospitalflow/tests/testthat/testdata/los_att_adm_tests/correct_answers_real_data_los_att_adm.rds")
+  spell_table <- readr::read_rds("testdata/los_att_adm_tests/spelltable_sample.rds")
+  correct_answers <- readr::read_rds("testdata/los_att_adm_tests/correct_answers_real_data_los_att_adm.rds")
 
   result <- hospitalflow::los_att_adm_ae(start_date = as.Date("2016-01-01", tz = "Europe/London"),
                                          end_date = as.Date("2016-01-08", tz = "Europe/London"),
