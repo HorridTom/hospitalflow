@@ -1,4 +1,4 @@
-#' occupancy_weekday_houR
+#' occupancy_weekday_hour for A&E
 #'
 #' @param data
 #' @param plot_chart
@@ -9,7 +9,7 @@
 #' @examples
 occupancy_weekday_hour <- function(start_date = as.Date("2015-04-01", tz = "Europe/London"),
                                    end_date = as.POSIXct("2016-04-01", tz = "Europe/London"),
-                                   data, plot_chart, hospital_name = "Queen Elizabeth Hospital") {
+                                   data, plot_chart, hospital_name = "Hospital name") {
 
   # renaming the variables I am interested in
   df_select <- data %>%
