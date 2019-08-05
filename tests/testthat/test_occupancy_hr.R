@@ -23,8 +23,8 @@ test_that("Occupancy by hour of a date is generated correctly for two dates",{
                                             spell_start,
                                             spell_end)
 
-  result_occ <- hospitalflow::occupancy_fct(start_date = as.POSIXct("2018-12-10 09:00",tz = "Europe/London"),
-                                            end_date = as.POSIXct("2018-12-10 10:00",tz = "Europe/London"),
+  result_occ <- hospitalflow::occupancy_fct(start_date = as.Date("2018-12-10",tz = "Europe/London"),
+                                            end_date = as.Date("2018-12-10",tz = "Europe/London"),
                                             data = test_arrivals_occupancy)
 
   result_occ <- result_occ %>%
