@@ -2,7 +2,9 @@
 % Please edit documentation in R/admissions_discharges.R
 \name{admissions_discharges}
 \alias{admissions_discharges}
-\title{admission_discharges}
+\title{Admission and Discharges Function
+data isn't  standardised
+admission_discharges}
 \usage{
 admissions_discharges(start_date = as.Date("2018-12-10", tz =
   "Europe/London"), end_date = as.Date("2018-12-23", tz =
@@ -28,6 +30,8 @@ WardCode - the ward for the episode}
 Chart or dataframe showing average Admissions and Discharges by the day of the week
 }
 \description{
+Admission and Discharges Function
+data isn't  standardised
 admission_discharges
 }
 \examples{
