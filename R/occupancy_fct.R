@@ -8,8 +8,8 @@
 #' @export
 #'
 #' @examples
-occupancy_fct <- function(start_date = as.Date("2016-06-01", tz = "Europe/London"),
-                          end_date = as.Date("2016-06-08", tz = "Europe/London"),
+occupancy_fct <- function(start_date = as.POSIXct("2016-06-01 00:00:00", tz = "Europe/London"),
+                          end_date = as.POSIXct("2016-06-08 00:00:00", tz = "Europe/London"),
                           data){
 
   # using gather function to create a new column with date
