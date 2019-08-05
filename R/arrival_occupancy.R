@@ -1,8 +1,3 @@
-#################################################################################
-###3.A&E Arrivals and Occupancy, 3rd of March to 27th of April, 2015 ############
-#################################################################################
-
-
 #' arrival_occupancy
 #'
 #' @param start_date
@@ -15,57 +10,59 @@
 #' @export
 #'
 #' @examples
-####################################################################################################################
-###3.A&E Arrivals and Occupancy, 3rd of March to 27th of April, 2015 ###############################################
-####################################################################################################################
-arrival_occupancy_fct <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-                                  end_date = as.Date("2015-01-01", tz = "Europe/London"),
-                                  data, plot_chart, hospital_name = "Chelsea & Westminster"){
+ae_arrival_occupancy_fct <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
+                                     end_date = as.Date("2015-01-01", tz = "Europe/London"),
+                                     data, plot_chart, hospital_name = "Hospital name"){
 
-  # start_date = as.Date("2015-04-01", tz = "Europe/London")
-  # end_date = as.Date("2016-04-01", tz = "Europe/London")
+  # start_date <- as.Date("2016-06-01")
+  # end_date <- as.Date("2016-06-08")
 
-  dt_los <- queh_data %>%
+  dt_los <- spelltable_sample %>%
     dplyr::select(spell_number, spell_start, spell_end, spell_class_col) %>%
     dplyr::mutate(Same_day_discharge = as.numeric(difftime(spell_end, spell_start, unit = c("min")))) %>%
     dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission")
 
-
   dt_calc <- dt_los %>%
     dplyr::mutate(Same_day_discharge = dplyr::if_else(as.Date(spell_start) == as.Date(spell_end),  TRUE, FALSE),
                   Los = as.numeric(difftime(spell_end, spell_start, unit = c("hour"))),
-                  Discharged_24hr = if_else(Los < 24, TRUE, FALSE)) %>%
+                  Discharged_24hr = dplyr::if_else(Los < 24, TRUE, FALSE)) %>%
     dplyr::filter(Discharged_24hr == TRUE & Los <= 24) %>%
     dplyr::filter(spell_start > start_date & spell_end < end_date)
 
 
-  # using gather function to create a new column with date; and filter only by Emergency Department
-  arrivals_occupancy <-  dt_calc %>%
+  # using gather function to create a new column with date
+  arrivals <-  dt_calc %>%
     tidyr::gather(key = type, time, spell_start:spell_end) %>%
-    dplyr::mutate(change = if_else(type == "spell_start", 1, -1)) %>%
+    dplyr::mutate(change = dplyr::if_else(type == "spell_start", 1, -1)) %>%
     dplyr::group_by(time_hr = lubridate::floor_date(time, "1 hour")) %>%
-    dplyr::summarise(arrivals = sum(type == "spell_start"), change = sum(change)) %>%
+    dplyr::summarise(
+      arrivals = sum(type == "spell_start")) %>%
     padr::pad(start_val = start_date, end_val = end_date) %>%
-    tidyr::replace_na(list(arrivals = 0, change = 0)) %>%
-    dplyr::mutate(occupancy = cumsum(change)) %>%
-    drop_na()
+    tidyr::replace_na(list(arrivals = 0)) %>%
+    tidyr::drop_na()
 
 
-  avg_arriv_occup <- arrivals_occupancy  %>%
+  occupancy <- occupancy_fct(start_date = start_date,
+                             end_date = end_date,
+                             data = dt_calc)
+
+  arrival_occupancy <- dplyr::left_join(arrivals, occupancy, by = c("time_hr"))
+
+  avg_arriv_occup <- arrival_occupancy  %>%
     dplyr::mutate(Hour = lubridate::hour(time_hr)) %>%
     dplyr::group_by(Hour) %>%
-    summarize(Average_arrivals = mean(arrivals),
-              Average_occupancy = mean(occupancy))
+    dplyr::summarize(Average_arrivals = mean(arrivals),
+                     Average_occupancy = mean(occupancy))
 
 
   # Set the title
-  title_stub <- " hospital: Hourly A&E occupancy and arrival profile, "
+  title_stub <- " hospital: Hourly A&E arrival & occupancy profile, "
   hospital_name <- "Chelsea & Westminster"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
 
-  plt_occ_percent <- ggplot2::ggplot(data = avg_arriv_occup_jan_march, ggplot2::aes(x = as.numeric(Hour), y = Average_occupancy, group = Hour))+
+  plt_occ_percent <- ggplot2::ggplot(data = avg_arriv_occup, ggplot2::aes(x = as.numeric(Hour), y = Average_occupancy, group = Hour))+
     ggplot2::geom_bar(stat = "identity", alpha=0.7, width = 0.40, ggplot2::aes(fill = "Occupancy")) +
     ggplot2::scale_x_continuous(breaks = 0:23, expand = c(0, 0.2)) + #, expand = c(0, 0)
     #ggplot2::scale_y_continuous(expand = c(0, 0)) + # breaks = c(0, 5, 10, 15, 20, 25))
@@ -93,7 +90,7 @@ arrival_occupancy_fct <- function(start_date = as.Date("2012-01-01", tz = "Europ
 
   }else{
 
-    plt_occ_percent$data %>% select(Hour, Average_arrivals , Average_occupancy)
+    plt_occ_percent$data %>% dplyr::select(Hour, Average_arrivals , Average_occupancy)
 
   }
 
