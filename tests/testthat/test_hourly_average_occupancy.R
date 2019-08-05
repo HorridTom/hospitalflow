@@ -1,7 +1,7 @@
-context("Admissions and Occupancy by hour of the day")
+context("Arrivals and Occupancy by hour of the day")
 library(hospitalflow)
 
-test_that("admissions and occupancy by hour of the day",{
+test_that("arrivals and occupancy by hour of the day is correctly calculated",{
 
   #Specify correct results
   correct_answers_arriv_occ <- tibble::tibble(
@@ -19,25 +19,29 @@ test_that("admissions and occupancy by hour of the day",{
 
   dt2 <- c("2018-12-10 12:30:00", "2018-12-11 07:45:00", "2018-12-11 09:05-00")
 
-  start_datetime <- as.POSIXct(dt1, tz = "Europe/London")
-  end_datetime <- as.POSIXct(dt2,tz = "Europe/London")
+  spell_class_col <- as.character(c("ed_non_admission", "ed_comp_non_admission", "ed_non_admission"))
 
-  test_arrivals_occupancy <- tibble::tibble(pseudo_id = 101:103,
-                                            start_datetime,
-                                            end_datetime)
+  spell_start <- as.POSIXct(dt1, tz = "Europe/London")
+  spell_end <- as.POSIXct(dt2,tz = "Europe/London")
+
+  test_arrivals_occupancy <- tibble::tibble(spell_number = 101:103,
+                                            spell_start,
+                                            spell_end,
+                                            spell_class_col)
 
 
   #Run Admission Discharges graph
 
-  result_arriv_occ_jan_march <- hospitalflow::arrival_occupancy_hr(start_date = as.POSIXct("2018-12-10 00:00",tz = "Europe/London"),
-                                                                   end_date = as.POSIXct("2018-12-11 23:00",tz = "Europe/London"),
-                                                  data = test_arrivals_occupancy, plot_chart = TRUE, hospital_name = "Hospital name")
+  result_arriv_occ<- hospitalflow::ae_arrival_occupancy_fct(start_date = as.Date("2018-12-10",tz = "Europe/London"),
+                                                            end_date = as.Date("2018-12-11",tz = "Europe/London"),
+                                                            data = test_arrivals_occupancy, plot_chart = FALSE,
+                                                            hospital_name = "Hospital name")
 
   #result_ariv_occ_data_jm <- result_arriv_occ_jan_march$data
-  result_arriv_occ_jan_march$Hour <- as.character(result_arriv_occ_jan_march$Hour)
+  result_arriv_occh$Hour <- as.character(result_arriv_occ$Hour)
 
   #Test results are correct
-  expect_equal(as.data.frame(correct_answers_arriv_occ), as.data.frame(result_arriv_occ_jan_march), tolerance = 0.01)
+  expect_equal(as.data.frame(correct_answers_arriv_occ), as.data.frame(result_arriv_occ), tolerance = 0.01)
 
 })
 

@@ -1,4 +1,4 @@
-#' arrival_occupancy
+#' ae_arrival_occupancy_fct
 #'
 #' @param start_date
 #' @param end_date
@@ -17,7 +17,7 @@ ae_arrival_occupancy_fct <- function(start_date = as.Date("2012-01-01", tz = "Eu
   # start_date <- as.Date("2016-06-01")
   # end_date <- as.Date("2016-06-08")
 
-  dt_los <- spelltable_sample %>%
+  dt_los <- data %>%
     dplyr::select(spell_number, spell_start, spell_end, spell_class_col) %>%
     dplyr::mutate(Same_day_discharge = as.numeric(difftime(spell_end, spell_start, unit = c("min")))) %>%
     dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission")
@@ -42,7 +42,7 @@ ae_arrival_occupancy_fct <- function(start_date = as.Date("2012-01-01", tz = "Eu
     tidyr::drop_na()
 
 
-  occupancy <- occupancy_fct(start_date = start_date,
+  occupancy <- hospitalflow::occupancy_fct(start_date = start_date,
                              end_date = end_date,
                              data = dt_calc)
 
