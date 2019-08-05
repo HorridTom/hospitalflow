@@ -1,7 +1,7 @@
-context("Occupancy by hour of the day")
+context("Occupancy by hour of a date")
 library(hospitalflow)
 
-test_that("occupancy by hour of the day",{
+test_that("Occupancy by hour of a date is generated correctly for two dates",{
 
   #Specify correct results
   correct_answers <- tibble::tibble(
