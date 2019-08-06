@@ -32,7 +32,7 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated",{
 
   #Run Admission Discharges graph
 
-  result_arriv_occ<- hospitalflow::ae_arrival_occupancy_fct(start_date = as.Date("2018-12-10",tz = "Europe/London"),
+  result_arriv_occ<- ae_arrival_occupancy_fct(start_date = as.Date("2018-12-10",tz = "Europe/London"),
                                                             end_date = as.Date("2018-12-11",tz = "Europe/London"),
                                                             data = test_arrivals_occupancy, plot_chart = FALSE,
                                                             hospital_name = "Hospital name")
@@ -54,7 +54,7 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated",{
   load("D:/Rprojects/hospitalflow/tests/testthat/testdata/occupancy/occupancy_test.rda")
 
   occupancy_test <- occupancy %>%
-    dplyr::select(spell_number, spell_start, spell_end)
+    dplyr::select(spell_number, spell_start, spell_end, spell_class_col)
 
   #Specify correct results
   correct_answers <- tibble::tibble(
