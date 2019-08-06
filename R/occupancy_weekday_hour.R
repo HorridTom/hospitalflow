@@ -32,16 +32,7 @@ occupancy_weekday_hour <- function(start_date = as.Date("2015-04-01", tz = "Euro
 
 
   # using gather function to create a new column with date; and filter only by Emergency Department
-  occupancy <-  dt_calc %>%
-    tidyr::gather(key = type, time, start_datetime:end_datetime) %>%
-    dplyr::mutate(change = dplyr::if_else(type == "start_datetime", 1, -1)) %>%
-    dplyr::group_by(time_hr = lubridate::floor_date(time, "1 hour")) %>%
-    dplyr::summarise(change = sum(change)) %>%
-    padr::pad(start_val = start_date, end_val = end_date) %>%
-    tidyr::replace_na(list(change = 0)) %>%
-    dplyr::mutate(occupancy_var = cumsum(change)) %>%
-    tidyr::drop_na()
-
+  occupancy <-  occupancy_fct(start_date = start_date, end_date = end_date, date
 
 
   #subseting data set#
@@ -97,7 +88,7 @@ occupancy_weekday_hour <- function(start_date = as.Date("2015-04-01", tz = "Euro
     ggplot2::theme(axis.title.y = ggplot2::element_text(margin = ggplot2::margin(t = 0, r = 21, b = 0, l = 0)),
                    plot.title = ggplot2::element_text(size = 12, face = "bold"),
                    plot.subtitle = ggplot2::element_text(size = 10),
-                   legend.position = "bottom", legend.box = "horizontal")
+                   legend.position = "bottom", legend.box = "hoatizontal")
 
   plt
 
