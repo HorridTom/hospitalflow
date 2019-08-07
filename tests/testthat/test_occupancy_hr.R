@@ -1,13 +1,19 @@
-context("Occupancy by hour of a date")
+context("Occupancy at specified time")
 library(hospitalflow)
 
-test_that("Occupancy by hour of a date is generated correctly for two dates for improvised data",{
+test_that("Occupancy at specified time correct for improvised data",{
+
+  # test time
+  t0 <- as.POSIXct("2018-12-10 09:00:00", tz = "Europe/London")
+  t1 <- as.POSIXct("2018-12-10 09:30:00", tz = "Europe/London")
+  t2 <- as.POSIXct("2018-12-10 10:45:00", tz = "Europe/London")
+
 
   #Specify correct results
-  correct_answers <- tibble::tibble(
-    time_hr = as.POSIXct(c("2018-12-10 09:00:00")),
+  correct_answer0 <- 0
+  correct_answer1 <- 1
+  correct_answer2 <- 2
 
-    occupancy = as.numeric(c(1)))
 
   #creating a dataset
 
@@ -23,12 +29,14 @@ test_that("Occupancy by hour of a date is generated correctly for two dates for 
                                             spell_start,
                                             spell_end)
 
-  result_occ <- hospitalflow::occupancy_fct(start_date = as.POSIXct("2018-12-10 09:00:00",tz = "Europe/London"),
-                                            end_date = as.POSIXct("2018-12-10 09:00:00",tz = "Europe/London"),
-                                            data = test_arrivals_occupancy)
+  result0 <- occupancy(t0, df = test_arrivals_occupancy)
+  result1 <- occupancy(t1, df = test_arrivals_occupancy)
+  result2 <- occupancy(t2, df = test_arrivals_occupancy)
 
-  #Test results are correct
-  expect_equal(as.data.frame(correct_answers), as.data.frame(result_occ), tolerance = 0.01)
+  #Test resultsare correct
+  expect_equal(result0,  correct_answer0)
+  expect_equal(result1,  correct_answer1)
+  expect_equal(result2,  correct_answer2)
 
 })
 
@@ -47,7 +55,7 @@ test_that("Occupancy by hour of a date is generated correctly, for real data",{
 
     occupancy = as.numeric(c(1, 1)))
 
-  result_occ <- hospitalflow::occupancy_fct(start_date = as.POSIXct("2016-06-28 18:00:00",tz = "Europe/London"),
+  result_occ <- occupancy(start_date = as.POSIXct("2016-06-28 18:00:00",tz = "Europe/London"),
                                             end_date = as.POSIXct("2016-06-28 19:00:00",tz = "Europe/London"),
                                             data = occupancy_test)
 
