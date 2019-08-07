@@ -25,5 +25,6 @@ Imports:
     purrr,
     tidyr,
     forcats,
-    ggplot2
+    ggplot2,
+    padr
 VignetteBuilder: knitr

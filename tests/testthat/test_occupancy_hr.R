@@ -36,7 +36,7 @@ test_that("Occupancy by hour of a date is generated correctly for two dates for 
 
 test_that("Occupancy by hour of a date is generated correctly, for real data",{
 
-  load("D:/Rprojects/hospitalflow/tests/testthat/testdata/occupancy/occupancy_test.rda")
+  load("testdata/occupancy/occupancy_test.rda")
 
   occupancy_test <- occupancy %>%
     dplyr::select(spell_number, spell_start, spell_end)
