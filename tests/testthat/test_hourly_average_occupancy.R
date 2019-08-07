@@ -10,8 +10,6 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated",{
     Average_arrivals = as.numeric(c(0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
     Average_occupancy = as.numeric(c(0.5, 0.5, 0.5, 0.5, 0.5, 0.5,  0.5, 0.0, 0.5, 0.5, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,  0.5, 0.5, 0.5,  0.5, 0.5)))
 
-
-  str(correct_answers_arriv_occ)
   #creating a dataset
 
 
@@ -32,13 +30,14 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated",{
 
   #Run Admission Discharges graph
 
-  result_arriv_occ<- ae_arrival_occupancy_fct(start_date = as.Date("2018-12-10",tz = "Europe/London"),
-                                                            end_date = as.Date("2018-12-11",tz = "Europe/London"),
-                                                            data = test_arrivals_occupancy, plot_chart = FALSE,
-                                                            hospital_name = "Hospital name")
+  result_arriv_occ<- ae_arrival_occupancy_fct(start_date = as.POSIXct("2018-12-10 01:00:00",tz = "Europe/London"),
+                                              end_date = as.POSIXct("2018-12-12 00:00:00",tz = "Europe/London"),
+                                              data = test_arrivals_occupancy,
+                                              plot_chart = FALSE,
+                                              hospital_name = "Hospital name")
 
   #result_ariv_occ_data_jm <- result_arriv_occ_jan_march$data
-  result_arriv_occh$Hour <- as.character(result_arriv_occ$Hour)
+  result_arriv_occ$Hour <- as.character(result_arriv_occ$Hour)
 
   #Test results are correct
   expect_equal(as.data.frame(correct_answers_arriv_occ), as.data.frame(result_arriv_occ), tolerance = 0.01)
@@ -46,7 +45,7 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated",{
 })
 
 
-context("Arrivals and Occupancy by hour of the day")
+context("Arrivals and Occupancy by hour of the day, for real data")
 library(hospitalflow)
 
 test_that("arrivals and occupancy by hour of the day is correctly calculated",{
@@ -58,13 +57,14 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated",{
 
   #Specify correct results
   correct_answers <- tibble::tibble(
-    time_hr = as.POSIXct(c("2016-06-28 18:00:00", "2016-06-28 19:00:00")),
+    Hour = as.numeric(c(18, 19)),
 
-    occupancy = as.numeric(c(1, 1)))
+    Average_arrivals = as.numeric(c(0, 0)),
+    Average_occupancy = as.numeric(c(0, 0)))
 
   result_occ <- ae_arrival_occupancy_fct(start_date = as.POSIXct("2016-06-28 18:00:00",tz = "Europe/London"),
-                                            end_date = as.POSIXct("2016-06-28 19:00:00",tz = "Europe/London"),
-                                            data = occupancy_test)
+                                         end_date = as.POSIXct("2016-06-28 19:00:00",tz = "Europe/London"),
+                                         data = occupancy_test, plot_chart = FALSE, hospital_name = "Hospital Name")
 
   #Test results are correct
   expect_equal(as.data.frame(correct_answers), as.data.frame(result_occ), tolerance = 0.01)

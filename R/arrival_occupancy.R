@@ -10,8 +10,8 @@
 #' @export
 #'
 #' @examples
-ae_arrival_occupancy_fct <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-                                     end_date = as.Date("2015-01-01", tz = "Europe/London"),
+ae_arrival_occupancy_fct <- function(start_date = as.POSIXct("2012-01-01 00:00:00", tz = "Europe/London"),
+                                     end_date = as.POSIXct("2015-01-01 00:00:00", tz = "Europe/London"),
                                      data, plot_chart, hospital_name = "Hospital name"){
 
   # start_date <- as.Date("2016-06-01")
