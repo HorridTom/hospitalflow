@@ -1,27 +1,26 @@
-#' occupancy_fct
+#' occupancy
 #'
-#' @param start_date
-#' @param end_date
-#' @param data
+#' @param date_time datetime at which we want to know the occupancy
+#' @param df dataframe representing stays, with start_datetime and end_datetime specifying stay start and end
 #'
-#' @return
+#' @return the occupancy at date_time
 #' @export
 #'
 #' @examples
-occupancy_fct <- function(start_date = as.POSIXct("2016-06-01 00:00:00", tz = "Europe/London"),
-                          end_date = as.POSIXct("2016-06-08 00:00:00", tz = "Europe/London"),
-                          data){
+occupancy <- function(date_time, df, start_time = "spell_start", end_time = "spell_end"){
 
-  # using gather function to create a new column with date
-  occupancy <-  data %>%
-    tidyr::gather(key = type, time, spell_start:spell_end) %>%
-    dplyr::mutate(change = dplyr::if_else(type == "spell_start", 1, -1)) %>%
-    dplyr::group_by(time_hr = lubridate::floor_date(time, "1 hour")) %>%
-    dplyr::summarise(change = sum(change)) %>%
-    padr::pad(start_val = start_date, end_val = end_date) %>%
-    tidyr::replace_na(list(change = 0)) %>%
-    dplyr::mutate(occupancy = cumsum(change)) %>%
-    dplyr::select(-change) %>%
-    tidyr::drop_na()
+
+  start_time <- as.name(start_time)
+  end_time <- as.name(end_time)
+
+  #point interval for the time that you are calculating the occupancy for
+  testInterval <- lubridate::interval(date_time, date_time)
+
+  df <- df %>%
+    dplyr::mutate(stayInterval = lubridate::interval(!!start_time,!!end_time)) %>%
+    dplyr::mutate(overLapTest = lubridate::int_overlaps(stayInterval, testInterval))
+
+  occupancy <- sum(df$overLapTest)
+  occupancy
 
 }
