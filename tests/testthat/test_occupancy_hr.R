@@ -46,20 +46,23 @@ test_that("Occupancy by hour of a date is generated correctly, for real data",{
 
   load("testdata/occupancy/occupancy_test.rda")
 
-  occupancy_test <- occupancy %>%
+  occupancy_test <- occupancy_test %>%
     dplyr::select(spell_number, spell_start, spell_end)
 
+
+  t0 <- as.POSIXct("2016-05-23 13:45:00", tz = "Europe/London")
+  t1 <- as.POSIXct("2016-06-01 06:00:00", tz = "Europe/London")
+
   #Specify correct results
-  correct_answers <- tibble::tibble(
-    time_hr = as.POSIXct(c("2016-06-28 18:00:00", "2016-06-28 19:00:00")),
+  correct_answer0 <- 1
+  correct_answer1 <- 2
 
-    occupancy = as.numeric(c(1, 1)))
-
-  result_occ <- occupancy(start_date = as.POSIXct("2016-06-28 18:00:00",tz = "Europe/London"),
-                                            end_date = as.POSIXct("2016-06-28 19:00:00",tz = "Europe/London"),
-                                            data = occupancy_test)
+  #Specify correct results
+  result0 <- occupancy(t0, df = occupancy_test)
+  result1 <- occupancy(t1, df = occupancy_test)
 
   #Test results are correct
-  expect_equal(as.data.frame(correct_answers), as.data.frame(result_occ), tolerance = 0.01)
+  expect_equal(result0, correct_answer0)
+  expect_equal(result1, correct_answer1)
 
 })
