@@ -61,10 +61,10 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated",{
 
   #Specify correct results
   correct_answers <- tibble::tibble(
-    Hour = as.numeric(c(5, 23)),
+    Hour = as.numeric(c(0, 1, 2, 3, 4, 5, 23)),
 
-    Average_arrivals = as.numeric(c(0, 0)),
-    Average_occupancy = as.numeric(c(2, 1)))
+    Average_arrivals = as.numeric(c(0, 0, 0, 0, 0, 0, 2)),
+    Average_occupancy = as.numeric(c(2, 2, 2, 2, 2, 2, 0)))
 
   result_occ <- ae_arrival_occupancy_fct(start_date = as.POSIXct("2016-05-31 23:00:00",tz = "Europe/London"),
                                          end_date = as.POSIXct("2016-06-01 05:00:00",tz = "Europe/London"),

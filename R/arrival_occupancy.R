@@ -24,7 +24,7 @@ ae_arrival_occupancy_fct <- function(start_date = as.POSIXct("2012-01-01 00:00:0
                   Los = as.numeric(difftime(initial_ed_end_datetime, spell_start, unit = c("hour"))),
                   Discharged_24hr = dplyr::if_else(Los < 24, TRUE, FALSE)) %>%
     dplyr::filter(Discharged_24hr == TRUE & Los <= 24) %>%
-    dplyr::filter(spell_start > start_date & initial_ed_end_datetime < end_date)
+    dplyr::filter(spell_start > start_date | initial_ed_end_datetime < end_date)
 
 
   # using gather function to create a new column with date
@@ -41,7 +41,7 @@ ae_arrival_occupancy_fct <- function(start_date = as.POSIXct("2012-01-01 00:00:0
 
   time_hr <- seq(from = start_date, to = end_date, by = "hour")
 
-  occupancy_vct <- sapply(time_hr, occupancy, df = data, start_time = "spell_start", end_time = "initial_ed_end_datetime")
+  occupancy_vct <- sapply(time_hr, occupancy, df = dt_calc, start_time = "spell_start", end_time = "initial_ed_end_datetime")
 
   occupancy_df <- tibble::tibble(time_hr, occupancy_vct)
 
