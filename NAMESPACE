@@ -3,5 +3,6 @@
 export(admission_discharges)
 export(ae_arrival_occupancy_fct)
 export(hello_world)
+export(occupancy)
 importFrom(lubridate,"%m+%")
 importFrom(magrittr,"%>%")
