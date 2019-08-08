@@ -14,13 +14,10 @@ ae_arrival_occupancy_fct <- function(start_date = as.POSIXct("2012-01-01 00:00:0
                                      end_date = as.POSIXct("2015-01-01 00:00:00", tz = "Europe/London"),
                                      data, plot_chart, hospital_name = "Hospital name"){
 
-  # start_date <- as.Date("2016-06-01")
-  # end_date <- as.Date("2016-06-08")
-
   dt_los <- data %>%
     dplyr::select(spell_number, spell_start, initial_ed_end_datetime, spell_class_col, starts_with_ed) %>%
     dplyr::mutate(Same_day_discharge = as.numeric(difftime(initial_ed_end_datetime, spell_start, unit = c("min")))) %>%
-    dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission" | starts_with_ed == TRUE)
+    dplyr::filter(starts_with_ed == TRUE)
 
   dt_calc <- dt_los %>%
     dplyr::mutate(Same_day_discharge = dplyr::if_else(as.Date(spell_start) == as.Date(initial_ed_end_datetime),  TRUE, FALSE),
@@ -41,6 +38,7 @@ ae_arrival_occupancy_fct <- function(start_date = as.POSIXct("2012-01-01 00:00:0
     tidyr::replace_na(list(arrivals = 0)) %>%
     tidyr::drop_na()
 
+
   time_hr <- seq(from = start_date, to = end_date, by = "hour")
 
   occupancy_vct <- sapply(time_hr, occupancy, df = data, start_time = "spell_start", end_time = "initial_ed_end_datetime")
@@ -55,6 +53,7 @@ ae_arrival_occupancy_fct <- function(start_date = as.POSIXct("2012-01-01 00:00:0
     dplyr::group_by(Hour) %>%
     dplyr::summarize(Average_arrivals = mean(arrivals),
                      Average_occupancy = mean(occupancy_vct))
+
 
 
   # Set the title
