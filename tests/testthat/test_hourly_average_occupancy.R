@@ -8,7 +8,7 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated",{
     Hour = as.character(c(0, 1, 2, 3, 4, 5, 6, 7, 8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,  23)),
 
     Average_arrivals = as.numeric(c(0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)),
-    Average_occupancy = as.numeric(c(0.5, 0.5, 0.5, 0.5, 0.5, 0.5,  0.5, 0.0, 0.5, 0.5, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,  0.5, 0.5, 0.5,  0.5, 0.5)))
+    Average_occupancy = as.numeric(c(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0, 0.5, 0.5, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,  0.5, 0.5, 0.5,  0.5, 0.5)))
 
   #creating a dataset
 
@@ -19,13 +19,17 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated",{
 
   spell_class_col <- as.character(c("ed_non_admission", "ed_comp_non_admission", "ed_non_admission"))
 
+  starts_with_ed <- as.character(c(TRUE, TRUE, TRUE))
+
   spell_start <- as.POSIXct(dt1, tz = "Europe/London")
-  spell_end <- as.POSIXct(dt2,tz = "Europe/London")
+
+  initial_ed_end_datetime <- as.POSIXct(dt2,tz = "Europe/London")
 
   test_arrivals_occupancy <- tibble::tibble(spell_number = 101:103,
                                             spell_start,
-                                            spell_end,
-                                            spell_class_col)
+                                            initial_ed_end_datetime,
+                                            spell_class_col,
+                                            starts_with_ed)
 
 
   #Run Admission Discharges graph
@@ -50,21 +54,21 @@ library(hospitalflow)
 
 test_that("arrivals and occupancy by hour of the day is correctly calculated",{
 
-  load("D:/Rprojects/hospitalflow/tests/testthat/testdata/occupancy/occupancy_test.rda")
+  occupancy_arrival_test <- readRDS("testdata/arrival_occupancy/occupancy_arrival_test.rds")
 
-  occupancy_test <- occupancy %>%
-    dplyr::select(spell_number, spell_start, spell_end, spell_class_col)
+  occupancy_arrival_test <- occupancy_arrival_test %>%
+    dplyr::select(spell_number, spell_start, initial_ed_end_datetime, spell_class_col, starts_with_ed)
 
   #Specify correct results
   correct_answers <- tibble::tibble(
-    Hour = as.numeric(c(18, 19)),
+    Hour = as.numeric(c(5, 23)),
 
     Average_arrivals = as.numeric(c(0, 0)),
-    Average_occupancy = as.numeric(c(0, 0)))
+    Average_occupancy = as.numeric(c(2, 1)))
 
-  result_occ <- ae_arrival_occupancy_fct(start_date = as.POSIXct("2016-06-28 18:00:00",tz = "Europe/London"),
-                                         end_date = as.POSIXct("2016-06-28 19:00:00",tz = "Europe/London"),
-                                         data = occupancy_test, plot_chart = FALSE, hospital_name = "Hospital Name")
+  result_occ <- ae_arrival_occupancy_fct(start_date = as.POSIXct("2016-05-31 23:00:00",tz = "Europe/London"),
+                                         end_date = as.POSIXct("2016-06-01 05:00:00",tz = "Europe/London"),
+                                         data = occupancy_arrival_test, plot_chart = FALSE, hospital_name = "Hospital Name")
 
   #Test results are correct
   expect_equal(as.data.frame(correct_answers), as.data.frame(result_occ), tolerance = 0.01)

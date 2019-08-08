@@ -18,21 +18,21 @@ ae_arrival_occupancy_fct <- function(start_date = as.POSIXct("2012-01-01 00:00:0
   # end_date <- as.Date("2016-06-08")
 
   dt_los <- data %>%
-    dplyr::select(spell_number, spell_start, spell_end, spell_class_col) %>%
-    dplyr::mutate(Same_day_discharge = as.numeric(difftime(spell_end, spell_start, unit = c("min")))) %>%
-    dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission")
+    dplyr::select(spell_number, spell_start, initial_ed_end_datetime, spell_class_col, starts_with_ed) %>%
+    dplyr::mutate(Same_day_discharge = as.numeric(difftime(initial_ed_end_datetime, spell_start, unit = c("min")))) %>%
+    dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission" | starts_with_ed == TRUE)
 
   dt_calc <- dt_los %>%
-    dplyr::mutate(Same_day_discharge = dplyr::if_else(as.Date(spell_start) == as.Date(spell_end),  TRUE, FALSE),
-                  Los = as.numeric(difftime(spell_end, spell_start, unit = c("hour"))),
+    dplyr::mutate(Same_day_discharge = dplyr::if_else(as.Date(spell_start) == as.Date(initial_ed_end_datetime),  TRUE, FALSE),
+                  Los = as.numeric(difftime(initial_ed_end_datetime, spell_start, unit = c("hour"))),
                   Discharged_24hr = dplyr::if_else(Los < 24, TRUE, FALSE)) %>%
     dplyr::filter(Discharged_24hr == TRUE & Los <= 24) %>%
-    dplyr::filter(spell_start > start_date & spell_end < end_date)
+    dplyr::filter(spell_start > start_date & initial_ed_end_datetime < end_date)
 
 
   # using gather function to create a new column with date
   arrivals <-  dt_calc %>%
-    tidyr::gather(key = type, time, spell_start:spell_end) %>%
+    tidyr::gather(key = type, time, spell_start:initial_ed_end_datetime) %>%
     dplyr::mutate(change = dplyr::if_else(type == "spell_start", 1, -1)) %>%
     dplyr::group_by(time_hr = lubridate::floor_date(time, "1 hour")) %>%
     dplyr::summarise(
@@ -41,18 +41,20 @@ ae_arrival_occupancy_fct <- function(start_date = as.POSIXct("2012-01-01 00:00:0
     tidyr::replace_na(list(arrivals = 0)) %>%
     tidyr::drop_na()
 
+  time_hr <- seq(from = start_date, to = end_date, by = "hour")
 
-  occupancy <- hospitalflow::occupancy_fct(start_date = start_date,
-                             end_date = end_date,
-                             data = dt_calc)
+  occupancy_vct <- sapply(time_hr, occupancy, df = data, start_time = "spell_start", end_time = "initial_ed_end_datetime")
 
-  arrival_occupancy <- dplyr::left_join(arrivals, occupancy, by = c("time_hr"))
+  occupancy_df <- tibble::tibble(time_hr, occupancy_vct)
+
+  arrival_occupancy <- dplyr::left_join(arrivals, occupancy_df, by = c("time_hr"))
+
 
   avg_arriv_occup <- arrival_occupancy  %>%
     dplyr::mutate(Hour = lubridate::hour(time_hr)) %>%
     dplyr::group_by(Hour) %>%
     dplyr::summarize(Average_arrivals = mean(arrivals),
-                     Average_occupancy = mean(occupancy))
+                     Average_occupancy = mean(occupancy_vct))
 
 
   # Set the title

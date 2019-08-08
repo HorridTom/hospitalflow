@@ -4,9 +4,9 @@
 \alias{ae_arrival_occupancy_fct}
 \title{ae_arrival_occupancy_fct}
 \usage{
-ae_arrival_occupancy_fct(start_date = as.Date("2012-01-01", tz =
-  "Europe/London"), end_date = as.Date("2015-01-01", tz =
-  "Europe/London"), data, plot_chart, hospital_name = "Hospital name")
+ae_arrival_occupancy_fct(start_date = as.POSIXct("2012-01-01 00:00:00",
+  tz = "Europe/London"), end_date = as.POSIXct("2015-01-01 00:00:00", tz
+  = "Europe/London"), data, plot_chart, hospital_name = "Hospital name")
 }
 \arguments{
 \item{hospital_name}{}
