@@ -44,7 +44,7 @@ test_that("Occupancy at specified time correct for improvised data",{
 
 test_that("Occupancy by hour of a date is generated correctly, for real data",{
 
-  load("testdata/occupancy/occupancy_test.rda")
+  occupancy_test <- readRDS("testdata/occupancy/occupancy_test.rds")
 
   occupancy_test <- occupancy_test %>%
     dplyr::select(spell_number, spell_start, spell_end)
