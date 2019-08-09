@@ -92,10 +92,14 @@ wait_times_over_4hrs_Vs_occupancy <- function(df, startDate, endDate, hospitalNa
                              colour = "perc_LoS_over_4hrs")) +
     ggplot2::geom_smooth(aes(y=perc_W4T_over_4hrs,
                              colour = "per_W4T_over_4hrs")) +
+    ggplot2::geom_point(aes(y=perc_LoS_over_4hrs,
+                             colour = "perc_LoS_over_4hrs")) +
+    ggplot2::geom_point(aes(y=perc_W4T_over_4hrs,
+                             colour = "per_W4T_over_4hrs")) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.title = element_blank(),
                    legend.position = "bottom") +
-    ggplot2::labs(title = "Occupancy on Arrival versus Average Percentage of Unscheduled \nED Attendances with LoS and Wait Time for Treatment over 4hrs",
+    ggplot2::labs(title = "Occupancy on Arrival versus Percentage of Unscheduled \nED Attendances with LoS and Wait Time for Treatment over 4hrs",
                   subtitle = paste(hospitalName,"\nbetween ", strftime(startDate, "%d/%m/%Y"),
                                    " and ", strftime(endDate, "%d/%m/%Y")),
                   y = "Percentage over 4hrs, %", x = "Occupancy on arrival",
@@ -103,8 +107,8 @@ wait_times_over_4hrs_Vs_occupancy <- function(df, startDate, endDate, hospitalNa
     ggplot2::scale_x_continuous(breaks = scales::pretty_breaks()) +
     ggplot2::scale_y_continuous(breaks = scales::pretty_breaks()) +
     ggplot2::scale_colour_manual(labels = c("Number of Attendances",
-                                  "Average % of unscheduled ED \nattendances with LoS over 4hrs",
-                                  "Average % of unscheduled ED attendances \nwith wait time for treatment over 4hrs"),
+                                  "% of unscheduled ED \nattendances with LoS over 4hrs",
+                                  "% of unscheduled ED attendances \nwith wait time for treatment over 4hrs"),
                                 values = c("dodgerblue2", "firebrick3", "seagreen4")) +
     ggplot2::guides(color = guide_legend(reverse = TRUE)) +
     ggplot2::geom_vline(xintercept = deciles_tib$deciles,
