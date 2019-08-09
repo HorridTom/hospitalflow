@@ -1,43 +1,39 @@
-# need a skeleton
 
-# functions to calculate and plot the registered ED occupancy on arrival against the unscheduled attendances with LoS >4hrs,
-# wait for assessment and unscheduled ED attendance
-
-
-# standard occupancy function
-occupancy <- function(occupancyDateTime, df){
-
-
-  #point interval for the time that you are calculating the occupancy for
-  testInterval <- lubridate::interval(occupancyDateTime, occupancyDateTime)
-
-  df <- df %>%
-    #this line should make the code faster but currently having problems with the >= for datetimes
-    #dplyr::filter(start_datetime <= occupancyDateTime & end_datetime >= occupancyDateTime) %>%
-    dplyr::mutate(stayInterval = lubridate::interval(start_datetime,end_datetime)) %>%
-    dplyr::mutate(overLapTest = lubridate::int_overlaps(stayInterval, testInterval))
-
-
-  occupancy <- sum(df$overLapTest)
-  occupancy
-
-}
-
-
-# function to calculate the ED occupancy on arrival which is added as a column to the input dataframe
-# will try two methods: calculate each row individually and create a table and use lookup
-ed_occupancy_on_arrival <- function(df = test_ed_occupancy_on_arrival_data){
+#' ed_occupancy_on_arrival
+#'
+#' @param df dataframe of ED data with start_datetime and end_datetime representing start and end of a patient's time in ED
+#'
+#'
+#' @return the input df with an extra column containing the corresponding occupancy on arrival for each patient
+#'
+#'
+#' @examples
+ed_occupancy_on_arrival <- function(df){
 
   df <- df %>%
-    rowwise %>%
-    dplyr::mutate(occupancy_on_arrival = occupancy(start_datetime, df))
+    dplyr::rowwise() %>%
+    dplyr::mutate(occupancy_on_arrival = hospitalflow::occupancy(start_datetime, df,
+                                                                 start_time = "start_datetime", end_time = "end_datetime"))
 
   df
 
 }
 
 
-#function to calculate dataframe and plot % of unscheduled ED attendances with ED LoS >4hrs and wait for treatment >4hrs against ED occupancy on arrival
+
+#' wait_times_over_4hrs_Vs_occupancy
+#'
+#' @param df dataframe of ED data with start_datetime and end_datetime representing start and end of a patient's time in ED
+#' @param startDate the first date of the period for which the analysis will run
+#' @param endDate the last date of the period for which the analysis will run
+#' @param hospitalName the name of the hospital for which the analysis is being done
+#' @param plotChart plots the graph if set to TRUE, returns dataframe of the plot variables if set to FALSE
+#'
+#' @return graph or dataframe of % of unscheduled ED attendances with ED LoS >4hrs and wait for treatment >4hrs
+#' against ED occupancy on arrival
+#' @export
+#'
+#' @examples
 wait_times_over_4hrs_Vs_occupancy <- function(df, startDate, endDate, hospitalName, plotChart = T){
 
 
