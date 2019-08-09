@@ -7,44 +7,39 @@
 #' @export
 #'
 #' @examples
-occupancy_weekday_hour <- function(start_date = as.Date("2015-04-01", tz = "Europe/London"),
-                                   end_date = as.POSIXct("2016-04-01", tz = "Europe/London"),
+occupancy_weekday_hour <- function(start_date = as.POSIXct("2015-04-01 00:00:00", tz = "Europe/London"),
+                                   end_date = as.POSIXct("2016-04-01 00:00:00", tz = "Europe/London"),
                                    data, plot_chart, hospital_name = "Hospital name") {
 
   # renaming the variables I am interested in
   df_select <- data %>%
-    dplyr::select(pseudo_id, episode_id, start_datetime, end_datetime, attendance_disposal) %>%
-    dplyr::filter(start_datetime <= end_date, end_datetime >= start_date) %>%
-    dplyr::filter(attendance_disposal == "Discharged")
+    dplyr::select(spell_number, spell_start, initial_ed_end_datetime, starts_with_ed) %>%
+    dplyr::filter(spell_start <= end_date, initial_ed_end_datetime >= start_date) %>%
+    dplyr::filter(starts_with_ed == TRUE)
 
-
-  dt_los <- data %>%
-    dplyr::select(pseudo_id, start_datetime, end_datetime) %>%
-    dplyr::mutate(Same_day_discharge = as.numeric(difftime(end_datetime, start_datetime, unit = c("min"))))
-
-
-  dt_calc <- dt_los %>%
-    dplyr::mutate(Same_day_discharge = dplyr::if_else(as.Date(start_datetime) == as.Date(end_datetime),  TRUE, FALSE),
-                  Los = as.numeric(difftime(start_datetime, end_datetime, unit = c("hour"))),
+  dt_calc <- df_select %>%
+    dplyr::mutate(Same_day_discharge = dplyr::if_else(as.Date(spell_start) == as.Date(initial_ed_end_datetime),  TRUE, FALSE),
+                  Los = as.numeric(difftime(initial_ed_end_datetime, spell_start, unit = c("hour"))),
                   Discharged_24hr = dplyr::if_else(Los < 24, TRUE, FALSE)) %>%
     dplyr::filter(Discharged_24hr == TRUE & Los <= 24) %>%
-    dplyr::filter(start_datetime <= end_date & end_datetime >= start_date)
+    dplyr::filter(spell_start <= end_date | initial_ed_end_datetime >= start_date)
 
+  # date time period chosen
 
-  # using gather function to create a new column with date; and filter only by Emergency Department
-  occupancy <-  occupancy_fct(start_date = start_date, end_date = end_date, date
+  time_hr <- seq(from = start_date, to = end_date, by = "hour")
 
+  occupancy_vct <- sapply(time_hr, occupancy, df = dt_calc, start_time = "spell_start", end_time = "initial_ed_end_datetime")
 
-  #subseting data set#
+  occupancy_df <- tibble::tibble(time_hr, occupancy_vct)
 
   #################################################################################################################
 
 
-  dt_wday_hour_month <- occupancy %>%
+  dt_wday_hour_month <- occupancy_df %>%
     dplyr::mutate(month = lubridate::month(time_hr),
            Wday = lubridate::wday(time_hr, label = TRUE, abbr = TRUE),
            hour = lubridate::hour(time_hr)) %>%
-    dplyr::select(time_hr, month, Wday, hour, occupancy_var)
+    dplyr::select(time_hr, month, Wday, hour, occupancy_vct)
 
 
   #######################################################################
@@ -53,23 +48,16 @@ occupancy_weekday_hour <- function(start_date = as.Date("2015-04-01", tz = "Euro
   # getting the averages, min, max, interquartile ranges (Q1 and  Q3)
   tbl_avg_occ <- dt_wday_hour_month %>%
     dplyr::group_by(hour, Wday) %>%
-    dplyr::summarize(average_occupancy = mean(occupancy_var),
-                     Q1 = quantile(occupancy_var, 0.025),
-                     Q3 = quantile(occupancy_var, 0.975),
-                     Min_n = min(occupancy_var),
-                     Max_n = max(occupancy_var)) %>%
+    dplyr::summarize(average_occupancy = mean(occupancy_vct),
+                     Q1 = quantile(occupancy_vct, 0.025),
+                     Q3 = quantile(occupancy_vct, 0.975),
+                     Min_n = min(occupancy_vct),
+                     Max_n = max(occupancy_vct)) %>%
     dplyr::ungroup()
 
 
   Weekdays <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
   tbl_avg_occ_2 <- dplyr::arrange(transform(tbl_avg_occ, day = factor(Wday, levels = Weekdays)), Wday)
-
-  # Set the title
-  title_stub <- ": Attendances and Admissions by Age and Gender,\n"
-  hospital_name <- "Chelsea & Westminster"
-  start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
-  end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
-  chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
 
 
   plt <- tbl_avg_occ_2 %>%
@@ -98,7 +86,7 @@ occupancy_weekday_hour <- function(start_date = as.Date("2015-04-01", tz = "Euro
 
   }else{
 
-    plt$data %>% select(hour, Average_occ, Q1, Q3, Min_n, Max_n)
+    plt$data %>% dplyr::select(hour, average_occupancy, Q1, Q3, Min_n, Max_n)
 
   }
 }
