@@ -4,7 +4,8 @@ library(hospitalflow)
 
 test_that("occupancies on arrival are correct",{
 
-  test_ed_occupancy_on_arrival_data <- readRDA("testdata/ed_occupancy_on_arrival/test_ed_occupancy_on_arrival.rda")
+  test_ed_occupancy_on_arrival_data <- readRDS("testdata/ed_occupancy_on_arrival_tests/test_ed_occupancy_on_arrival.rds")
+
 
   correct_answers <- c(4, 5, 4, 8, 8, 7, 8, 4, 4, 8)
 
