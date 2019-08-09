@@ -36,10 +36,11 @@ ed_occupancy_on_arrival <- function(df){
 #' @examples
 wait_times_over_4hrs_Vs_occupancy <- function(df, startDate, endDate, hospitalName, plotChart = T){
 
+  df <- filter(df, start_datetime >= startDate, end_datetime <= endDate)
 
   df <- ed_occupancy_on_arrival(df)
   df <- df %>%
-    dplyr::filter(start_datetime >= startDate, end_datetime <= endDate) %>%
+    #dplyr::filter(start_datetime >= startDate, end_datetime <= endDate) %>%
     dplyr::filter(attendance_category != "Follow up - Planned") %>%
     dplyr::mutate(LoS_hrs =
                     as.numeric(difftime(end_datetime, start_datetime, units = "hours"))) %>%
