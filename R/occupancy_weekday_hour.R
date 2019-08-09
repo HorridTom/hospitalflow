@@ -49,8 +49,8 @@ occupancy_weekday_hour <- function(start_date = as.POSIXct("2015-04-01 00:00:00"
   tbl_avg_occ <- dt_wday_hour_month %>%
     dplyr::group_by(hour, Wday) %>%
     dplyr::summarize(average_occupancy = mean(occupancy_vct),
-                     Q1 = quantile(occupancy_vct, 0.025),
-                     Q3 = quantile(occupancy_vct, 0.975),
+                     Q1 = quantile(occupancy_vct, 0.25),
+                     Q3 = quantile(occupancy_vct, 0.75),
                      Min_n = min(occupancy_vct),
                      Max_n = max(occupancy_vct)) %>%
     dplyr::ungroup()
@@ -58,6 +58,14 @@ occupancy_weekday_hour <- function(start_date = as.POSIXct("2015-04-01 00:00:00"
 
   Weekdays <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
   tbl_avg_occ_2 <- dplyr::arrange(transform(tbl_avg_occ, day = factor(Wday, levels = Weekdays)), Wday)
+
+  # Set the title
+  title_stub <- ": Unscheduled ED Occupancy by day and hour"
+  #hospital_name <- "Chelsea & Westminster"
+  start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
+  end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
+  chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
+
 
 
   plt <- tbl_avg_occ_2 %>%
