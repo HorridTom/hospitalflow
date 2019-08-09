@@ -43,6 +43,7 @@ ED_day_hour <- function(startDay, endDay, df,
 #' @param df Dataframe representing ED stays with start_ime and end_time specifying stay start and end of time in ED
 #' @param start_time Name of column in df containing stay start time in ED
 #' @param end_time Name of column in df containing stay end time in ED
+#' @param hospital_name Name of hospital for which the analysis is being done
 #' @param plot_chat Plots chart if set to TRUE, else returns dataframe of plot data
 #'
 #' @return A plot or dataframe with mean, Q1, Q3, max and min occupancy for each hour of the week
@@ -51,6 +52,7 @@ ED_day_hour <- function(startDay, endDay, df,
 #' @examples
 ED_day_hour_plot <- function(startDay, endDay, df,
                              start_time = "start_datetime", end_time = "end_datetime",
+                             hospital_name = "Hospital Name",
                              plot_chart = T){
 
   #text for annotation
@@ -82,8 +84,6 @@ ED_day_hour_plot <- function(startDay, endDay, df,
                         linetype = "longdash") +
     ggplot2::xlab("Hour in the day") +
     ggplot2::ylab("ED Occupancy") +
-    ggplot2::ggtitle(paste("ED 'occupancy' by day and hour \nbetween",startDay,"and",endDay)) +
-    ggplot2::theme(plot.title = element_text(hjust = 0.5, face = "bold")) +
     ggplot2::theme(plot.margin = unit(c(1,1,5,1), "lines")) +
     ggplot2::theme(axis.title.x = element_text(vjust=-8)) +
     ggplot2::theme(axis.text.x=element_text(angle=90, vjust=0.5)) +
@@ -96,7 +96,10 @@ ED_day_hour_plot <- function(startDay, endDay, df,
     ggplot2::scale_colour_manual("",
                                  values="red") +
     ggplot2::scale_fill_manual("",
-                               values=c("blue","steel blue"))
+                               values=c("blue","steel blue")) +
+    ggplot2::labs(title = "ED 'occupancy' by day and hour",
+                  subtitle = paste(hospital_name,"\nbetween",strftime(startDay, "%d/%b/%Y"),"and",strftime(endDay, "%d/%b/%Y")),
+                  caption = "Source: CLAHRC NWL")
 
   #setting where the day labels are placed in y coordinates
   ymin <- -(ggplot2::ggplot_build(p)$layout$panel_params[[1]]$y.range[2] / 6)
