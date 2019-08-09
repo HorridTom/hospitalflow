@@ -2,15 +2,19 @@ context("calculate and plot the Unscheduled ED 'occupancy' by day and hour betwe
 #source('...R/ED_day_hour.R')
 source('C:/Users/iconnorh/Desktop/Imogen/Rprojects/GraphGeneration/R/ED_day_hour.R')
 
-#load('tests/test-data/ED_day_hour_data_test.rda')
-load('C:/Users/iconnorh/Desktop/Imogen/Rprojects/GraphGeneration/tests/test-data/ED_day_hour_data_test.rda')
+load('tests/test-data/ED_day_hour_data_test.rda')
+#load('C:/Users/iconnorh/Desktop/Imogen/Rprojects/GraphGeneration/tests/test-data/ED_day_hour_data_test.rda')
+#need to update this
 
 
 testthat::test_that("Occupancy is calculated correctly",{
 
-  occupancy_day1 <- ED_day_hour_occupancy("2013-01-01 12:00:00","2013-01-01","2013-01-15", df = ED_day_hour_data_test)
-  occupancy_day6 <- ED_day_hour_occupancy("2013-01-06 12:00:00","2013-01-01","2013-01-15", df = ED_day_hour_data_test)
-  occupancy_day13 <- ED_day_hour_occupancy("2013-01-13 12:00:00","2013-01-01","2013-01-15", df = ED_day_hour_data_test)
+  # occupancy_day1 <- ED_day_hour_occupancy("2013-01-01 12:00:00","2013-01-01","2013-01-15", df = ED_day_hour_data_test)
+  # occupancy_day6 <- ED_day_hour_occupancy("2013-01-06 12:00:00","2013-01-01","2013-01-15", df = ED_day_hour_data_test)
+  # occupancy_day13 <- ED_day_hour_occupancy("2013-01-13 12:00:00","2013-01-01","2013-01-15", df = ED_day_hour_data_test)
+  occupancy_day1 <- ED_day_hour_occupancy("2013-01-01 12:00:00", df = ED_day_hour_data_test)
+  occupancy_day6 <- ED_day_hour_occupancy("2013-01-06 12:00:00", df = ED_day_hour_data_test)
+  occupancy_day13 <- ED_day_hour_occupancy("2013-01-13 12:00:00", df = ED_day_hour_data_test)
 
   testthat::expect_equal(occupancy_day1, 2)
   testthat::expect_equal(occupancy_day6, 6)
