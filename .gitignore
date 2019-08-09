@@ -1,6 +1,5 @@
 packrat/lib*/
 .Rproj.user
-
 # History files
 .Rhistory
 .Rapp.history
@@ -32,11 +31,8 @@ rsconnect/
 # Data
 /data
 inst/doc
-
-
 # Temporarily ignore whole vignette folder as caches contain data
 /vignettes
-
 # pdfs in config file
 /lgt-config/*.pdf
-
+lgt-data
