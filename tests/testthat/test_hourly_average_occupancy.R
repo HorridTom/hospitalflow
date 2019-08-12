@@ -34,7 +34,7 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated",{
 
   #Run Admission Discharges graph
 
-  result_arriv_occ<- ae_arrival_occupancy_fct(start_date = as.POSIXct("2018-12-10 01:00:00",tz = "Europe/London"),
+  result_arriv_occ<- ae_arrival_occupancy(start_date = as.POSIXct("2018-12-10 01:00:00",tz = "Europe/London"),
                                               end_date = as.POSIXct("2018-12-12 00:00:00",tz = "Europe/London"),
                                               data = test_arrivals_occupancy,
                                               plot_chart = FALSE,
@@ -66,7 +66,7 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated",{
     Average_arrivals = as.numeric(c(0, 0, 0, 0, 0, 0, 2)),
     Average_occupancy = as.numeric(c(2, 2, 2, 2, 2, 2, 0)))
 
-  result_occ <- ae_arrival_occupancy_fct(start_date = as.POSIXct("2016-05-31 23:00:00",tz = "Europe/London"),
+  result_occ <- ae_arrival_occupancy(start_date = as.POSIXct("2016-05-31 23:00:00",tz = "Europe/London"),
                                          end_date = as.POSIXct("2016-06-01 05:00:00",tz = "Europe/London"),
                                          data = occupancy_arrival_test, plot_chart = FALSE, hospital_name = "Hospital Name")
 

@@ -1,4 +1,4 @@
-#' ae_arrival_occupancy_fct
+#' ae_arrival_occupancy
 #'
 #' @param start_date
 #' @param end_date
@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-ae_arrival_occupancy_fct <- function(start_date = as.POSIXct("2012-01-01 00:00:00", tz = "Europe/London"),
+ae_arrival_occupancy <- function(start_date = as.POSIXct("2012-01-01 00:00:00", tz = "Europe/London"),
                                      end_date = as.POSIXct("2015-01-01 00:00:00", tz = "Europe/London"),
                                      data, plot_chart, hospital_name = "Hospital name"){
 
@@ -58,7 +58,6 @@ ae_arrival_occupancy_fct <- function(start_date = as.POSIXct("2012-01-01 00:00:0
 
   # Set the title
   title_stub <- " hospital: Hourly A&E arrival & occupancy profile, "
-  hospital_name <- "Chelsea & Westminster"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
@@ -74,7 +73,7 @@ ae_arrival_occupancy_fct <- function(start_date = as.POSIXct("2012-01-01 00:00:0
     ggplot2::theme_bw() +
     ggplot2::labs(title = chart_title,
                   subtitle = "Averages - Hourly ED Occupancy, % , by Hour of the day. \nNote: results are intended for management information only",
-                  y = "Average occupancy, n", x = "Hour of the day", caption = "Source: CLAHRC NWL") +
+                  y = "Average Count", x = "Hour of the day", caption = "Source: CLAHRC NWL") +
     ggplot2::theme(axis.title.y = ggplot2::element_text(margin = ggplot2::margin(t = 0, r = 21, b = 0, l = 0)),
                    plot.title = ggplot2::element_text(size = 12, face = "bold"),
                    plot.subtitle = ggplot2::element_text(size = 10),
