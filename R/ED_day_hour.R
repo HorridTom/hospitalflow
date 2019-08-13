@@ -56,15 +56,6 @@ ED_day_hour_plot <- function(startDay, endDay, df,
                              hospital_name = "Hospital Name",
                              plot_chart = T){
 
-  #text for annotation
-  mon <- grid::textGrob("Monday", gp = grid::gpar(fontsize=10, fontface="bold"))
-  tues <- grid::textGrob("Tuesday", gp = grid::gpar(fontsize=10, fontface="bold"))
-  wed <- grid::textGrob("Wednesday", gp = grid::gpar(fontsize=10, fontface="bold"))
-  thurs <- grid::textGrob("Thursday", gp = grid::gpar(fontsize=10, fontface="bold"))
-  fri <- grid::textGrob("Friday", gp = grid::gpar(fontsize=10, fontface="bold"))
-  sat <- grid::textGrob("Saturday", gp = grid::gpar(fontsize=10, fontface="bold"))
-  sun <- grid::textGrob("Sunday", gp = grid::gpar(fontsize=10, fontface="bold"))
-
   occupancy_df <- ED_day_hour(startDay, endDay, df)
 
   #tick lables for the x axis
@@ -79,16 +70,12 @@ ED_day_hour_plot <- function(startDay, endDay, df,
   p <- ggplot2::ggplot(occupancy_df,
                        ggplot2::aes(x= numberCode, y = value)) +
     ggplot2::geom_line(ggplot2::aes(colour = Analysis),
-              size = 1) +
+                                size = 1) +
     ggplot2::scale_x_continuous(breaks= breaksVect,
                                 labels= labelsVect) +
     ggplot2::geom_vline(xintercept=(24*(1:6))+1,
                         linetype = "longdash") +
-    ggplot2::xlab("Hour in the day") +
-    ggplot2::ylab("ED Occupancy") +
-    ggplot2::theme(plot.margin = grid::unit(c(1,1,5,1), "lines")) +
-    ggplot2::theme(axis.title.x = ggplot2::element_text(vjust=-8)) +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) +
+    ggplot2::theme(legend.position = "bottom") +
     ggplot2::geom_ribbon(data = occupancy_df,
                          ggplot2::aes(ymin = Q1, ymax = Q3, fill = "interquartile range"),
                          alpha = "0.2") +
@@ -99,29 +86,28 @@ ED_day_hour_plot <- function(startDay, endDay, df,
                                  values = "red") +
     ggplot2::scale_fill_manual("",
                                values = c("blue","steel blue")) +
-    ggplot2::labs(title = "ED 'occupancy' by day and hour",
-                  subtitle = paste(hospital_name,"\nbetween",strftime(startDay, "%d/%b/%Y"),"and",strftime(endDay, "%d/%b/%Y")),
-                  caption = "Source: CLAHRC NWL")
-
-  #setting where the day labels are placed in y coordinates
-  ymin <- -(ggplot2::ggplot_build(p)$layout$panel_params[[1]]$y.range[2] / 6)
-  ymax <- ymin
-
-  p <- p +
-    ggplot2::annotation_custom(mon,xmin=0,xmax=24,ymin=ymin,ymax=ymax) +
-    ggplot2::annotation_custom(tues,xmin=24,xmax=24*2,ymin=ymin,ymax=ymax) +
-    ggplot2::annotation_custom(wed,xmin=24*2,xmax=24*3,ymin=ymin,ymax=ymax) +
-    ggplot2::annotation_custom(thurs,xmin=24*3,xmax=24*4,ymin=ymin,ymax=ymax) +
-    ggplot2::annotation_custom(fri,xmin=24*4,xmax=24*5,ymin=ymin,ymax=ymax) +
-    ggplot2::annotation_custom(sat,xmin=24*5,xmax=24*6,ymin=ymin,ymax=ymax) +
-    ggplot2::annotation_custom(sun,xmin=24*6,xmax=24*7,ymin=ymin,ymax=ymax)
+    # ggplot2::labs(title = "ED 'occupancy' by day and hour",
+    #               subtitle = paste(hospital_name,"\nbetween",strftime(startDay, "%d/%b/%Y"),"and",strftime(endDay, "%d/%b/%Y")),
+    #               caption = "Source: CLAHRC NWL") +
+    ggplot2::labs(title = paste0(hospital_name, ": ED 'occupancy' by day and hour "),
+                  subtitle = paste0("From ", strftime(startDay, "%d/%B/%Y")," to ", strftime(endDay, "%d/%B/%Y"),"\nNote: results are intended for management information only"),
+                  y = "ED Occupancy",
+                  x = "Hour in the day",
+                  caption = "Source: CLAHRC NWL") +
+    ggplot2::annotate(geom = "text",
+                        x = c(12, 12+24, 12+(2*24), 12+(3*24), 12+(4*24), 12+(5*24), 12+(6*24)),
+                        y = Inf,
+                        label = c("Mon", "Tues", "Wed", "Thurs", "Fri", "Sat", "Sun"),
+                        size = 3.5,
+                        vjust = 1.5,
+                        fontface = "bold")
 
   if(plot_chart == T){
-    gt <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(p))
-    gt$layout$clip[gt$layout$name == "panel"] <- "off"
-    grid::grid.draw(gt)
+    p
   }else{
     occupancy_df
   }
 
 }
+
+
