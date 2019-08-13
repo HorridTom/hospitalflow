@@ -22,13 +22,13 @@ Package version: `r stringr::str_sub(system("git rev-parse HEAD", intern=TRUE), 
 
 
 ```{r, echo=F, results='asis', fig.height=5, fig.width=16, cache=TRUE}
-hospitalflow::age_sex()
+#hospitalflow::age_sex()
 ```
 
 ## Admissions and Discharges by Day of Week
 
 
 ```{r, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-hospitalflow::adm_disch_day_of_week()
+#hospitalflow::adm_disch_day_of_week()
 ```
 
