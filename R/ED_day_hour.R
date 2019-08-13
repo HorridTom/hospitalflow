@@ -16,6 +16,8 @@ ED_day_hour <- function(startDay, endDay, df){
   #removing rows with NA values in start_datetime or end_datetime
   #df <- df[complete.cases(df[,c("start_datettime","end_datetime")]),]
 
+  df <- dplyr::filter(df, start_datetime <= endDay, end_datetime >= startDay)
+
   dateTime <- seq(as.POSIXlt(startDay), as.POSIXlt(endDay), by="hours")
   hourly_occupancy <- sapply(dateTime, hospitalflow::occupancy, df, "start_datetime", "end_datetime")
   occupancy_df <- data.frame(dateTime, hourly_occupancy)
