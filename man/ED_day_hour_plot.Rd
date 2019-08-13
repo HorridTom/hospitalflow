@@ -4,8 +4,8 @@
 \alias{ED_day_hour_plot}
 \title{ED_day_hour_plot}
 \usage{
-ED_day_hour_plot(startDay, endDay, df, start_time = "start_datetime",
-  end_time = "end_datetime", plot_chart = T)
+ED_day_hour_plot(startDay, endDay, df, hospital_name = "Hospital Name",
+  plot_chart = T)
 }
 \arguments{
 \item{startDay}{Date for which the analysis starts}
@@ -14,9 +14,7 @@ ED_day_hour_plot(startDay, endDay, df, start_time = "start_datetime",
 
 \item{df}{Dataframe representing ED stays with start_ime and end_time specifying stay start and end of time in ED}
 
-\item{start_time}{Name of column in df containing stay start time in ED}
-
-\item{end_time}{Name of column in df containing stay end time in ED}
+\item{hospital_name}{Name of hospital for which the analysis is being done}
 
 \item{plot_chat}{Plots chart if set to TRUE, else returns dataframe of plot data}
 }

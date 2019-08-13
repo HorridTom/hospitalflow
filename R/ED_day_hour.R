@@ -4,20 +4,20 @@
 #' @param startDay Date for which the analysis starts
 #' @param endDay Date for which analysis ends
 #' @param df Dataframe representing ED stays with start_ime and end_time specifying stay start and end of time in ED
-#' @param start_time Name of column in df containing stay start time in ED
-#' @param end_time Name of column in df containing stay end time in ED
+#'
+#'
 #'
 #' @return A dataframe with mean, Q1, Q3, max and min occupancy for each hour of the week
 #'
 #'
 #' @examples
-ED_day_hour <- function(startDay, endDay, df,
-                        start_time = "start_datetime", end_time = "end_datetime"
-                        ){
+ED_day_hour <- function(startDay, endDay, df){
 
-  #getting the dataframe into the right format
+  #removing rows with NA values in start_datetime or end_datetime
+  #df <- df[complete.cases(df[,c("start_datettime","end_datetime")]),]
+
   dateTime <- seq(as.POSIXlt(startDay), as.POSIXlt(endDay), by="hours")
-  hourly_occupancy <- sapply(dateTime, hospitalflow::occupancy, df, start_time, end_time)
+  hourly_occupancy <- sapply(dateTime, hospitalflow::occupancy, df, "start_datetime", "end_datetime")
   occupancy_df <- data.frame(dateTime, hourly_occupancy)
 
   occupancy_df <- occupancy_df %>%
@@ -25,13 +25,15 @@ ED_day_hour <- function(startDay, endDay, df,
     dplyr::mutate(date = as.Date(dateTime), time = format(dateTime,"%H:%M:%S")) %>%
     dplyr::group_by(weekDay, time) %>%
     dplyr::summarise(average = mean(hourly_occupancy), Q1 = quantile(hourly_occupancy,0.25), Q3 = quantile(hourly_occupancy,0.75),
-              Max = max(hourly_occupancy), Min = min(hourly_occupancy)) %>%
+                     Max = max(hourly_occupancy), Min = min(hourly_occupancy)) %>%
     dplyr::ungroup()%>%
     dplyr::mutate(weekDay = ordered(weekDay, levels = c("Monday", "Tuesday", "Wednesday", "Thursday",
                                                  "Friday", "Saturday", "Sunday"))) %>%
     dplyr::arrange(weekDay) %>%
     dplyr::mutate(numberCode = 1:168) %>%
     dplyr::select(-weekDay)
+
+  occupancy_df
 
 }
 
@@ -41,8 +43,6 @@ ED_day_hour <- function(startDay, endDay, df,
 #' @param startDay Date for which the analysis starts
 #' @param endDay Date for which analysis ends
 #' @param df Dataframe representing ED stays with start_ime and end_time specifying stay start and end of time in ED
-#' @param start_time Name of column in df containing stay start time in ED
-#' @param end_time Name of column in df containing stay end time in ED
 #' @param hospital_name Name of hospital for which the analysis is being done
 #' @param plot_chat Plots chart if set to TRUE, else returns dataframe of plot data
 #'
@@ -51,20 +51,19 @@ ED_day_hour <- function(startDay, endDay, df,
 #'
 #' @examples
 ED_day_hour_plot <- function(startDay, endDay, df,
-                             start_time = "start_datetime", end_time = "end_datetime",
                              hospital_name = "Hospital Name",
                              plot_chart = T){
 
   #text for annotation
-  mon <- grid::textGrob("Monday", gp=gpar(fontsize=10, fontface="bold"))
-  tues <- grid::textGrob("Tuesday", gp=gpar(fontsize=10, fontface="bold"))
-  wed <- grid::textGrob("Wednesday", gp=gpar(fontsize=10, fontface="bold"))
-  thurs <- grid::textGrob("Thursday", gp=gpar(fontsize=10, fontface="bold"))
-  fri <- grid::textGrob("Friday", gp=gpar(fontsize=10, fontface="bold"))
-  sat <- grid::textGrob("Saturday", gp=gpar(fontsize=10, fontface="bold"))
-  sun <- grid::textGrob("Sunday", gp=gpar(fontsize=10, fontface="bold"))
+  mon <- grid::textGrob("Monday", gp = grid::gpar(fontsize=10, fontface="bold"))
+  tues <- grid::textGrob("Tuesday", gp = grid::gpar(fontsize=10, fontface="bold"))
+  wed <- grid::textGrob("Wednesday", gp = grid::gpar(fontsize=10, fontface="bold"))
+  thurs <- grid::textGrob("Thursday", gp = grid::gpar(fontsize=10, fontface="bold"))
+  fri <- grid::textGrob("Friday", gp = grid::gpar(fontsize=10, fontface="bold"))
+  sat <- grid::textGrob("Saturday", gp = grid::gpar(fontsize=10, fontface="bold"))
+  sun <- grid::textGrob("Sunday", gp = grid::gpar(fontsize=10, fontface="bold"))
 
-  occupancy_df <- ED_day_hour(startDay, endDay, df, start_time, end_time)
+  occupancy_df <- ED_day_hour(startDay, endDay, df)
 
   #tick lables for the x axis
   breaksVect <- occupancy_df$numberCode[(occupancy_df$numberCode%%4)-1 ==0]
@@ -72,11 +71,12 @@ ED_day_hour_plot <- function(startDay, endDay, df,
   labelsVect <- (labelsVect[breaksVect])
 
   occupancy_df <- dplyr::select(occupancy_df, -time)
-  occupancy_df <- reshape2::melt(occupancy_df, id.vars = c('numberCode',"Q1","Q3", "Max","Min"), variable.name = 'Analysis')
+  occupancy_df <- reshape2::melt(occupancy_df, id.vars = c('numberCode',"Q1","Q3", "Max","Min"),
+                                 variable.name = 'Analysis')
 
   p <- ggplot2::ggplot(occupancy_df,
-                       aes(x= numberCode, y = value)) +
-    ggplot2::geom_line(aes(colour = Analysis),
+                       ggplot2::aes(x= numberCode, y = value)) +
+    ggplot2::geom_line(ggplot2::aes(colour = Analysis),
               size = 1) +
     ggplot2::scale_x_continuous(breaks= breaksVect,
                                 labels= labelsVect) +
@@ -84,19 +84,19 @@ ED_day_hour_plot <- function(startDay, endDay, df,
                         linetype = "longdash") +
     ggplot2::xlab("Hour in the day") +
     ggplot2::ylab("ED Occupancy") +
-    ggplot2::theme(plot.margin = unit(c(1,1,5,1), "lines")) +
-    ggplot2::theme(axis.title.x = element_text(vjust=-8)) +
-    ggplot2::theme(axis.text.x=element_text(angle=90, vjust=0.5)) +
-    ggplot2::geom_ribbon(data=occupancy_df,
-                         aes(ymin=Q1,ymax=Q3, fill="interquartile range"),
-                         alpha="0.2") +
-    ggplot2::geom_ribbon(data=occupancy_df,
-                         aes(ymin=Min,ymax=Max, fill="range"),
-                         alpha="0.2") +
+    ggplot2::theme(plot.margin = grid::unit(c(1,1,5,1), "lines")) +
+    ggplot2::theme(axis.title.x = ggplot2::element_text(vjust=-8)) +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) +
+    ggplot2::geom_ribbon(data = occupancy_df,
+                         ggplot2::aes(ymin = Q1, ymax = Q3, fill = "interquartile range"),
+                         alpha = "0.2") +
+    ggplot2::geom_ribbon(data = occupancy_df,
+                         ggplot2::aes(ymin = Min, ymax = Max, fill = "range"),
+                         alpha = "0.2") +
     ggplot2::scale_colour_manual("",
-                                 values="red") +
+                                 values = "red") +
     ggplot2::scale_fill_manual("",
-                               values=c("blue","steel blue")) +
+                               values = c("blue","steel blue")) +
     ggplot2::labs(title = "ED 'occupancy' by day and hour",
                   subtitle = paste(hospital_name,"\nbetween",strftime(startDay, "%d/%b/%Y"),"and",strftime(endDay, "%d/%b/%Y")),
                   caption = "Source: CLAHRC NWL")
@@ -114,12 +114,8 @@ ED_day_hour_plot <- function(startDay, endDay, df,
     ggplot2::annotation_custom(sat,xmin=24*5,xmax=24*6,ymin=ymin,ymax=ymax) +
     ggplot2::annotation_custom(sun,xmin=24*6,xmax=24*7,ymin=ymin,ymax=ymax)
 
-  # gt <- ggplot2::ggplot_gtable(ggplot_build(p))
-  # gt$layout$clip[gt$layout$name == "panel"] <- "off"
-  # grid::grid.draw(gt)
-
   if(plot_chart == T){
-    gt <- ggplot2::ggplot_gtable(ggplot_build(p))
+    gt <- ggplot2::ggplot_gtable(ggplot2::ggplot_build(p))
     gt$layout$clip[gt$layout$name == "panel"] <- "off"
     grid::grid.draw(gt)
   }else{

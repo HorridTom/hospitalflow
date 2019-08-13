@@ -4,8 +4,7 @@
 \alias{ED_day_hour}
 \title{ED_day_hour}
 \usage{
-ED_day_hour(startDay, endDay, df, start_time = "start_datetime",
-  end_time = "end_datetime")
+ED_day_hour(startDay, endDay, df)
 }
 \arguments{
 \item{startDay}{Date for which the analysis starts}
@@ -13,10 +12,6 @@ ED_day_hour(startDay, endDay, df, start_time = "start_datetime",
 \item{endDay}{Date for which analysis ends}
 
 \item{df}{Dataframe representing ED stays with start_ime and end_time specifying stay start and end of time in ED}
-
-\item{start_time}{Name of column in df containing stay start time in ED}
-
-\item{end_time}{Name of column in df containing stay end time in ED}
 }
 \value{
 A dataframe with mean, Q1, Q3, max and min occupancy for each hour of the week
