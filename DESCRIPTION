@@ -25,5 +25,6 @@ Imports: tidyverse,
     tidyr,
     forcats,
     ggplot2,
-    padr
+    padr,
+    grid
 VignetteBuilder: knitr
