@@ -1,6 +1,6 @@
 ---
 title: "Example Hospital Flow Report"
-author: "Gabriel Burcea and Tom Woodcock"
+author: "CLAHRC NWL Information Intelligence Team"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -14,21 +14,119 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+library(magrittr)
+
+sample_duration <- lubridate::duration(4, "weeks")
 ```
 
 Package version: `r stringr::str_sub(system("git rev-parse HEAD", intern=TRUE), 1, 8)`
 
+```{r import-data, cache=TRUE, echo=FALSE}
+# Import and Standardise Data
+
+import_list <- readRDS("../lgt-config/lgt_import_list.rds")
+
+# This import list uses relative paths (good for us during development)
+# which means the paths need prepending with "../" to work from the
+# working directory used in running this file.
+# In production use, users will be best specifying their import paths
+# as absolute paths.
+import_list <- lapply(import_list, function(x) {
+  list(data_path = paste0("../", x$data_path),
+  config_path = paste0("../", x$config_path))
+})
+
+data_list <- hospitalflow::import_and_standardise(import_list)
+```
+
+```{r spell-table, cache=TRUE, echo=FALSE}
+ed_data <- data_list[[1]]
+inpatient_data <- data_list[[3]]
+
+data_start_date <- as.Date(max(min(ed_data$start_datetime, na.rm = TRUE),
+                       min(ed_data$end_datetime, na.rm = TRUE),
+                       min(inpatient_data$start_datetime, na.rm = TRUE),
+                       min(inpatient_data$end_datetime, na.rm = TRUE)))
+data_end_date <- as.Date(min(max(ed_data$start_datetime, na.rm = TRUE),
+                     max(ed_data$end_datetime, na.rm = TRUE),
+                     max(inpatient_data$start_datetime, na.rm = TRUE),
+                     max(inpatient_data$end_datetime, na.rm = TRUE)))
+start_date <- data_start_date
+end_date <- data_end_date
+
+if(!is.na(sample_duration)) {
+  
+  data_start_date <- lubridate::ceiling_date(data_start_date, "month")
+  data_end_date <- lubridate::floor_date(data_end_date, "month")
+  
+  if(data_end_date - data_start_date > sample_duration) {
+    start_date <- data_end_date - sample_duration
+    end_date <- data_end_date
+    example_ed_data <- ed_data %>% dplyr::filter(start_datetime <= end_date,
+                                                 end_datetime >= start_date)
+    example_inpatient_data <- inpatient_data %>% dplyr::filter(start_datetime <= end_date,
+                                                               end_datetime >= start_date)
+  } else {
+    example_ed_data <- ed_data
+    example_inpatient_data <- inpatient_data
+  }
+} else {
+  example_ed_data <- ed_data
+  example_inpatient_data <- inpatient_data
+}
+
+example_spell_table <- hospitalflow::make_spell_table(ed_data = example_ed_data,
+                                                      inpatient_data = example_inpatient_data)
+```
+## Example dataset
+This example report is based on `r nrow(example_ed_data)` emergency department attendances and `r nrow(example_inpatient_data)` inpatient episodes of care, linked into `r nrow(example_spell_table)` hospital spells. All attendances and admissions occurred prior to `r end_date` and all discharges after `r start_date`.
+
 ## Age and Gender
 
-
-```{r, echo=F, results='asis', fig.height=5, fig.width=16, cache=TRUE}
-hospitalflow::age_sex()
+```{r age-gender-ed, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
+hospitalflow::ae_attendances_admissions_age_sex(start_date = start_date, end_date = end_date,
+                                                data = example_spell_table,
+                                                plot_chart = TRUE,
+                                                hospital_name = "Anytown General Hospital")
 ```
+
+## Arrival Occupancy
+
+```{r arr-occ, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
+hospitalflow::ae_arrival_occupancy(start_date = as.POSIXct(start_date, tz = "Europe/London"),
+                                   end_date = as.POSIXct(end_date, tz = "Europe/London"),
+                                   data = example_spell_table,
+                                   plot_chart = TRUE,
+                                   hospital_name = "Anytown General Hospital")
+```
+
+## Duration in ED by admitted/non-admitted
+
+```{r los-ed, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
+hospitalflow::los_att_adm_ae(start_date = start_date, end_date = end_date,
+                             data = example_spell_table,
+                             plot_chart = TRUE,
+                             hospital_name = "Anytown General Hospital")
+```
+
 
 ## Admissions and Discharges by Day of Week
 
 
-```{r, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-hospitalflow::adm_disch_day_of_week()
+```{r adm-disch-dow, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
+hospitalflow::admissions_discharges(start_date = start_date, end_date = end_date,
+                                    data = example_spell_table,
+                                    plot_chart = TRUE,
+                                    hospital_name = "Anytown General Hospital")
 ```
 
+
+## Length of Stay
+
+```{r los-dist, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
+hospitalflow::los_distrib_method_admission(start_date = start_date, end_date = end_date,
+                             data = example_spell_table,
+                             plot_chart = TRUE,
+                             hospital_name = "Anytown General Hospital")
+```
