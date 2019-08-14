@@ -1,5 +1,5 @@
 
-#' ed_occupancy_on_arrival
+#' occupancy_on_arrival
 #'
 #' @param df dataframe of ED data with start_datetime and end_datetime representing start and end of a patient's time in ED
 #'
@@ -8,7 +8,7 @@
 #'
 #'
 #' @examples
-ed_occupancy_on_arrival <- function(df){
+occupancy_on_arrival <- function(df){
 
   df <- df %>%
     dplyr::rowwise() %>%
@@ -22,7 +22,7 @@ ed_occupancy_on_arrival <- function(df){
 
 
 
-#' wait_times_over_4hrs_Vs_occupancy
+#' ed_occupancy_on_arrival_plot
 #'
 #' @param df dataframe of ED data with start_datetime and end_datetime representing start and end of a patient's time in ED
 #' @param startDate the first date of the period for which the analysis will run
@@ -35,11 +35,11 @@ ed_occupancy_on_arrival <- function(df){
 #' @export
 #'
 #' @examples
-wait_times_over_4hrs_Vs_occupancy <- function(df, startDate, endDate, hospitalName, plotChart = T){
+ed_occupancy_on_arrival_plot <- function(df, startDate, endDate, hospitalName, plotChart = T){
 
   df <- dplyr::filter(df, start_datetime <= endDate, end_datetime >= startDate)
 
-  df <- ed_occupancy_on_arrival(df)
+  df <- occupancy_on_arrival(df)
   df <- df %>%
     dplyr::filter(start_datetime >= startDate, end_datetime <= endDate) %>%
     dplyr::filter(attendance_category != "Follow up - Planned") %>%
@@ -89,34 +89,39 @@ wait_times_over_4hrs_Vs_occupancy <- function(df, startDate, endDate, hospitalNa
 
   plot <- ggplot2::ggplot(df_to_plot,
                           ggplot2::aes(x = occupancy_on_arrival)) +
-    ggplot2::geom_line(ggplot2::aes(y=n_all, colour = "n_all")) +
+    #ggplot2::geom_line(ggplot2::aes(y=n_all, colour = "n_all")) +
     ggplot2::geom_smooth(ggplot2::aes(y=perc_LoS_over_4hrs,
-                             colour = "perc_LoS_over_4hrs")) +
+                                      colour = "perc_LoS_over_4hrs"),
+                         se = FALSE) +
     ggplot2::geom_smooth(ggplot2::aes(y=perc_W4T_over_4hrs,
-                             colour = "per_W4T_over_4hrs")) +
+                                      colour = "per_W4T_over_4hrs"),
+                         se = FALSE) +
     ggplot2::geom_point(ggplot2::aes(y=perc_LoS_over_4hrs,
-                             colour = "perc_LoS_over_4hrs")) +
+                                     colour = "perc_LoS_over_4hrs")) +
     ggplot2::geom_point(ggplot2::aes(y=perc_W4T_over_4hrs,
-                             colour = "per_W4T_over_4hrs")) +
+                                     colour = "per_W4T_over_4hrs")) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.title = ggplot2::element_blank(),
                    legend.position = "bottom") +
     ggplot2::labs(title = "Occupancy on Arrival versus Percentage of Unscheduled \nED Attendances with LoS and Wait Time for Treatment over 4hrs",
                   subtitle = paste(hospitalName,"\nbetween ", strftime(startDate, "%d/%m/%Y"),
                                    " and ", strftime(endDate, "%d/%m/%Y")),
-                  y = "Percentage over 4hrs, %", x = "Occupancy on arrival",
+                  y = "Percentage over 4hrs, %",
+                  x = "Occupancy on arrival",
                   caption = "Source: CLAHRC NWL") +
     ggplot2::scale_x_continuous(breaks = scales::pretty_breaks()) +
     ggplot2::scale_y_continuous(breaks = scales::pretty_breaks()) +
-    ggplot2::scale_colour_manual(labels = c("Number of Attendances",
+    ggplot2::scale_colour_manual(labels = c(#"Number of Attendances",
                                   "% of unscheduled ED \nattendances with LoS over 4hrs",
                                   "% of unscheduled ED attendances \nwith wait time for treatment over 4hrs"),
-                                values = c("dodgerblue2", "firebrick3", "seagreen4")) +
+                                values = c(#"dodgerblue2",
+                                           "firebrick3", "seagreen4")) +
     ggplot2::guides(color = ggplot2::guide_legend(reverse = TRUE)) +
     ggplot2::geom_vline(xintercept = deciles_tib$deciles,
                         linetype = "dashed",
-                        colour = "azure3",
-                        size=0.5) +
+                        colour = "grey54",
+                        size=0.5,
+                        show_guide = T) +
     ggplot2::annotate(geom ="text",
                       x = deciles_tib$deciles,
                       y = Inf,
