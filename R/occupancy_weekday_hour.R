@@ -48,7 +48,8 @@ occupancy_weekday_hour <- function(start_date = as.POSIXct("2015-04-01 00:00:00"
                      Q3 = quantile(occupancy_vct, 0.75),
                      Min_n = min(occupancy_vct),
                      Max_n = max(occupancy_vct)) %>%
-    dplyr::ungroup()
+    dplyr::ungroup() %>%
+    dplyr::select(hour, Wday, average_occupancy, Q1, Q3, Min_n, Max_n)
 
 
   Weekdays <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
