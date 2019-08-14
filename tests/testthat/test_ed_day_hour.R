@@ -197,7 +197,7 @@ testthat::test_that("Min is calculated correctly for real data",{
 #tests for graphics
 test_that("Plots have known output", {
 
-  ed_occupancy_day_hour_ggplot <- ED_day_hour_plot("2016-10-01", "2016-10-15", df = test_data_uhl_ed_sample, hospital_name = "UHL")
+  ed_occupancy_day_hour_ggplot <- ED_day_hour_plot("2016-10-01", "2016-10-15", df = test_data_uhl_ed_sample, hospital_name = "Hospital Name")
 
   vdiffr::expect_doppelganger("ed_occupancy_day_hour_plot", ed_occupancy_day_hour_ggplot)
 
