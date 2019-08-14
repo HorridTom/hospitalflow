@@ -102,7 +102,6 @@ testthat::test_that("Min is calculated correctly for constructed data",{
 
 
 # real data sample
-#test_data_uhl_ed_sample <- readRDS("C:/Users/iconnorh/Desktop/Imogen/Rprojects/hospitalflow/tests/testthat/testdata/test_data_uhl_ed_sample.rds")
 test_data_uhl_ed_sample <- readRDS("testdata/test_data_uhl_ed_sample.rds")
 
 testthat::test_that("Occupancy is calculated correctly for real data",{
@@ -129,7 +128,7 @@ testthat::test_that("Average is calculated correctly for real data",{
   average_sun <- occupancy_df_test_real[[157,"average"]]
   averages <- c(average_mon, average_tues, average_wed, average_thurs, average_fri, average_sat, average_sun)
 
-  testthat::expect_equal(averages, c(0,1,1,0.5,2,0.5,0), tolerance = 0.05)
+  testthat::expect_equal(averages, c(0,1,1,0.5,2,0.5,0))
 
 })
 
@@ -191,6 +190,17 @@ testthat::test_that("Min is calculated correctly for real data",{
   mins <- c(min_mon, min_tues, min_wed, min_thurs, min_fri, min_sat, min_sun)
 
   testthat::expect_equal(mins, c(0,0,0,0,2,0,0))
+
+})
+
+
+#tests for graphics
+test_that("Plots have known output", {
+
+  ed_occupancy_day_hour_ggplot <- ED_day_hour_plot("2016-10-01", "2016-10-15", df = test_data_uhl_ed_sample, hospital_name = "UHL")
+
+  vdiffr::expect_doppelganger("ed_occupancy_day_hour_plot", ed_occupancy_day_hour_ggplot)
+
 
 })
 
