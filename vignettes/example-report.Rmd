@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 library(magrittr)
 
-sample_duration <- lubridate::duration(4, "weeks")
+sample_duration <- lubridate::duration(12, "weeks")
 ```
 
 Package version: `r stringr::str_sub(system("git rev-parse HEAD", intern=TRUE), 1, 8)`
@@ -126,7 +126,25 @@ hospitalflow::admissions_discharges(start_date = start_date, end_date = end_date
 
 ```{r los-dist, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
 hospitalflow::los_distrib_method_admission(start_date = start_date, end_date = end_date,
-                             data = example_spell_table,
+                                           data = example_spell_table,
+                                           plot_chart = TRUE,
+                                           hospital_name = "Anytown General Hospital")
+```
+
+## ED occupancy by hour of week
+
+```{r ed-occ-2, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
+hospitalflow::ED_day_hour_plot(startDay = start_date, endDay = end_date,
+                             df = example_ed_data,
                              plot_chart = TRUE,
                              hospital_name = "Anytown General Hospital")
+```
+
+Alternative presentation of this same analysis
+```{r ed-occ-1, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
+hospitalflow::occupancy_weekday_hour(start_date = as.POSIXct(start_date, tz = "Europe/London"),
+                                   end_date = as.POSIXct(end_date, tz = "Europe/London"),
+                                   data = example_spell_table,
+                                   plot_chart = TRUE,
+                                   hospital_name = "Anytown General Hospital")
 ```
