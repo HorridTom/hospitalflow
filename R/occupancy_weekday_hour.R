@@ -68,7 +68,7 @@ occupancy_weekday_hour <- function(start_date = as.POSIXct("2015-04-01 00:00:00"
     ggplot2::ggplot(ggplot2::aes(x = hour)) +
     ggplot2::geom_line(ggplot2::aes(y = average_occupancy, color = "Average Occupancy"), size = 1) +
     ggplot2::scale_x_continuous(limits = c(0, 23)) +
-    ggplot2::facet_grid( ~day ) +  #nrow = 1
+    ggplot2::facet_grid( ~ Weekday ) +  #nrow = 1
     ggplot2::geom_ribbon(ggplot2::aes(ymin = Q1, ymax = Q3, fill = "interquartile range"), alpha = "0.20") +
     ggplot2::geom_ribbon(ggplot2::aes(ymin = Min_n, ymax = Max_n, fill = "range"), alpha = "0.30")+
     ggplot2::scale_colour_manual("", values = "red") +
