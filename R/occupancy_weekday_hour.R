@@ -14,15 +14,10 @@ occupancy_weekday_hour <- function(start_date = as.POSIXct("2015-04-01 00:00:00"
   # renaming the variables I am interested in
   df_select <- data %>%
     dplyr::select(spell_number, spell_start, initial_ed_end_datetime, starts_with_ed) %>%
-    dplyr::filter(spell_start <= end_date, initial_ed_end_datetime >= start_date) %>%
-    dplyr::filter(starts_with_ed == TRUE)
+    dplyr::filter(spell_start <= end_date | initial_ed_end_datetime >= start_date) %>%
+    dplyr::filter(starts_with_ed == TRUE) %>%
+    tidyr::drop_na()
 
-  dt_calc <- df_select %>%
-    dplyr::mutate(Same_day_discharge = dplyr::if_else(as.Date(spell_start) == as.Date(initial_ed_end_datetime),  TRUE, FALSE),
-                  Los = as.numeric(difftime(initial_ed_end_datetime, spell_start, unit = c("hour"))),
-                  Discharged_24hr = dplyr::if_else(Los < 24, TRUE, FALSE)) %>%
-    dplyr::filter(Discharged_24hr == TRUE & Los <= 24) %>%
-    dplyr::filter(spell_start <= end_date | initial_ed_end_datetime >= start_date)
 
   # date time period chosen
 
