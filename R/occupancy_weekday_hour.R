@@ -32,9 +32,9 @@ occupancy_weekday_hour <- function(start_date = as.POSIXct("2015-04-01 00:00:00"
 
   dt_wday_hour_month <- occupancy_df %>%
     dplyr::mutate(month = lubridate::month(time_hr),
-           Wday = lubridate::wday(time_hr, label = TRUE, abbr = TRUE),
+           Weekday = lubridate::wday(time_hr, label = TRUE, abbr = TRUE),
            hour = lubridate::hour(time_hr)) %>%
-    dplyr::select(time_hr, month, Wday, hour, occupancy_vct)
+    dplyr::select(time_hr, month, Weekday, hour, occupancy_vct)
 
 
   #######################################################################
@@ -42,18 +42,18 @@ occupancy_weekday_hour <- function(start_date = as.POSIXct("2015-04-01 00:00:00"
   ########################################################################
   # getting the averages, min, max, interquartile ranges (Q1 and  Q3)
   tbl_avg_occ <- dt_wday_hour_month %>%
-    dplyr::group_by(hour, Wday) %>%
+    dplyr::group_by(hour, Weekday) %>%
     dplyr::summarize(average_occupancy = mean(occupancy_vct),
                      Q1 = quantile(occupancy_vct, 0.25),
                      Q3 = quantile(occupancy_vct, 0.75),
                      Min_n = min(occupancy_vct),
                      Max_n = max(occupancy_vct)) %>%
     dplyr::ungroup() %>%
-    dplyr::select(hour, Wday, average_occupancy, Q1, Q3, Min_n, Max_n)
+    dplyr::select(hour, Weekday, average_occupancy, Q1, Q3, Min_n, Max_n)
 
 
-  Weekdays <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-  tbl_avg_occ_2 <- dplyr::arrange(transform(tbl_avg_occ, day = factor(Wday, levels = Weekdays)), Wday)
+  # Weekdays <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+  # tbl_avg_occ_2 <- dplyr::arrange(transform(tbl_avg_occ, day = factor(Weekday, levels = Weekdays)), Weekday)
 
   # Set the title
   title_stub <- ": Unscheduled ED Occupancy by day and hour"
@@ -64,7 +64,7 @@ occupancy_weekday_hour <- function(start_date = as.POSIXct("2015-04-01 00:00:00"
 
 
 
-  plt <- tbl_avg_occ_2 %>%
+  plt <- tbl_avg_occ %>%
     ggplot2::ggplot(ggplot2::aes(x = hour)) +
     ggplot2::geom_line(ggplot2::aes(y = average_occupancy, color = "Average Occupancy"), size = 1) +
     ggplot2::scale_x_continuous(limits = c(0, 23)) +
@@ -90,7 +90,7 @@ occupancy_weekday_hour <- function(start_date = as.POSIXct("2015-04-01 00:00:00"
 
   }else{
 
-    plt$data %>% dplyr::select(hour, average_occupancy, Q1, Q3, Min_n, Max_n)
+    plt$data %>% dplyr::select(hour, Weekday, average_occupancy, Q1, Q3, Min_n, Max_n)
 
   }
 }
