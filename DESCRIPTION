@@ -13,7 +13,8 @@ RoxygenNote: 6.1.1
 Suggests: testthat,
     knitr,
     rmarkdown
-Imports: tidyverse,
+Imports: 
+    tidyverse,
     lubridate,
     reshape2,
     scales,
@@ -26,5 +27,6 @@ Imports: tidyverse,
     forcats,
     ggplot2,
     padr,
-    grid
+    grid,
+    DescTools
 VignetteBuilder: knitr
