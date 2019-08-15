@@ -15,17 +15,29 @@ library(ggfortify)
 
 ```{r}
 #surv_data <- readRDS(file = "../data/ed_ex.rds")
-surv_data <- readRDS(file = "../../cw-data/cw_ip_spells.rds")
-surv_data <- surv_data %>% filter(substr(as.character(ADMISSIONMETHOD), 1, 1) == "2")
+#surv_data <- readRDS(file = "../../cw-data/cw_ip_spells.rds")
+surv_data <- readRDS(file = "../../lgt-data/data-out/spell_table_lgt_20190815_944e22e6.rds")
+surv_data <- surv_data %>% filter(admission_method_type == "Emergency Admissions") %>%
+  mutate(start_datetime = initial_ed_end_datetime, end_datetime = spell_end)
 surv_data <- surv_data %>% mutate(los = difftime(end_datetime, start_datetime), adm_wd = weekdays(start_datetime)) %>% filter(!is.na(los))
 units(surv_data$los) <- "hours"
-eventT <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2018-11-01 00:00')) %>% pull(los)
-adm_wd <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2018-11-01 00:00')) %>% pull(adm_wd)
-obsLen <- 365*24                  # length of observation time (censoring time = end of study)
-obsT   <- pmin(eventT, obsLen)  # observed censored event times
-status <- eventT <= obsLen     # has event occured?
-dfSurv <- data.frame(eventT, obsT, status)          # data frame
-dfSurv2 <- data.frame(eventT, obsT, status, adm_wd)
+clean_surv_data <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2019-01-31 00:00'))
+
+
+obsLen <- 365*24 # length of observation time (censoring time = end of study)
+clean_surv_data <- clean_surv_data %>% mutate(eventT = los,
+                                              obsT = pmin(eventT, obsLen),
+                                              status = eventT <= obsLen,
+                                              gender = dplyr::if_else(gender == "Male", 1, 0))
+# eventT <- clean_surv_data %>% pull(los)
+# adm_wd <- clean_surv_data %>% pull(adm_wd)
+# obsT   <- pmin(eventT, obsLen)  # observed censored event times
+# status <- eventT <= obsLen     # has event occured?
+
+dfSurv <- clean_surv_data %>% select(eventT, obsT, status)
+dfSurv2 <- clean_surv_data %>% select(spell_number, eventT, obsT, status,
+                                      adm_wd, gender, age_band_start,
+                                      start_datetime, end_datetime)
 ```
 
 ```{r}
@@ -40,9 +52,6 @@ ggplot(dfSurv, aes(eventT)) + stat_ecdf(geom = "step") +
 ```{r}
 KM0 <- survfit(Surv(obsT, status) ~ 1,  type="kaplan-meier", conf.type="log", data=dfSurv)
 KM1 <- survfit(Surv(obsT, status) ~ adm_wd,  type="kaplan-meier", conf.type="log", data=dfSurv2)
-
-CM1 <- coxph(Surv(obsT, status) ~ adm_wd, data = dfSurv2)
-KM1S <- survfit(CM1, newdata = data.frame(adm_wd = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")))
 ```
 
 ```{r}
@@ -54,9 +63,6 @@ autoplot(KM1) + ggtitle(expression(paste("Kaplan-Meier estimate ", hat(S)(t), " 
 
 ```{r}
 S_function <- hospitalflow::make_survival_function(KM0)
-
-step_funs <- lapply(c(1:7), function(x) {hospitalflow::make_survival_function(KM1S[,x])})
-names(step_funs) <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
 cond_S_function <- function(t0, t1, S_function) {
   pmin(S_function(t1)/S_function(t0),1)
@@ -132,7 +138,7 @@ expected_k2
 Next step is to write a function to run this on patients actually in hospital/ward at a specified time t.
 
 ```{r}
-T1 <- strptime("2018-06-08 12:43:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
+T1 <- strptime("2018-09-01 12:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
 ipss1 <- hospitalflow::get_inpatient_snapshot(df = surv_data, t = T1) %>% filter(!is.na(stay_duration))
 
 ipss1 <- ipss1 %>% mutate(prob_here_48h = hospitalflow::get_discharge_probability(stay_duration, S_function, 48))
@@ -150,7 +156,7 @@ expected_k_T1
 Now let's see how accurate that prediction is
 
 ```{r}
-ipss1_48h <- hospitalflow::get_inpatient_snapshot(df = surv_data, t = T1 + 48*60*60) %>% mutate(residual = SPELLNUMBER %in% ipss1$SPELLNUMBER)
+ipss1_48h <- hospitalflow::get_inpatient_snapshot(df = surv_data, t = T1 + 48*60*60) %>% mutate(residual = spell_number %in% ipss1$spell_number)
 residual_T1 <- ipss1_48h %>% filter(residual == TRUE) %>% nrow()
 paste("Predicted residual occupancy: ", expected_k_T1, ". Actual residual occupancy: ", residual_T1)
 paste("Error: ", expected_k_T1 - residual_T1, ". Relative error: ", (expected_k_T1 - residual_T1)/residual_T1)
@@ -167,7 +173,7 @@ For now let's carry on and hack together a means of getting the prediction for a
 hospitalflow::predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
 hospitalflow::get_residual_occupancy(df = surv_data, t = T1, delta_t = 48)
 
-dates <- seq(lubridate::ymd_hm('2018-11-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2019-01-31 12:00', tz = "Europe/London"), by = '1 day')
+dates <- seq(lubridate::ymd_hm('2018-09-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2018-11-30 12:00', tz = "Europe/London"), by = '1 day')
 
 model_output <- hospitalflow::run_S_func_model(df = surv_data, S_func = S_function, date_seq = dates)
 
@@ -190,6 +196,83 @@ model_output$diagnostics$rel_err_plot
 The errors clearly show (as expected) the effect of weekends on this model - this naive model does not take into account any weekend effect. 
 
 Next steps will be to generalise the model to include this weekly effect.
+
+## Using predictions from Cox PH Model
+
+```{r coxph-model1}
+CM1 <- coxph(Surv(obsT, status) ~ adm_wd, data = dfSurv2)
+KM1S <- survfit(CM1, newdata = data.frame(adm_wd = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")))
+
+step_funs <- lapply(c(1:7), function(x) {hospitalflow::make_survival_function(KM1S[,x])})
+names(step_funs) <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+```
+
+```{r coxph-predict1}
+ipss <- hospitalflow::get_inpatient_snapshot(df = dfSurv2, t = T1) %>% filter(!is.na(stay_duration))
+newdata1 <- ipss %>% select(obsT = stay_duration, adm_wd) %>% mutate(status = TRUE)
+newdata1d <- newdata1 %>% mutate(obsT = obsT + 48)
+CM1_prediction_1 <- predict(CM1, newdata = newdata1, type = "expected")
+CM1_prediction_2 <- predict(CM1, newdata = newdata1d, type = "expected")
+prob_here_48h_CM1 <- exp(-CM1_prediction_2)/exp(-CM1_prediction_1)
+
+
+
+predictions_CM1 <- cbind(ipss, CM1_pred_prob = prob_here_48h_CM1)
+
+sum(predictions_CM1$CM1_pred_prob)
+# Now lets embed that into predict_residual_occupancy
+
+hospitalflow::predict_residual_occupancy(df = dfSurv2, t = T1, delta_t = 48,
+                                         coxmodel = "Surv(obsT, status) ~ adm_wd")
+hospitalflow::get_residual_occupancy(df = dfSurv2, t = T1, delta_t = 48)
+```
+
+```{r eval-coxph1}
+model_output_CM <- hospitalflow::run_S_func_model(df = dfSurv2, coxmodel = "Surv(obsT, status) ~ adm_wd",
+                                                  date_seq = dates)
+
+summary(model_output_CM$predictions)
+```
+
+```{r}
+model_output_CM$diagnostics$comp_plot
+```
+
+```{r}
+model_output_CM$diagnostics$err_plot
+```
+
+```{r}
+model_output_CM$diagnostics$rel_err_plot
+```
+
+```{r eval-coxph2}
+CM2 <- coxph(Surv(obsT, status) ~ adm_wd + gender + age_band_start, data = dfSurv2)
+newdata2 <- ipss %>% select(obsT = stay_duration, adm_wd, gender, age_band_start) %>% mutate(status = TRUE)
+newdata2d <- newdata2 %>% mutate(obsT = obsT + 48)
+CM2_prediction_1 <- predict(CM2, newdata = newdata2, type = "expected")
+CM2_prediction_2 <- predict(CM2, newdata = newdata2d, type = "expected")
+prob_here_48h_CM2 <- exp(-CM2_prediction_2)/exp(-CM2_prediction_1)
+
+model_output_CM2 <- hospitalflow::run_S_func_model(df = dfSurv2,
+                                                   coxmodel = "Surv(obsT, status) ~ adm_wd + gender + age_band_start",
+                                                  date_seq = dates)
+
+summary(model_output_CM2$predictions)
+```
+
+```{r}
+model_output_CM2$diagnostics$comp_plot
+```
+
+```{r}
+model_output_CM2$diagnostics$err_plot
+```
+
+```{r}
+model_output_CM2$diagnostics$rel_err_plot
+```
+
 
 Medical patients only
 ~0% non-emergency medical
