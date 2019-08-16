@@ -106,6 +106,27 @@ spell_variables <- function(all_episodes) {
 }
 
 
+#' add_spell_variables
+#'
+#' @param ed_data
+#' @param inpatient_data
+#' @param spell_table pre-created from ed_data and inpatient_data using make_spell_table
+#'
+#' @return
+#' @export
+#'
+#' @examples
+add_spell_variables <- function(ed_data, inpatient_data, spell_table) {
+
+  inpatient_data <- inpatient_data %>% dplyr::mutate(main_specialty = addNA(main_specialty))
+  spell_table %>% dplyr::mutate(main_specialty_start = purrr::map(constituent_ip_episodes, function(x) {
+    if(length(x) == 0) {NA} else {
+      inpatient_data %>% dplyr::filter(episode_id == x[[1]]) %>% dplyr::slice(1) %>% dplyr::pull(main_specialty)
+      }
+    })
+  ) %>% tidyr::unnest(main_specialty_start)
+}
+
 get_episode_id_list <- function(episode_df, episode_type_to_list) {
   ep_id_v <- episode_df %>% dplyr::filter(episode_type == episode_type_to_list) %>% dplyr::pull(episode_id)
   list(as.list(ep_id_v))
