@@ -23,8 +23,8 @@ surv_data <- surv_data %>% dplyr::left_join(spec_dir_mapping, by = c("main_speci
 
 surv_data <- surv_data %>% filter(admission_method_type == "Emergency Admissions",
                                   !(age_band_start %in% c("1-4 yrs", "5-9 yrs", "10-14 yrs")),
-                                  #directorate == "Medical",
-                                  main_specialty_start %in% c("ACUTE INTERNAL MEDICINE", "GENERAL MEDICINE")
+                                  directorate == "Medical"#,
+                                  #main_specialty_start %in% c("ACUTE INTERNAL MEDICINE", "GENERAL MEDICINE")
                                   ) %>%
   mutate(start_datetime = initial_ed_end_datetime, end_datetime = spell_end,
          age_band_start = forcats::fct_drop(age_band_start))

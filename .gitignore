@@ -43,5 +43,7 @@ inst/doc
 /data-out
 lgt-data
 
-# html output from survival analysis
+# output from survival analysis
 survival-analysis/*.html
+survival-analysis/*.pdf
+survival-analysis/*.tex
