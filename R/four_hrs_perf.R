@@ -11,8 +11,8 @@
 #'
 #' @examples
 four_hrs_perf <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-                               end_date = as.Date("2015-01-01", tz = "Europe/London"),
-                               data, plot_chart, hospital_name = "Hospital_Name"){
+                          end_date = as.Date("2015-01-01", tz = "Europe/London"),
+                          data, plot_chart, hospital_name = "Hospital_Name"){
 
   dt_select <- data %>%
     dplyr::select(pseudo_id, start_datetime, end_datetime) %>%
@@ -33,12 +33,14 @@ four_hrs_perf <- function(start_date = as.Date("2012-01-01", tz = "Europe/London
                   One_week = lubridate::round_date(Time, "7 days")) %>%
     dplyr::select(pseudo_id, Los, Time, One_week, Hr_perf)
 
-
   sum_4hrs_perf <- dt_los %>%
     dplyr::group_by(Time, Hr_perf) %>%
     dplyr::summarise(Count = n()) %>%
+    tidyr::drop_na() %>%
     tidyr::spread(Hr_perf, Count) %>%
-    dplyr::mutate(N = under_4hrs + above_4hrs)
+    dplyr::mutate(N = under_4hrs + above_4hrs) %>%
+    tidyr::drop_na()
+
 
   # Set the title
   title_stub <- " Hospital LoS distribution for admitted patients, "
@@ -54,7 +56,7 @@ four_hrs_perf <- function(start_date = as.Date("2012-01-01", tz = "Europe/London
   plot <- qicharts2::qic(Time, under_4hrs,
                          n = N,
                          data = sum_4hrs_perf,
-                         chart = 'pp',
+                         chart = 'p',
                          ylab = "percent",
                          show.grid = TRUE,
                          #freeze = 1,
@@ -65,7 +67,25 @@ four_hrs_perf <- function(start_date = as.Date("2012-01-01", tz = "Europe/London
                          xlab = " Compliance with 4hr emergency care standard",
                          title = chart_title)
 
-  plot
+
+
+   p <- plot$data
+
+   p_chart <- ggplot2::ggplot(p, ggplot2::aes(x,y)) +
+     ggplot2::geom_ribbon(ymin = p$lcl, ymax = p$ucl, fill = "grey",alpha = 0.4) +
+     ggplot2::geom_line(colour = "blue", size = .75) +
+     ggplot2::geom_line(ggplot2::aes(x,cl)) +
+     ggplot2::geom_point(colour = "black" , fill = "black", size = 1.5) +
+     ggplot2::ggtitle(label = "example i chart") +
+     ggplot2::labs(x = NULL,
+          y = NULL)+
+     ggplot2::theme_minimal()
+
+   p_chart
+
+   plot + ggplot2::geom_hline(yintercept = 0.95, colour = "red")
+
+
 
   if(plot_chart == TRUE){
 
