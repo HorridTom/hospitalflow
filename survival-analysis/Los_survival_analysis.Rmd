@@ -16,9 +16,18 @@ library(ggfortify)
 ```{r}
 #surv_data <- readRDS(file = "../data/ed_ex.rds")
 #surv_data <- readRDS(file = "../../cw-data/cw_ip_spells.rds")
-surv_data <- readRDS(file = "../../lgt-data/data-out/spell_table_lgt_20190815_944e22e6.rds")
-surv_data <- surv_data %>% filter(admission_method_type == "Emergency Admissions") %>%
-  mutate(start_datetime = initial_ed_end_datetime, end_datetime = spell_end)
+surv_data <- readRDS(file = "../../lgt-data/data-out/spell_table_lgt_20190816_b704e260_ms.rds")
+
+spec_dir_mapping <- readr::read_csv("../data/SPECIALTY_HCPmap.csv")
+surv_data <- surv_data %>% dplyr::left_join(spec_dir_mapping, by = c("main_specialty_start" = "spec_name"))
+
+surv_data <- surv_data %>% filter(admission_method_type == "Emergency Admissions",
+                                  !(age_band_start %in% c("1-4 yrs", "5-9 yrs", "10-14 yrs")),
+                                  #directorate == "Medical",
+                                  main_specialty_start %in% c("ACUTE INTERNAL MEDICINE", "GENERAL MEDICINE")
+                                  ) %>%
+  mutate(start_datetime = initial_ed_end_datetime, end_datetime = spell_end,
+         age_band_start = forcats::fct_drop(age_band_start))
 surv_data <- surv_data %>% mutate(los = difftime(end_datetime, start_datetime), adm_wd = weekdays(start_datetime)) %>% filter(!is.na(los))
 units(surv_data$los) <- "hours"
 clean_surv_data <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2019-01-31 00:00'))
@@ -28,7 +37,8 @@ obsLen <- 365*24 # length of observation time (censoring time = end of study)
 clean_surv_data <- clean_surv_data %>% mutate(eventT = los,
                                               obsT = pmin(eventT, obsLen),
                                               status = eventT <= obsLen,
-                                              gender = dplyr::if_else(gender == "Male", 1, 0))
+                                              gender = dplyr::if_else(gender == "Male", 1, 0),
+                                              adm_calmonth = as.factor(format(start_datetime, "%b")))
 # eventT <- clean_surv_data %>% pull(los)
 # adm_wd <- clean_surv_data %>% pull(adm_wd)
 # obsT   <- pmin(eventT, obsLen)  # observed censored event times
@@ -36,7 +46,7 @@ clean_surv_data <- clean_surv_data %>% mutate(eventT = los,
 
 dfSurv <- clean_surv_data %>% select(eventT, obsT, status)
 dfSurv2 <- clean_surv_data %>% select(spell_number, eventT, obsT, status,
-                                      adm_wd, gender, age_band_start,
+                                      adm_wd, adm_calmonth, gender, age_band_start,
                                       start_datetime, end_datetime)
 ```
 
@@ -247,15 +257,15 @@ model_output_CM$diagnostics$rel_err_plot
 ```
 
 ```{r eval-coxph2}
-CM2 <- coxph(Surv(obsT, status) ~ adm_wd + gender + age_band_start, data = dfSurv2)
-newdata2 <- ipss %>% select(obsT = stay_duration, adm_wd, gender, age_band_start) %>% mutate(status = TRUE)
+CM2 <- coxph(Surv(obsT, status) ~ adm_wd + adm_calmonth + gender + age_band_start, data = dfSurv2)
+newdata2 <- ipss %>% select(obsT = stay_duration, adm_wd, adm_calmonth, gender, age_band_start) %>% mutate(status = TRUE)
 newdata2d <- newdata2 %>% mutate(obsT = obsT + 48)
 CM2_prediction_1 <- predict(CM2, newdata = newdata2, type = "expected")
 CM2_prediction_2 <- predict(CM2, newdata = newdata2d, type = "expected")
 prob_here_48h_CM2 <- exp(-CM2_prediction_2)/exp(-CM2_prediction_1)
 
 model_output_CM2 <- hospitalflow::run_S_func_model(df = dfSurv2,
-                                                   coxmodel = "Surv(obsT, status) ~ adm_wd + gender + age_band_start",
+                                                   coxmodel = "Surv(obsT, status) ~ adm_wd + adm_calmonth + gender + age_band_start",
                                                   date_seq = dates)
 
 summary(model_output_CM2$predictions)

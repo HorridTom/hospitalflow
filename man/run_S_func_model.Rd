@@ -4,7 +4,7 @@
 \alias{run_S_func_model}
 \title{run_S_func_model}
 \usage{
-run_S_func_model(df, S_func, date_seq, horizon = 48)
+run_S_func_model(df, S_func, coxmodel = NULL, date_seq, horizon = 48)
 }
 \arguments{
 \item{df}{dataset of spells}
