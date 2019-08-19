@@ -35,7 +35,7 @@ occupancy_on_arrival <- function(df){
 #' @export
 #'
 #' @examples
-ed_occupancy_on_arrival_plot <- function(df, startDate, endDate, hospital_name, plotChart = T){
+ed_occupancy_on_arrival_plot <- function(df, startDate, endDate, hospital_name = "Hospital Name", plotChart = T){
 
   df <- dplyr::filter(df, start_datetime <= endDate, end_datetime >= startDate)
 
@@ -50,7 +50,6 @@ ed_occupancy_on_arrival_plot <- function(df, startDate, endDate, hospital_name, 
     dplyr::mutate(wait_for_treatment_hrs =
                     as.numeric(difftime(treatment_datetime, start_datetime, units = "hours")))
 
-  df
 
   df_all <- df %>%
     dplyr::count(occupancy_on_arrival) %>%
@@ -63,7 +62,7 @@ ed_occupancy_on_arrival_plot <- function(df, startDate, endDate, hospital_name, 
     dplyr::rename(n_LoS_over_4hrs = n)
 
 
-  df_LoS_merged <- dplyr::inner_join(df_all, df_LoS_over_4hrs)
+  df_LoS_merged <- dplyr::left_join(df_all, df_LoS_over_4hrs)
   df_LoS_merged <- df_LoS_merged %>%
     dplyr::mutate(perc_LoS_over_4hrs = (n_LoS_over_4hrs*100)/n_all)
 
@@ -74,12 +73,19 @@ ed_occupancy_on_arrival_plot <- function(df, startDate, endDate, hospital_name, 
     dplyr::rename(n_W4T_over_4hrs = n)
 
 
-  df_W4T_merged <- dplyr::inner_join(df_all, df_W4T_over_4hrs)
+  df_W4T_merged <- dplyr::left_join(df_all, df_W4T_over_4hrs)
   df_W4T_merged <- df_W4T_merged %>%
-                        dplyr::mutate(perc_W4T_over_4hrs = (n_W4T_over_4hrs*100)/n_all)
+    dplyr::mutate(perc_W4T_over_4hrs = (n_W4T_over_4hrs*100)/n_all)
 
 
-  df_to_plot <- dplyr::inner_join(df_LoS_merged, df_W4T_merged)
+  #putting both analyses together in the right form to plot
+  df_to_plot <- dplyr::full_join(df_LoS_merged, df_W4T_merged)
+  df_to_plot <- df_to_plot %>%
+    dplyr::mutate(n_LoS_over_4hrs = plyr::mapvalues(n_LoS_over_4hrs, from = NA, to = 0, warn_missing = F)) %>%
+    dplyr::mutate(perc_LoS_over_4hrs = plyr::mapvalues(perc_LoS_over_4hrs, from = NA, to = 0, warn_missing = F)) %>%
+    dplyr::mutate(n_W4T_over_4hrs = plyr::mapvalues(n_W4T_over_4hrs, from = NA, to = 0, warn_missing = F)) %>%
+    dplyr::mutate(perc_W4T_over_4hrs = plyr::mapvalues(perc_W4T_over_4hrs, from = NA, to = 0, warn_missing = F))
+
 
   #generate deciles from attendances profile
   deciles <- stats::quantile(df$occupancy_on_arrival, probs = seq(0, 1, length = 11), type = 5)
@@ -93,13 +99,13 @@ ed_occupancy_on_arrival_plot <- function(df, startDate, endDate, hospital_name, 
     ggplot2::geom_smooth(ggplot2::aes(y=perc_LoS_over_4hrs,
                                       colour = "perc_LoS_over_4hrs"),
                          se = FALSE) +
-    ggplot2::geom_smooth(ggplot2::aes(y=perc_W4T_over_4hrs,
-                                      colour = "per_W4T_over_4hrs"),
-                         se = FALSE) +
     ggplot2::geom_point(ggplot2::aes(y=perc_LoS_over_4hrs,
                                      colour = "perc_LoS_over_4hrs")) +
+    ggplot2::geom_smooth(ggplot2::aes(y=perc_W4T_over_4hrs,
+                                      colour = "perc_W4T_over_4hrs"),
+                         se = FALSE) +
     ggplot2::geom_point(ggplot2::aes(y=perc_W4T_over_4hrs,
-                                     colour = "per_W4T_over_4hrs")) +
+                                     colour = "perc_W4T_over_4hrs")) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.title = ggplot2::element_blank(),
                    legend.position = "bottom") +
@@ -115,7 +121,6 @@ ed_occupancy_on_arrival_plot <- function(df, startDate, endDate, hospital_name, 
                                   "% of unscheduled ED attendances \nwith wait time for treatment over 4hrs"),
                                 values = c(#"dodgerblue2",
                                            "firebrick3", "seagreen4")) +
-    #ggplot2::guides(color = ggplot2::guide_legend(reverse = TRUE)) +
     ggplot2::geom_vline(xintercept = deciles_tib$deciles,
                         linetype = "dashed",
                         colour = "grey54",
@@ -126,12 +131,7 @@ ed_occupancy_on_arrival_plot <- function(df, startDate, endDate, hospital_name, 
                       y = Inf,
                       label = deciles_tib$labels,
                       size = 3,
-                      vjust = 3) #+
-    # ggplot2::annotate(geom = "text",
-    #                   x = deciles[1],
-    #                   y = Inf, label = "deciles:",
-    #                   size = 3,
-    #                   vjust = 1.5)
+                      vjust = 3)
 
 
   if(plotChart == T){
