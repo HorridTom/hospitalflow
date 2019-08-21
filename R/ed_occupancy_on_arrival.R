@@ -109,18 +109,18 @@ ed_occupancy_on_arrival_plot <- function(df, startDate, endDate, hospital_name =
     ggplot2::theme_bw() +
     ggplot2::theme(legend.title = ggplot2::element_blank(),
                    legend.position = "bottom") +
-    ggplot2::labs(title = paste0(hospital_name, ": Occupancy on Arrival versus Percentage of \nUnscheduled ED Attendances with LoS and Wait Time for Treatment over 4hrs"),
+    ggplot2::labs(title = paste0(hospital_name, ": ED 'Occupancy' on Arrival versus Percentage of \nUnscheduled ED Attendances with LoS and Wait Time for Treatment over 4hrs"),
                   subtitle = paste0("From ", strftime(startDate, "%d/%B/%Y")," to ", strftime(endDate, "%d/%B/%Y"),"\nNote: results are intended for management information only"),
                   y = "Percentage over 4hrs, %",
-                  x = "Occupancy on arrival",
+                  x = "ED 'Occupancy' on arrival",
                   caption = "Vertical lines represent deciles of number of attendances at given occupancies on arrival                       \nSource: CLAHRC NWL") +
     ggplot2::scale_x_continuous(breaks = scales::pretty_breaks()) +
     ggplot2::scale_y_continuous(breaks = scales::pretty_breaks()) +
     ggplot2::scale_colour_manual(labels = c(#"Number of Attendances",
                                   "% of unscheduled ED attendances \nwith LoS in ED over 4hrs",
                                   "% of unscheduled ED attendances \nwith wait time for treatment over 4hrs"),
-                                values = c(#"dodgerblue2",
-                                           "firebrick3", "seagreen4")) +
+                                values = c(#"seagreen4",
+                                           "orangered2", "dodgerblue2")) +
     ggplot2::geom_vline(xintercept = deciles_tib$deciles,
                         linetype = "dashed",
                         colour = "grey54",
