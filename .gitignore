@@ -28,11 +28,19 @@ vignettes/*.pdf
 rsconnect/
 # Test data
 /tests/testthat/testdata
+
 # Data
 /data
 inst/doc
+
 # Temporarily ignore whole vignette folder as caches contain data
 /vignettes
 # pdfs in config file
 /lgt-config/*.pdf
+
+# Data-out
+/data-out
 lgt-data
+
+# html output from survival analysis
+survival-analysis/*.html

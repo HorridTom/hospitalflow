@@ -25,5 +25,8 @@ Imports:
     purrr,
     tidyr,
     forcats,
-    ggplot2
+    ggplot2,
+    padr,
+    grid,
+    DescTools
 VignetteBuilder: knitr

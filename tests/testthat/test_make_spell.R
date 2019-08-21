@@ -1,6 +1,7 @@
 context("Make a spell table function and test los_att_adm_ae")
 library(hospitalflow)
 
+
 test_that("spell table is created correctly",{
 
   correct_answers <- tibble::tibble(
@@ -34,8 +35,7 @@ test_that("spell table is created correctly",{
                                     start_datetime,
                                     end_datetime,
                                     gender,
-                                    age_band_start
-                                    )
+                                    age_band_start)
 
 
   pseudo_id <- as.character(c("112", "112", "112", "113", "113", "114", "114"))
@@ -73,5 +73,4 @@ test_that("spell table is created correctly",{
 
 
 })
-
 
