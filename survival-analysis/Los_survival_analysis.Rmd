@@ -285,20 +285,27 @@ model_output_CM2$diagnostics$rel_err_plot
 ```
 
 
-Medical patients only
-~0% non-emergency medical
+
 
 AAU - more consistency 7 day
 Downstream - much less so - could assume no weekend discharges?
 
-Before tacking this, we need a general framework within which these models can be deployed and evaluated.
+General framework above does work to deploy and evaluate these models. However would be better to use the structure of e.g. caret!
 
-This should include:
+This includes:
 1. A structure to better represent (conditional) survival functions
 2. A function or function template for calculating these survival functions from (a specified, and eventually possibly rolling, "training" subset of) the data
 3. A function for applying these survival functions to the data at a given point in time to yield a delta-t horizon prediction for residual occupancy
 4. A function or functions to evaluate these predictions across a "test" range
 
-Idea: can I use the newdata argument of survfit to provide the actual covariates of snapshot data, to get a) S(t1 | covs) and b) S(t0 | covs), then compute their ratio to get the probability of still being in? If so this saves a lot of machinery in e.g. predict_residual_occupancy. Need to check the maths to see if this is valid - does it commute or something!?
+Idea: can I use the newdata argument of survfit to provide the actual covariates of snapshot data, to get a) S(t1 | covs) and b) S(t0 | covs), then compute their ratio to get the probability of still being in? If so this saves a lot of machinery in e.g. predict_residual_occupancy. - This is essentially what the Cox model approach above is doing.
 
+Evaluation by occupancy "zones" - ROC?
+Time series - esp. for delta on the predictions
+v v v Busy ED/AAU : ?more admissions
+Visualise to see the prediction before the effect
+Time since prev adm- 
+Existence of certain diagnoses previuos: chest pain, asthma, overdose, falls, found on floor, hf copd, dka
+Prb of overfull given predicted residual occupancy + distrib of expected admits over 48hrs...
 
+?incorporate lou's data?
