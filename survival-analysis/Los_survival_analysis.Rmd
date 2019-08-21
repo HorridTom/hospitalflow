@@ -184,7 +184,7 @@ For now let's carry on and hack together a means of getting the prediction for a
 hospitalflow::predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
 hospitalflow::get_residual_occupancy(df = surv_data, t = T1, delta_t = 48)
 
-dates <- seq(lubridate::ymd_hm('2018-09-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2018-11-30 12:00', tz = "Europe/London"), by = '1 day')
+dates <- seq(lubridate::ymd_hm('2017-12-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2018-11-30 12:00', tz = "Europe/London"), by = '1 day')
 
 model_output <- hospitalflow::run_S_func_model(df = surv_data, S_func = S_function, date_seq = dates)
 
@@ -284,6 +284,27 @@ model_output_CM2$diagnostics$err_plot
 model_output_CM2$diagnostics$rel_err_plot
 ```
 
+```{r naive-ts}
+naive_preds <- model_output_CM2$predictions %>% dplyr::select(dates, actual)
+
+naive_preds <- naive_preds %>% dplyr::mutate(predicted = dplyr::lag(actual, 2)) %>% dplyr::filter(!is.na(predicted))
+
+naive_preds <- naive_preds %>% 
+  dplyr::mutate(error = predicted - actual, rel_error = error/actual,
+                abs_error = abs(error), abs_rel_error = abs(rel_error))
+
+prediction_comparison <- naive_preds %>% select(dates, predicted, actual) %>% gather(key = "type", value = "residual_occ", predicted, actual)
+comp_plot <- ggplot2::ggplot(data = prediction_comparison, mapping = aes(dates, residual_occ)) + ggplot2::geom_point(aes(group = type, colour = type)) + geom_line(aes(group = type, colour = type)) + ggtitle("Residual occupancy: predictions versus actual") +
+  xlab("Date of prediction") + ylab("Residual occupancy")
+
+err_plot <- ggplot2::ggplot(data = naive_preds, mapping = aes(dates, error)) + ggplot2::geom_point() + geom_line() + ggtitle("Residual occupancy: errors in predictions versus actual") +
+  xlab("Date of prediction") + ylab("Error")
+
+rel_err_plot <- ggplot2::ggplot(data = naive_preds, mapping = aes(dates, rel_error)) + ggplot2::geom_point() + geom_line() + ggtitle("Residual occupancy: relative errors in predictions versus actual") +
+  xlab("Date of prediction") + ylab("Relative Error")
+
+summary(naive_preds)
+```
 
 
 
