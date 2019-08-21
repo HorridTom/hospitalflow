@@ -88,7 +88,8 @@ spell_variables <- function(all_episodes) {
     dplyr::group_by(spell_number) %>%
     dplyr::summarise(spell_start = min(start_datetime, na.rm = TRUE),
                      spell_end = max(end_datetime, na.rm = TRUE),
-                     number_of_episodes = n()) %>%
+                     number_of_episodes = n(),
+                     pseudo_id = dplyr::first(pseudo_id)) %>%
     dplyr::left_join(episode_lists, by = "spell_number") %>%
     dplyr::mutate(starts_with_ed = stringr::str_detect(episode_class_sequence, pattern = "^E.*$"),
                   ed_non_adm = stringr::str_detect(episode_class_sequence, pattern = "^E$"),
@@ -119,12 +120,17 @@ spell_variables <- function(all_episodes) {
 add_spell_variables <- function(ed_data, inpatient_data, spell_table) {
 
   inpatient_data <- inpatient_data %>% dplyr::mutate(main_specialty = addNA(main_specialty))
-  spell_table %>% dplyr::mutate(main_specialty_start = purrr::map(constituent_ip_episodes, function(x) {
-    if(length(x) == 0) {NA} else {
-      inpatient_data %>% dplyr::filter(episode_id == x[[1]]) %>% dplyr::slice(1) %>% dplyr::pull(main_specialty)
+  spell_table %>% dplyr::mutate(
+    main_specialty_start = purrr::map(constituent_ip_episodes, function(x) {
+      if(length(x) == 0) {NA} else {
+        inpatient_data %>% dplyr::filter(episode_id == x[[1]]) %>% dplyr::slice(1) %>% dplyr::pull(main_specialty)
       }
     })
-  ) %>% tidyr::unnest(main_specialty_start)
+  ) %>% tidyr::unnest(main_specialty_start) %>%
+    dplyr::group_by(pseudo_id) %>%
+    dplyr::mutate(prev_disch = dplyr::lag(spell_end, order_by = spell_start)) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(days_since_prev_disch = difftime(spell_start, prev_disch, units = "days"))
 }
 
 get_episode_id_list <- function(episode_df, episode_type_to_list) {
