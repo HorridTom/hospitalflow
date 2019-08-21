@@ -35,7 +35,6 @@ inst/doc
 
 # Temporarily ignore whole vignette folder as caches contain data
 /vignettes
-
 # pdfs in config file
 /lgt-config/*.pdf
 
