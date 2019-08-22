@@ -23,10 +23,10 @@ get_simulated_ed_data <- function(npat = 1000, start = as.POSIXct("2019-01-01 00
     mutate(arrival_mode = get_arrival_mode()) %>%
     mutate(attendance_disposal = get_attendance_disp()) %>%
     mutate(referral_cource = get_referral_source()) %>%
-    mutate(initial_assess_datetime = generate_initial_assess(start_datetime = start_datetime,
-                                                             end_datetime = end_datetime)) %>%
-    mutate(treatment_datetime = generate_treatment_time(start_datetime = start_datetime,
-                                                             end_datetime = end_datetime))
+    mutate(initial_assess_datetime = as.POSIXct(generate_initial_assess(start_datetime = start_datetime,
+                                                             end_datetime = end_datetime))) %>%
+    mutate(treatment_datetime = as.POSIXct(generate_treatment_time(start_datetime = start_datetime,
+                                                             end_datetime = end_datetime)))
 
   simulated_data$episode_id <- 1:nrow(simulated_data)
 
@@ -58,9 +58,9 @@ get_simulated_admission_data <- function(patient_data, fixedPerPatient = F, lamb
     pseudo_id <- list(...)[["pseudo_id"]]
     num_admissions <- list(...)[["num_admissions"]]
     tibble::tibble(pseudo_id = rep(pseudo_id, num_admissions),
-                   start_datetime = random_datetimes(n = num_admissions, start = start, end = end),
-                   end_datetime = start_datetime +
-                     as.difftime(rexp(num_admissions, rate = los_rate), units = "secs")
+                   start_datetime = as.POSIXct(random_datetimes(n = num_admissions, start = start, end = end)),
+                   end_datetime = as.POSIXct(start_datetime +
+                     as.difftime(rexp(num_admissions, rate = los_rate), units = "secs"))
     )
 
   }
