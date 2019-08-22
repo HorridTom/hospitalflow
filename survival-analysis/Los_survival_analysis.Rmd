@@ -307,6 +307,17 @@ summary(naive_preds)
 ```
 
 
+```{r}
+comp_plot
+```
+
+```{r}
+err_plot
+```
+
+```{r}
+rel_err_plot
+```
 
 AAU - more consistency 7 day
 Downstream - much less so - could assume no weekend discharges?
