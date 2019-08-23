@@ -84,7 +84,7 @@ four_hrs_perf <- function(start_date = as.Date("2015-01-01", tz = "Europe/London
     ggplot2::geom_text(ggplot2::aes(label = ifelse(x==max(x), format(x, '%b-%y'),'')), hjust = -0.05, vjust = 2)
 
 
-  if(four_hr_plot == TRUE){
+  if(plot_chart == TRUE){
 
     four_hr_plot
 
