@@ -4,12 +4,29 @@
 \alias{four_hrs_perf}
 \title{four hour performance for ED}
 \usage{
-four_hrs_perf(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-  end_date = as.Date("2015-01-01", tz = "Europe/London"), data,
-  plot_chart, hospital_name = "Hospital_Name")
+four_hrs_perf(start_dt, end_dt, data, time_unit = "day", plot_chart,
+  hospital_name = "Hospital_Name")
 }
 \arguments{
-\item{hospital_name}{}
+\item{start_dt}{datetime, as a POSIXct, of the earliest attendance to be included in the analysis}
+
+\item{data}{hospital episode data with at least the following fields:
+Attendances - the attendances date and time;
+Discharges - the discharge date and time;
+Pseudo id - the patient pseudo id;}
+
+\item{time_unit}{the unit of aggregation for 4 hour performance percentages
+in the same format as lubridate::round_date}
+
+\item{plot_chart}{if TRUE return chart, otherwise if FALSE return dataframe}
+
+\item{hospital_name}{the hospital name for which the analysis are undertaken}
+
+\item{end_date}{datetime, as a POSIXct, of the latest attendance to be included in the analysis}
+}
+\value{
+Chart or dataframe showing 4 hour performance at the
+aggregation unit chosen
 }
 \description{
 four hour performance for ED

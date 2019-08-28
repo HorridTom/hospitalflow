@@ -1,22 +1,28 @@
 #' four hour performance for ED
 #'
-#' @param start_date
-#' @param end_date
-#' @param data
-#' @param plot_chart
-#' @param hospital_name
+#' @param start_dt datetime, as a POSIXct, of the earliest attendance to be included in the analysis
+#' @param end_date datetime, as a POSIXct, of the latest attendance to be included in the analysis
+#' @param data hospital episode data with at least the following fields:
+#' Attendances - the attendances date and time;
+#' Discharges - the discharge date and time;
+#' Pseudo id - the patient pseudo id;
+#' @param time_unit the unit of aggregation for 4 hour performance percentages
+#' in the same format as lubridate::round_date
+#' @param plot_chart if TRUE return chart, otherwise if FALSE return dataframe
+#' @param hospital_name the hospital name for which the analysis are undertaken
 #'
-#' @return
+#' @return Chart or dataframe showing 4 hour performance at the
+#' aggregation unit chosen
 #' @export
 #'
 #' @examples
-four_hrs_perf <- function(start_date = as.Date("2015-01-01", tz = "Europe/London"),
-                          end_date = as.Date("2015-01-01", tz = "Europe/London"),
-                          data, plot_chart, hospital_name = "Hospital_Name"){
+four_hrs_perf <- function(start_dt,
+                          end_dt,
+                          data, time_unit = "day", plot_chart, hospital_name = "Hospital_Name"){
 
   dt_select <- data %>%
     dplyr::select(pseudo_id, start_datetime, end_datetime) %>%
-    dplyr::filter(start_datetime <= end_date & end_datetime >= start_date)
+    dplyr::filter(start_datetime <= end_dt & start_datetime >= start_dt)
 
 
   # calculating total time by using difftime ####
@@ -29,9 +35,8 @@ four_hrs_perf <- function(start_date = as.Date("2015-01-01", tz = "Europe/London
                   Hr_perf = dplyr::case_when(
                     Los <= 240 ~ "under_4hrs",
                     Los >= 240 ~ "above_4hrs"),
-                  Time = as.Date(start_datetime),
-                  One_week = lubridate::round_date(Time, "7 days")) %>%
-    dplyr::select(pseudo_id, Los, Time, One_week, Hr_perf)
+                  Time = lubridate::round_date(start_datetime, unit = time_unit))%>%
+    dplyr::select(pseudo_id, Los, Time, Hr_perf)
 
   sum_4hrs_perf <- dt_los %>%
     dplyr::group_by(Time, Hr_perf) %>%
@@ -43,17 +48,27 @@ four_hrs_perf <- function(start_date = as.Date("2015-01-01", tz = "Europe/London
 
 
   # Set the title
-  title_stub <- ": Number of A&E attendances, "
+  title_stub <- ": daily 4 hr emergency access performance, "
   hospital_name <- "Hospital_name"
-  start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
-  end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
+  start_date_title <- format(as.Date(start_dt), format = "%d %B %Y")
+  end_date_title <- format(as.Date(end_dt), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
 
 
   # function to plot the 4 hrs emergency performance
   # Plot all days - see Tom's AE APP
 
-  pct <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf, chart = 'p', ylab = "percent",
+  ## Version 0.6.0 of qicharts2 still appears to suffer from
+  ## the issue described here: https://github.com/anhoej/qicharts2/issues/21
+  ## although it looks like there is a fix. Once that fix is
+  ## integrated into a CRAN release, this code should be removed. ***
+  options(qic.linecol   = '#5DA5DA',
+          qic.signalcol = '#F15854',
+          qic.targetcol = '#059748',
+          qic.clshade   = TRUE)
+  ## ***
+
+  pct <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf, chart = 'pp', ylab = "percent",
                         show.grid = TRUE, multiply= 100)
 
   pct$data$x <- as.Date(pct$data$x, tz = "Europe/London")
@@ -62,8 +77,8 @@ four_hrs_perf <- function(start_date = as.Date("2015-01-01", tz = "Europe/London
   cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
   #convert arguments to dates and round to nearest quarter
-  st.dt <- as.Date(start_date, format = "%Y-%m-%d", tz = "Europe/London")
-  ed.dt <- as.Date(end_date, format = "%Y-%m-%d", tz = "Europe/London")
+  st.dt <- as.Date(start_dt, format = "%Y-%m-%d", tz = "Europe/London")
+  ed.dt <- as.Date(end_dt, format = "%Y-%m-%d", tz = "Europe/London")
   #q.st.dt <- as.Date(zoo::as.yearqtr(st.dt, format = "%Y-%m-%d"))
   #q.ed.dt <- as.Date(zoo::as.yearqtr(ed.dt, format = "%Y-%m-%d"), frac = 1) + 1
   cht_axis_breaks <- seq(st.dt, ed.dt, by = "quarters")
@@ -83,6 +98,7 @@ four_hrs_perf <- function(start_date = as.Date("2015-01-01", tz = "Europe/London
     ggplot2::ylim(ylimlow, 100) +
     ggplot2::geom_text(ggplot2::aes(label = ifelse(x==max(x), format(x, '%b-%y'),'')), hjust = -0.05, vjust = 2)
 
+  four_hr_plot
 
   if(plot_chart == TRUE){
 
@@ -90,11 +106,12 @@ four_hrs_perf <- function(start_date = as.Date("2015-01-01", tz = "Europe/London
 
   }else{
 
-    four_hr_plot$pct %>% dplyr::select(Time, above_4hrs, under_4hrs, N)
+   four_hr_plot$data
 
   }
 
 }
+
 
 format_control_chart <- function(cht, r1_col, r2_col) {
 
