@@ -4,7 +4,7 @@
 \alias{predict_residual_occupancy}
 \title{predict_residual_occupancy}
 \usage{
-predict_residual_occupancy(df, t, S_function, delta_t)
+predict_residual_occupancy(df, t, S_function, delta_t, coxmodel = NULL)
 }
 \arguments{
 \item{delta_t}{}

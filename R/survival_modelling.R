@@ -73,10 +73,23 @@ get_inpatient_snapshot <- function(df, t) {
 #' @export
 #'
 #' @examples
-predict_residual_occupancy <- function(df, t, S_function, delta_t) {
-  ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
-  ipss1 <- ipss1 %>% mutate(prob_here_after_dt = hospitalflow::get_discharge_probability(stay_duration, S_function, delta_t))
-  ipss1 %>% pull(prob_here_after_dt) %>% sum()
+predict_residual_occupancy <- function(df, t, S_function, delta_t, coxmodel = NULL) {
+  if(is.null(coxmodel)) {
+    ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
+    ipss1 <- ipss1 %>% mutate(prob_here_after_dt = hospitalflow::get_discharge_probability(stay_duration, S_function, delta_t))
+    ipss1 %>% pull(prob_here_after_dt) %>% sum()
+  } else {
+    # filter to only available data
+    df <- df %>% dplyr::filter(start_datetime <= t)
+    CM <- coxph(as.formula(coxmodel), data = df, na.action = na.exclude)
+    ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% dplyr::filter(!is.na(stay_duration))
+    newdata <- ipss1 %>% dplyr::select(obsT = stay_duration, adm_wd, adm_daytime, adm_calmonth, gender, age_band_start) %>% mutate(status = TRUE)
+    newdata_d <- newdata %>% mutate(obsT = obsT + delta_t)
+    CM_prediction_0 <- predict(CM, newdata = newdata, type = "expected")
+    CM_prediction_1 <- predict(CM, newdata = newdata_d, type = "expected")
+    prob_here_48h_CM <- exp(-CM_prediction_1)/exp(-CM_prediction_0)
+    sum(prob_here_48h_CM)
+  }
 }
 
 #' get_residual_occupancy
@@ -91,7 +104,7 @@ predict_residual_occupancy <- function(df, t, S_function, delta_t) {
 #' @examples
 get_residual_occupancy <- function(df, t, delta_t) {
   ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
-  ipss1_dt <- hospitalflow::get_inpatient_snapshot(df = df, t = t + delta_t*60*60) %>% mutate(residual = SPELLNUMBER %in% ipss1$SPELLNUMBER)
+  ipss1_dt <- hospitalflow::get_inpatient_snapshot(df = df, t = t + delta_t*60*60) %>% mutate(residual = spell_number %in% ipss1$spell_number)
   ipss1_dt %>% filter(residual == TRUE) %>% nrow()
 }
 
@@ -125,16 +138,17 @@ make_survival_function <- function(KM) {
 #' @export
 #'
 #' @examples
-run_S_func_model <- function(df, S_func, date_seq, horizon = 48) {
+run_S_func_model <- function(df, S_func, coxmodel = NULL, date_seq, horizon = 48) {
 
   pred_res_occ_v <- Vectorize(hospitalflow::predict_residual_occupancy, vectorize.args = "t")
   get_res_occ_v <- Vectorize(hospitalflow::get_residual_occupancy, vectorize.args = "t")
 
   predictions <- tibble::tibble(dates = date_seq)
-  predictions <- predictions %>% dplyr::mutate(predicted = pred_res_occ_v(df = surv_data, dates,
+  predictions <- predictions %>% dplyr::mutate(predicted = pred_res_occ_v(df = df, dates,
                                                                           S_function = S_function,
+                                                                          coxmodel = coxmodel,
                                                                           delta_t = horizon))
-  predictions <- predictions %>% dplyr::mutate(actual = get_res_occ_v(df = surv_data, dates, delta_t = horizon)) %>%
+  predictions <- predictions %>% dplyr::mutate(actual = get_res_occ_v(df = df, dates, delta_t = horizon)) %>%
     dplyr::mutate(error = predicted - actual, rel_error = error/actual,
                   abs_error = abs(error), abs_rel_error = abs(rel_error))
 
