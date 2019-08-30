@@ -83,7 +83,10 @@ predict_residual_occupancy <- function(df, t, S_function, delta_t, coxmodel = NU
     df <- df %>% dplyr::filter(start_datetime <= t)
     CM <- coxph(as.formula(coxmodel), data = df, na.action = na.exclude)
     ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% dplyr::filter(!is.na(stay_duration))
-    newdata <- ipss1 %>% dplyr::select(obsT = stay_duration, adm_wd, adm_daytime, adm_calmonth, gender, age_band_start) %>% mutate(status = TRUE)
+    newdata <- ipss1 %>%
+      dplyr::select(obsT = stay_duration, adm_wd, adm_daytime, adm_calmonth, gender, age_band_start,
+                    disch_in_last_week, disch_in_last_month, admitted_before) %>%
+      mutate(status = TRUE)
     newdata_d <- newdata %>% mutate(obsT = obsT + delta_t)
     CM_prediction_0 <- predict(CM, newdata = newdata, type = "expected")
     CM_prediction_1 <- predict(CM, newdata = newdata_d, type = "expected")
