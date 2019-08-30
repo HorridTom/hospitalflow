@@ -16,7 +16,8 @@ library(ggfortify)
 ```{r}
 #surv_data <- readRDS(file = "../data/ed_ex.rds")
 #surv_data <- readRDS(file = "../../cw-data/cw_ip_spells.rds")
-surv_data <- readRDS(file = "../../lgt-data/data-out/spell_table_lgt_20190816_b704e260_ms.rds")
+#surv_data <- readRDS(file = "../../lgt-data/data-out/spell_table_lgt_20190816_b704e260_ms.rds")
+surv_data <- readRDS(file = "../../cw-data/spell_table_cw_20190827_38ba2c47.rds")
 
 spec_dir_mapping <- readr::read_csv("../data/SPECIALTY_HCPmap.csv")
 surv_data <- surv_data %>% dplyr::left_join(spec_dir_mapping, by = c("main_specialty_start" = "spec_name"))
@@ -30,7 +31,7 @@ surv_data <- surv_data %>% filter(admission_method_type == "Emergency Admissions
          age_band_start = forcats::fct_drop(age_band_start))
 surv_data <- surv_data %>% mutate(los = difftime(end_datetime, start_datetime), adm_wd = weekdays(start_datetime)) %>% filter(!is.na(los))
 units(surv_data$los) <- "hours"
-clean_surv_data <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2019-01-31 00:00'))
+clean_surv_data <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2017-09-01 00:00'))
 
 
 obsLen <- 365*24 # length of observation time (censoring time = end of study)
@@ -149,7 +150,7 @@ expected_k2
 Next step is to write a function to run this on patients actually in hospital/ward at a specified time t.
 
 ```{r}
-T1 <- strptime("2018-09-01 12:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
+T1 <- strptime("2017-07-01 12:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
 ipss1 <- hospitalflow::get_inpatient_snapshot(df = surv_data, t = T1) %>% filter(!is.na(stay_duration))
 
 ipss1 <- ipss1 %>% mutate(prob_here_48h = hospitalflow::get_discharge_probability(stay_duration, S_function, 48))
@@ -184,7 +185,7 @@ For now let's carry on and hack together a means of getting the prediction for a
 hospitalflow::predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
 hospitalflow::get_residual_occupancy(df = surv_data, t = T1, delta_t = 48)
 
-dates <- seq(lubridate::ymd_hm('2017-12-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2018-11-30 12:00', tz = "Europe/London"), by = '1 day')
+dates <- seq(lubridate::ymd_hm('2017-01-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2017-07-31 12:00', tz = "Europe/London"), by = '1 day')
 
 model_output <- hospitalflow::run_S_func_model(df = surv_data, S_func = S_function, date_seq = dates)
 
