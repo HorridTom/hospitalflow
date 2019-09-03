@@ -1,4 +1,4 @@
-#' four_hrs_perf_flow_groups
+#' four hrs perf flow_groups
 #'
 #' @param start_dt
 #' @param end_dt
