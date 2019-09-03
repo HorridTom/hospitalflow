@@ -1,4 +1,4 @@
-#' Title
+#' four_hrs_perf_flow_groups
 #'
 #' @param start_dt
 #' @param end_dt
