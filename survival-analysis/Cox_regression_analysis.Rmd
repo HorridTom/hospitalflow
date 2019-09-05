@@ -13,7 +13,7 @@ library(ggfortify)
 #surv_data <- readRDS(file = "../data/ed_ex.rds")
 #surv_data <- readRDS(file = "../../cw-data/cw_ip_spells.rds")
 #surv_data <- readRDS(file = "../../lgt-data/data-out/spell_table_lgt_20190816_b704e260_ms.rds")
-surv_data <- readRDS(file = "../../cw-data/spell_table_cw_20190827_38ba2c47.rds")
+surv_data <- readRDS(file = "../../cw-data/spell_table_cw_20190902_b7fae6f7.rds")
 
 spec_dir_mapping <- readr::read_csv("../data/SPECIALTY_HCPmap.csv")
 surv_data <- surv_data %>% dplyr::left_join(spec_dir_mapping, by = c("main_specialty_start" = "spec_name"))
@@ -23,7 +23,8 @@ surv_data <- surv_data %>% filter(admission_method_type == "Emergency Admissions
                                   directorate == "Medical"#,
                                   #main_specialty_start %in% c("ACUTE INTERNAL MEDICINE", "GENERAL MEDICINE")
                                   ) %>%
-  mutate(start_datetime = initial_ed_end_datetime, end_datetime = spell_end,
+  mutate(start_datetime = if_else(is.na(initial_ed_end_datetime), spell_start, initial_ed_end_datetime),
+         end_datetime = spell_end,
          age_band_start = forcats::fct_drop(age_band_start))
 surv_data <- surv_data %>% mutate(los = difftime(end_datetime, start_datetime), adm_wd = weekdays(start_datetime)) %>% filter(!is.na(los)) %>%
   mutate(days_since_prev_disch = as.numeric(replace(days_since_prev_disch, days_since_prev_disch <= 0, NA)),
@@ -31,7 +32,7 @@ surv_data <- surv_data %>% mutate(los = difftime(end_datetime, start_datetime), 
          disch_in_last_month = if_else(!is.na(days_since_prev_disch) & days_since_prev_disch <=30, TRUE, FALSE),
          admitted_before = !is.na(days_since_prev_disch))
 units(surv_data$los) <- "hours"
-clean_surv_data <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2017-09-01 00:00'))
+clean_surv_data <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2019-03-01 00:00'))
 
 
 obsLen <- 365*24 # length of observation time (censoring time = end of study)
@@ -102,7 +103,7 @@ ggplot(data.frame(x=c(0,30L*24L)), aes(x)) +
 
 
 ```{r}
-T1 <- strptime("2017-07-01 12:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
+T1 <- strptime("2018-09-01 12:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
 ```
 
 # Predicting Residual Occupancy
@@ -112,7 +113,7 @@ T1 <- strptime("2017-07-01 12:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe
 hospitalflow::predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
 hospitalflow::get_residual_occupancy(df = surv_data, t = T1, delta_t = 48)
 
-dates <- seq(lubridate::ymd_hm('2017-01-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2017-07-31 12:00', tz = "Europe/London"), by = '1 day')
+dates <- seq(lubridate::ymd_hm('2018-08-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2019-01-31 12:00', tz = "Europe/London"), by = '1 day')
 
 model_output <- hospitalflow::run_S_func_model(df = surv_data, S_func = S_function, date_seq = dates)
 
