@@ -199,12 +199,13 @@ get_colname_mapping <- function(config_path) {
 #' data_path and config_path, whose values are character strings specifying the paths
 #' to i) a csv file to import data from and ii) a folder containing hospitalflow config
 #' files.
+#' @param remove_duplicates boolean to control whether data is de-duped (TRUE) or not (FALSE).
 #'
 #' @return list of tibbles, each containing standardised import of one data file from data_paths
 #' @export
 #'
 #' @examples
-import_and_standardise <- function(data_import_list) {
+import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
 
   # Take the data_import_list and for each element x, load the data located at data_path
   # using configuration specified by the files at config_path.
@@ -243,6 +244,13 @@ import_and_standardise <- function(data_import_list) {
 
   # Add episode ids to each tibble
   data_list <- lapply(data_list, make_episode_ids)
+
+  # If required, de-dupe each tibble based on pseudo_id, and episode start and end time
+  if(remove_duplicates) {
+    data_list <- lapply(data_list, function(x) {
+      dplyr::distinct(x, pseudo_id, start_datetime, end_datetime, .keep_all = TRUE)
+    })
+  }
 
   # Label this list of tibbles with the names of the files they came from
   data_filenames <- sapply(data_import_list, function(x) {
