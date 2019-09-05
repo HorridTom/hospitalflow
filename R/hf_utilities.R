@@ -20,3 +20,7 @@ convert_rds_cols_to_char <- function(path) {
     saveRDS(config_tibble, x)
   })
 }
+
+# , .sep = " ", .collapse = NULL
+cumulative_paste = function(x, ...)
+  Reduce(function(x1, x2) paste(x1, x2, ...), x, accumulate = TRUE)
