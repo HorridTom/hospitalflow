@@ -4,10 +4,10 @@
 \alias{add_directorate_variable}
 \title{add_directorate_variable}
 \usage{
-add_directorate_variable(inpatient_data)
+add_directorate_variable(spell_table)
 }
 \arguments{
-\item{inpatient_data}{}
+\item{spell_table}{}
 }
 \description{
 add_directorate_variable
