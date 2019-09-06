@@ -11,11 +11,13 @@
 #' @export
 #'
 #' @examples
-four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day", plot_chart, hospital_name = "Hospital_Name"){
+four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Europe/London"),
+                                      end_dt = as.Date("2016-09-01", tz = "Europe/London"),
+                                      data, time_unit = "day",  plot_chart, hospital_name = "Hospital_Name"){
 
 
   dt_select <- data %>%
-    dplyr::filter(spell_start <= end_dt | spell_end >= start_dt) %>%
+    dplyr::filter(spell_start < end_dt | spell_end > start_dt) %>%
     dplyr::arrange(spell_start) %>%
     dplyr::mutate(flow_groups = dplyr::case_when(ed_non_adm == TRUE  ~ "Flow A",
                                                  directorate == "Medical" ~ "Flow 3",
@@ -56,12 +58,15 @@ four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day",
 
 
   # Set the title
-  title_stub <- ": daily 4 hr emergency access performance,by patient flow groups "
+  title_stub_flow_a <- ": daily 4 hr emergency access performance,by patient flow group A \n"
+  title_stub_flow_3 <- ": daily 4 hr emergency access performance,by patient flow group 3 \n"
+  title_stub_flow_4 <- ": daily 4 hr emergency access performance,by patient flow group 4 \n"
   hospital_name <- "Hospital_name"
   start_date_title <- format(as.Date(start_dt), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_dt), format = "%d %B %Y")
-  chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
-
+  chart_title_flow_a <- paste0(hospital_name, title_stub_flow_a, start_date_title, " to ", end_date_title)
+  chart_title_flow_3 <- paste0(hospital_name, title_stub_flow_3, start_date_title, " to ", end_date_title)
+  chart_title_flow_4 <- paste0(hospital_name, title_stub_flow_4, start_date_title, " to ", end_date_title)
 
   # function to plot the 4 hrs emergency performance
   # Plot all days - see Tom's AE APP
@@ -111,14 +116,13 @@ four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day",
   ylimlow_flow_4 <- min(min(pct_flow_4$data$y, na.rm = TRUE),min(pct_flow_3$data$lcl, na.rm = TRUE))
 
 
-
   four_hr_plot_flow_a <- format_control_chart(pct, r1_col = "orange", r2_col = "steelblue") +
     ggplot2::geom_hline(ggplot2::aes(yintercept = yintercept, linetype = cutoff),
                         data = cutoff, colour = "#00BB00", linetype = 1) +
     ggplot2::scale_x_date(date_breaks = "1 month", labels = scales::date_format("%Y-%m-%d"),
                           breaks = cht_axis_breaks) + #limits = c(st.dt, ed.dt)
     ggplot2::annotate("text", ed.dt - 90, 95, vjust = -2, label = "95% Target", colour = "#00BB00") +
-    ggplot2::ggtitle(chart_title) +
+    ggplot2::ggtitle(chart_title_flow_a) +
     ggplot2::theme(plot.title = ggplot2::element_text(size = 7, face = "bold")) +
     #ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, size = 10)) +
     ggplot2::labs(x = "Month", y = "Percentage within 4 hours",
@@ -126,7 +130,6 @@ four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day",
     ggplot2::ylim(ylimlow, 100) +
     ggplot2::geom_text(ggplot2::aes(label = ifelse(x==max(x), format(x, '%b-%y'),'')), hjust = -0.05, vjust = 2)
 
-  four_hr_plot_flow_a
 
   four_hr_plot_flow_3 <- format_control_chart(pct_flow_3, r1_col = "orange", r2_col = "steelblue") +
     ggplot2::geom_hline(ggplot2::aes(yintercept = yintercept, linetype = cutoff),
@@ -134,15 +137,13 @@ four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day",
     ggplot2::scale_x_date(date_breaks = "1 month", labels = scales::date_format("%Y-%m-%d"),
                           breaks = cht_axis_breaks) + #limits = c(st.dt, ed.dt)
     ggplot2::annotate("text", ed.dt - 90, 95, vjust = -2, label = "95% Target", colour = "#00BB00") +
-    ggplot2::ggtitle(chart_title) +
+    ggplot2::ggtitle(chart_title_flow_3) +
     ggplot2::theme(plot.title = ggplot2::element_text(size = 7, face = "bold")) +
     #ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, size = 10)) +
     ggplot2::labs(x = "Month", y = "Percentage within 4 hours",
                   caption = "*Shewart chart rules apply (see Understanding the Analysis tab for more detail) \nRule 1: Any month outside the control limits \nRule 2: Eight or more consecutive months all above, or all below, the centre line", size = 0.5) +
     ggplot2::ylim(ylimlow_flow_3, 100) +
     ggplot2::geom_text(ggplot2::aes(label = ifelse(x==max(x), format(x, '%b-%y'),'')), hjust = -0.05, vjust = 2)
-
-  four_hr_plot_flow_3
 
 
   four_hr_plot_flow_4 <- format_control_chart(pct_flow_4, r1_col = "orange", r2_col = "steelblue") +
@@ -151,7 +152,7 @@ four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day",
     ggplot2::scale_x_date(date_breaks = "1 month", labels = scales::date_format("%Y-%m-%d"),
                           breaks = cht_axis_breaks) + #limits = c(st.dt, ed.dt)
     ggplot2::annotate("text", ed.dt - 90, 95, vjust = -2, label = "95% Target", colour = "#00BB00") +
-    ggplot2::ggtitle(chart_title) +
+    ggplot2::ggtitle(chart_title_flow_4) +
     ggplot2::theme(plot.title = ggplot2::element_text(size = 7, face = "bold")) +
     #ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, size = 10)) +
     ggplot2::labs(x = "Month", y = "Percentage within 4 hours",
@@ -159,28 +160,29 @@ four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day",
     ggplot2::ylim(ylimlow_flow_4, 100) +
     ggplot2::geom_text(ggplot2::aes(label = ifelse(x==max(x), format(x, '%b-%y'),'')), hjust = -0.05, vjust = 2)
 
-  four_hr_plot_flow_4
 
   #caption = paste("*Shewart chart rules apply: \nRule 1: Any month outside the control limits\nRule 2: Eight or more consecutive months all above, or all below, the centre line", sep = "")
 
   #text.p <- ggparagraph(text = caption, face = "italic", size = 11, color = "black")
 
-  figure <- ggpubr::ggarrange(four_hr_plot_flow_a, four_hr_plot_flow_3, four_hr_plot_flow_4,
-                              ncol = 2, nrow = 2)
+    flow_groups_plot <- ggpubr::ggarrange(four_hr_plot_flow_a, four_hr_plot_flow_3, four_hr_plot_flow_4,
+                                ncol = 2, nrow = 2)
 
-  figure
 
   if(plot_chart == TRUE){
 
-    four_hr_plot_flow_a
+    flow_groups_plot
 
   }else{
 
-    four_hr_plot_flow_a$data
+    sum_4hrs_perf
 
   }
 
+
+
 }
+
 
 
 format_control_chart <- function(cht, r1_col, r2_col) {
