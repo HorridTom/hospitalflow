@@ -14,7 +14,7 @@ weekly_ed_att_flgrp < function(start_date, end_date, data, plot_chart, hospital_
 
 
   #selecting the date and creating the flow groups
-  dt_select <- spell_table %>%
+  dt_select <- data %>%
     dplyr::filter(spell_start >= start_date | spell_end <= end_date) %>%
     dplyr::arrange(spell_start) %>%
     dplyr::mutate(flow_groups = dplyr::case_when(ed_non_adm == TRUE  ~ "Flow A",
@@ -39,10 +39,13 @@ weekly_ed_att_flgrp < function(start_date, end_date, data, plot_chart, hospital_
     tidyr::drop_na()
 
   tm_arrange_df <- count_df %>%
-    dplyr::mutate(time = as.character.Date(Time, format = "%d-%m-%Y", tz = "Europe/London"))
+    dplyr::mutate(time = as.character.Date(Time, format = "%d-%m-%Y", tz = "Europe/London")) %>%
+    dplyr::arrange(time)
+
 
   # Set the title
   title_stub <- ": Weekdly unscheduled ED attendance trends, "
+  hospital_name <- "Cw"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
@@ -77,8 +80,5 @@ weekly_ed_att_flgrp < function(start_date, end_date, data, plot_chart, hospital_
     plot_adm_disc$data %>% dplyr::select(Weekday, Event, Value)
 
   }
-
-}
-
 
 }
