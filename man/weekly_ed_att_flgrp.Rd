@@ -4,7 +4,8 @@
 \alias{weekly_ed_att_flgrp}
 \title{weekly_ed_att_flgrp}
 \usage{
-weekly_ed_att_flgrp(start_date, end_date, data, plot_chart, hospital_name)
+weekly_ed_att_flgrp(start_date, end_date, data, time_unit = "weekly",
+  plot_chart, hospital_name)
 }
 \arguments{
 \item{hospital_name}{}

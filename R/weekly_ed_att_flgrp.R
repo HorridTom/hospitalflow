@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-weekly_ed_att_flgrp <- function(start_date, end_date, data, plot_chart, hospital_name){
+weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "weekly", plot_chart, hospital_name){
 
 
   #selecting the date and creating the flow groups
@@ -61,7 +61,7 @@ weekly_ed_att_flgrp <- function(start_date, end_date, data, plot_chart, hospital
     ggplot2::labs(title = chart_title,
                   subtitle = "Weekly unscheduled ED attendance, by patient flow group, n
                   \nNote: Results are intended for management information only",
-                  y = "Count", x = Week, caption = "Source: CLAHRC NWL") +
+                  y = "Count", caption = "Source: CLAHRC NWL") +
     ggplot2::theme(axis.title.y = ggplot2::element_text(margin = ggplot2::margin(t = 0, r = 21, b = 0, l = 0)),
                    plot.title = ggplot2::element_text(size = 10, face = "bold"),
                    plot.subtitle = ggplot2::element_text(size = 9),
@@ -77,7 +77,7 @@ weekly_ed_att_flgrp <- function(start_date, end_date, data, plot_chart, hospital
 
   }else{
 
-    plot_adm_disc$data %>% dplyr::select(Weekday, Event, Value)
+    plot_weekly_att$data %>% dplyr::select(flow_groups, n, time)
 
   }
 
