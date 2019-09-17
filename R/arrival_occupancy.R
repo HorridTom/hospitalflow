@@ -54,8 +54,6 @@ ae_arrival_occupancy <- function(start_date = as.POSIXct("2012-01-01 00:00:00", 
     dplyr::summarize(Average_arrivals = mean(arrivals),
                      Average_occupancy = mean(occupancy_vct))
 
-
-
   # Set the title
   title_stub <- " hospital: Hourly A&E arrival & occupancy profile, "
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
