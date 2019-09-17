@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-weekly_ed_att_flgrp < function(start_date, end_date, data, plot_chart, hospital_name){
+weekly_ed_att_flgrp <- function(start_date, end_date, data, plot_chart, hospital_name){
 
 
   #selecting the date and creating the flow groups
