@@ -5,21 +5,23 @@
 #' @param data
 #' @param plot_chart
 #' @param hospital_name
+#' @param restrict_plot_range whether to zoom the plot to only the range
+#' specified by start_date and end_date
 #'
 #' @return
 #' @export
 #'
 #' @examples
-weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "weekly", plot_chart, hospital_name){
+weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "week",
+                                plot_chart, hospital_name, restrict_plot_range = TRUE){
 
 
   #selecting the date and creating the flow groups
   dt_select <- data %>%
-    dplyr::filter(spell_start >= start_date | spell_end <= end_date) %>%
-    dplyr::arrange(spell_start) %>%
-    dplyr::mutate(flow_groups = dplyr::case_when(ed_non_adm == TRUE  ~ "Flow A",
-                                                 directorate == "Medical" ~ "Flow 3",
-                                                 directorate == "Surgical" ~ "Flow 4"))
+    dplyr::filter(spell_start <= end_date | initial_ed_end_datetime >= start_date) %>%
+    dplyr::arrange(spell_start)
+
+  dt_select <- make_flow_groups(dt_select)
 
 
   # calculating total time by using difftime ####
@@ -38,10 +40,6 @@ weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "weekly"
     dplyr::tally() %>%
     tidyr::drop_na()
 
-  tm_arrange_df <- count_df %>%
-    dplyr::mutate(time = as.character.Date(Time, format = "%d-%m-%Y", tz = "Europe/London")) %>%
-    dplyr::arrange(time)
-
 
   # Set the title
   title_stub <- ": Weekdly unscheduled ED attendance trends, "
@@ -50,11 +48,23 @@ weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "weekly"
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
 
+
+  if(restrict_plot_range) {
+    plot_x_lims <- c(as.POSIXct(start_date, tz = "Europe/London"),
+                     as.POSIXct(end_date, tz = "Europe/London"))
+  } else {
+    plot_x_lims <- c(min(count_df %>% dplyr::pull(Time)),
+                     max(count_df %>% dplyr::pull(Time)))
+  }
+
   # plot the admissions and discharges (non-emergency appears as well )
-  plot_weekly_att <- ggplot2::ggplot(tm_arrange_df,  ggplot2::aes(x = time, y = n, group = flow_groups, fill = flow_groups)) + #shape = Event,  colour = Event
+  plot_weekly_att <- ggplot2::ggplot(count_df,  ggplot2::aes(x = Time, y = n, group = flow_groups, fill = flow_groups)) + #shape = Event,  colour = Event
     ggplot2::geom_line(ggplot2::aes(linetype = flow_groups, color = flow_groups), size = 1.0) +
     ggplot2::geom_point(ggplot2::aes(shape = flow_groups), size = 1.0) +
     ggplot2::scale_y_continuous(limits = c(0,NA)) +
+    ggplot2::scale_x_datetime(labels = scales::date_format("%d-%m-%Y"),
+                              breaks = scales::date_breaks(time_unit),
+                              limits = plot_x_lims) +
     ggplot2::scale_shape_manual(values = c(7, 6, 5)) +
     ggplot2::scale_color_manual(values=c("red", "green",  "blue")) +
     ggplot2::theme_bw() +
@@ -77,7 +87,7 @@ weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "weekly"
 
   }else{
 
-    plot_weekly_att$data %>% dplyr::select(flow_groups, n, time)
+    plot_weekly_att$data %>% dplyr::select(Time, flow_groups, n)
 
   }
 
