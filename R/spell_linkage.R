@@ -138,18 +138,24 @@ get_main_specialty <- function(x) {
   if(length(x) == 0)
     {NA}
   else {
-    inpatient_data %>% dplyr::filter(episode_id == x[[1]]) %>% dplyr::slice(1) %>% dplyr::pull(main_specialty)
+    inpatient_data %>%
+      dplyr::filter(episode_id == x[[1]]) %>%
+      dplyr::slice(1) %>%
+      dplyr::pull(main_specialty)
   }
 }
 
 
 get_episode_id_list <- function(episode_df, episode_type_to_list) {
-  ep_id_v <- episode_df %>% dplyr::filter(episode_type == episode_type_to_list) %>% dplyr::pull(episode_id)
+  ep_id_v <- episode_df %>%
+    dplyr::filter(episode_type == episode_type_to_list) %>%
+    dplyr::pull(episode_id)
   list(as.list(ep_id_v))
 }
 
 get_latest_gender <- function(gender_df) {
-  ordered_gender_records <- gender_df %>% dplyr::filter(!is.na(gender)) %>%
+  ordered_gender_records <- gender_df %>%
+    dplyr::filter(!is.na(gender)) %>%
     dplyr::arrange(dplyr::desc(start_datetime)) %>%
     dplyr::pull(gender)
 
