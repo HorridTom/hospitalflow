@@ -29,13 +29,22 @@ test_that("spell table is created correctly",{
 
   age_band_start <- c("1-4 yrs", "5-9", "10-14", "95+")
 
+  attendance_disposal <- c("Discharged", "Admitted", "Transfered to other Health Care Provider", "Referred to A&E clinic")
+
+  referral_source <- c("Emergency Services", "Self Referral", "Health Care Provider", "Emergency Services")
+
+  hrg_code <- c("VB082", "VB083", "VB084", "VB085")
+
 
 
   ed_data_age_sex <- tibble::tibble(pseudo_id, episode_id,
                                     start_datetime,
                                     end_datetime,
                                     gender,
-                                    age_band_start)
+                                    age_band_start,
+                                    attendance_disposal,
+                                    referral_source,
+                                    hrg_code)
 
 
   pseudo_id <- as.character(c("112", "112", "112", "113", "113", "114", "114"))
@@ -67,6 +76,8 @@ test_that("spell table is created correctly",{
 
   result$spell_number <- as.character(result$spell_number)
   result$number_of_episodes <- as.character(result$number_of_episodes)
+
+
 
   #Test results are correct
   expect_equal(result, correct_answers)
