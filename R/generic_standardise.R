@@ -268,12 +268,12 @@ make_episode_ids <- function(episode_data) {
 }
 
 
-# lgt__data_import_list <- list(list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_ED.csv",
+# lgt_data_import_list <- list(list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_ED.csv",
 #                                    config_path = "lgt-config/ed/"),
 #                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_AW.csv",
 #                                    config_path =  "lgt-config/aw/"),
-#                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_NCF.csv",
-#                                    config_path = "../lgt-config/ncf"),
+#                               # list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_NCF.csv",
+#                               #      config_path = "../lgt-config/ncf"),
 #                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_ED.csv",
 #                                    config_path = "lgt-config/ed/"),
 #                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_IP.csv",
