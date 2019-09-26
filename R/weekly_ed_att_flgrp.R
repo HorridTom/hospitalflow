@@ -42,7 +42,7 @@ weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "week",
 
 
   # Set the title
-  title_stub <- ": Weekdly unscheduled ED attendance trends, "
+  title_stub <- ": Weekly unscheduled ED attendance trends, "
   hospital_name <- "Cw"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")

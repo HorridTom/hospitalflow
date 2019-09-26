@@ -10,10 +10,19 @@
 #' @examples
 make_flow_groups <- function(spell_data){
 
-  spell_data <- spell_data %>%
-    dplyr::mutate(flow_groups = dplyr::case_when(ed_non_adm == TRUE  ~ "Flow A",
-                                                 directorate == "Medical" ~ "Flow 3",
-                                                 directorate == "Surgical" ~ "Flow 4"))
-  spell_data
+  specialty_mapping <- readr::read_csv("D:/Rprojects/hospitalflow/data/SPECIALTY_HCPmap.csv")
+  hrg_mapping <- readr::read_rds("D:/Rprojects/hospitalflow/data/map_hrg.rds")
+
+  spell_data_mapped <- dplyr::left_join(spell_data, hrg_mapping, by = c("hrg_ae_code"))
+
+  spell_data_specialty_mapped <- dplyr::left_join(spell_data_mapped, specialty_mapping, by = c("main_specialty_start" = "spec_name")) %>%
+    dplyr::select(-spec_code)
+
+  spell_table <- spell_data_specialty_mapped %>%
+    dplyr::mutate(flow_groups = dplyr::case_when(
+      starts_with_ed == TRUE & ed_non_adm == TRUE & (disposal_code != "Died in Department" | source_referral_ae != "General Medical Practitioner") & hrg_mapp_code == 1 ~ "Flow 1" ,
+      starts_with_ed == TRUE & ed_non_adm == TRUE & (disposal_code != "Died in Department" | source_referral_ae != "General Medical Practitioner") & hrg_mapp_code == 2  ~ "Flow 2" ,
+      directorate == "Medical" & starts_with_ed == TRUE & ed_admission == TRUE ~ "Flow 3",
+      directorate == "Surgical" & starts_with_ed == TRUE & ed_admission == TRUE ~ "Flow 4"))
 
 }
