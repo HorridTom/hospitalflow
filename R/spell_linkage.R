@@ -125,7 +125,16 @@ add_spell_variables <- function(ed_data, inpatient_data, spell_table) {
   inpatient_data <- inpatient_data %>% dplyr::mutate(main_specialty = addNA(main_specialty))
 
   spell_table %>%
-    dplyr::mutate(main_specialty_start = purrr::map(constituent_ip_episodes, get_main_specialty)) %>%
+    dplyr::mutate(main_specialty_start = purrr::map(constituent_ip_episodes, function(x) {
+      if(length(x) == 0)
+      {NA}
+      else {
+        inpatient_data %>%
+          dplyr::filter(episode_id == x[[1]]) %>%
+          dplyr::slice(1) %>%
+          dplyr::pull(main_specialty)
+      }
+    })) %>%
     tidyr::unnest(main_specialty_start) %>%
     dplyr::group_by(pseudo_id) %>%
     dplyr::mutate(prev_disch = dplyr::lag(spell_end, order_by = spell_start)) %>%
@@ -134,16 +143,16 @@ add_spell_variables <- function(ed_data, inpatient_data, spell_table) {
 
 }
 
-get_main_specialty <- function(x) {
-  if(length(x) == 0)
-    {NA}
-  else {
-    inpatient_data %>%
-      dplyr::filter(episode_id == x[[1]]) %>%
-      dplyr::slice(1) %>%
-      dplyr::pull(main_specialty)
-  }
-}
+# get_main_specialty <- function(x) {
+#   if(length(x) == 0)
+#     {NA}
+#   else {
+#     inpatient_data %>%
+#       dplyr::filter(episode_id == x[[1]]) %>%
+#       dplyr::slice(1) %>%
+#       dplyr::pull(main_specialty)
+#   }
+# }
 
 
 get_episode_id_list <- function(episode_df, episode_type_to_list) {
