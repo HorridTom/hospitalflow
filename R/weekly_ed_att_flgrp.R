@@ -65,8 +65,8 @@ weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "week",
     ggplot2::scale_x_datetime(labels = scales::date_format("%d-%m-%Y"),
                               breaks = scales::date_breaks(time_unit),
                               limits = plot_x_lims) +
-    ggplot2::scale_shape_manual(values = c(7, 6, 5)) +
-    ggplot2::scale_color_manual(values=c("red", "green",  "blue")) +
+    ggplot2::scale_shape_manual(values = c(7, 6, 5, 4)) +
+    ggplot2::scale_color_manual(values=c("red", "green",  "blue", "purple")) +
     ggplot2::theme_bw() +
     ggplot2::labs(title = chart_title,
                   subtitle = "Weekly unscheduled ED attendance, by patient flow group, n
