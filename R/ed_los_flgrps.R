@@ -13,15 +13,12 @@
 ed_los_flow_grps <- function(start_date, end_date, data, plot_chart, hospital_name = "Name"){
 
   dt_select <- spell_table %>%
-    dplyr::select(spell_number, spell_start, initial_ed_end_datetime, ed_non_adm) %>%
-    dplyr::filter(spell_start < end_date | initial_ed_end_datetime > start_date) %>%
-    dplyr::arrange(spell_start)
+    dplyr::filter(spell_start < end_date & initial_ed_end_datetime > start_date)
 
   dt_flow_grps <- make_flow_groups(dt_select)
 
   #subseting data set
   dt <-  dt_flow_grps %>%
-    dplyr::filter(spell_start < end_date  &  initial_ed_end_datetime > start_date) %>%
     dplyr::mutate(
       admitted_date = as.Date(spell_start),
       discharge_date = as.Date(initial_ed_end_datetime),
@@ -79,6 +76,7 @@ ed_los_flow_grps <- function(start_date, end_date, data, plot_chart, hospital_na
 
   # # Set the title
   title_stub <- " ED LoS distribution, "
+  hospital_name <- "Hospital"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
@@ -92,6 +90,15 @@ ed_los_flow_grps <- function(start_date, end_date, data, plot_chart, hospital_na
     ggplot2::scale_shape_manual(values = c(7, 6, 5, 4)) +
     ggplot2::scale_color_manual(values=c("red", "green",  "blue", "purple")) +
     ggplot2::theme_bw() +
+    ggplot2::xlim("00:00", "00:15", "00:30", "00:45",
+                  "1:00", "1:15", "1:30", "1:45",
+                  "2:00", "2:15", "2:30", "2:45",
+                  "3:00", "3:15", "3:30", "3:45",
+                  "4:00", "4:15", "4:30", "4:45",
+                  "5:00", "5:15", "5:30", "5:45",
+                  "6:00", "6:15", "6:30", "6:45",
+                  "7:00", "7:15", "7:30", "7:45",
+                  "8-12 hrs", "> 12 hrs") +
     ggplot2::labs(title = chart_title,
                   subtitle = "Weekly unscheduled ED attendance, by patient flow group, n
                   \nNote: Results are intended for management information only",
