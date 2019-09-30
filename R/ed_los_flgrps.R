@@ -13,15 +13,14 @@
 ed_los_flow_grps <- function(start_date, end_date, data, plot_chart, hospital_name = "Name"){
 
   dt_select <- spell_table %>%
-    dplyr::select(spell_number, spell_start, initial_ed_end_datetime, directorate, ed_non_adm) %>%
+    dplyr::select(spell_number, spell_start, initial_ed_end_datetime, ed_non_adm) %>%
     dplyr::filter(spell_start < end_date | initial_ed_end_datetime > start_date) %>%
-    dplyr::arrange(spell_start) %>%
-    dplyr::mutate(flow_groups = dplyr::case_when(ed_non_adm == TRUE  ~ "Flow A",
-                                                 directorate == "Medical" ~ "Flow 3",
-                                                 directorate == "Surgical" ~ "Flow 4"))
+    dplyr::arrange(spell_start)
+
+  dt_flow_grps <- make_flow_groups(dt_select)
 
   #subseting data set
-  dt <-  dt_select %>%
+  dt <-  dt_flow_grps %>%
     dplyr::filter(spell_start < end_date  &  initial_ed_end_datetime > start_date) %>%
     dplyr::mutate(
       admitted_date = as.Date(spell_start),
@@ -90,8 +89,8 @@ ed_los_flow_grps <- function(start_date, end_date, data, plot_chart, hospital_na
     ggplot2::geom_line(ggplot2::aes(linetype = flow_groups, color = flow_groups), size = 1.0) +
     ggplot2::geom_point(ggplot2::aes(shape = flow_groups), size = 1.0) +
     ggplot2::scale_y_continuous(limits = c(0,NA)) +
-    ggplot2::scale_shape_manual(values = c(7, 6, 5)) +
-    ggplot2::scale_color_manual(values=c("red", "green",  "blue")) +
+    ggplot2::scale_shape_manual(values = c(7, 6, 5, 4)) +
+    ggplot2::scale_color_manual(values=c("red", "green",  "blue", "purple")) +
     ggplot2::theme_bw() +
     ggplot2::labs(title = chart_title,
                   subtitle = "Weekly unscheduled ED attendance, by patient flow group, n
