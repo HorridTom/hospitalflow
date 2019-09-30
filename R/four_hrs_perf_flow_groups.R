@@ -18,10 +18,9 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
 
   dt_select <- data %>%
     dplyr::filter(spell_start < end_dt | spell_end > start_dt) %>%
-    dplyr::arrange(spell_start) %>%
-    dplyr::mutate(flow_groups = dplyr::case_when(ed_non_adm == TRUE  ~ "Flow A",
-                                                 directorate == "Medical" ~ "Flow 3",
-                                                 directorate == "Surgical" ~ "Flow 4"))
+    dplyr::arrange(spell_start)
+
+  dt_flow_grps <- make_flow_groups(dt_select)
 
 
   # calculating total time by using difftime ####
@@ -29,7 +28,7 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
   ##########################################################
   # creating a new variable - under 4 hrs and above 4 hrs ##
 
-  dt_los <-  dt_select  %>%
+  dt_los <-  dt_flow_grps %>%
     dplyr::filter(starts_with_ed == TRUE) %>%
     dplyr::arrange(spell_start) %>%
     dplyr::mutate(Los = difftime(spell_end, spell_start, units = c("min")),
@@ -37,7 +36,7 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
                     Los <= 240 ~ "under_4hrs",
                     Los >= 240 ~ "above_4hrs"),
                   Time = lubridate::round_date(spell_start, unit = time_unit)) %>%
-    dplyr::select(pseudo_id, Los, Time, Hr_perf, directorate, flow_groups, starts_with_ed)
+    dplyr::select(pseudo_id, Los, Time, Hr_perf, flow_groups)
 
   sum_4hrs_perf <- dt_los %>%
     dplyr::group_by(Time, Hr_perf, flow_groups) %>%
@@ -47,8 +46,11 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
     dplyr::mutate(N = under_4hrs + above_4hrs) %>%
     tidyr::drop_na()
 
-  sum_4hrs_perf_flow_a <- sum_4hrs_perf %>%
-    dplyr::filter(flow_groups == "Flow A")
+  sum_4hrs_perf_flow_1 <- sum_4hrs_perf %>%
+    dplyr::filter(flow_groups == "Flow 1")
+
+  sum_4hrs_perf_flow_2 <- sum_4hrs_perf %>%
+    dplyr::filter(flow_groups == "Flow 2")
 
   sum_4hrs_perf_flow_3 <- sum_4hrs_perf %>%
     dplyr::filter(flow_groups == "Flow 3")
@@ -58,13 +60,15 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
 
 
   # Set the title
-  title_stub_flow_a <- ": daily 4 hr emergency access performance,by patient flow group A \n"
+  title_stub_flow_1 <- ": daily 4 hr emergency access performance,by patient flow group 1 \n"
+  title_stub_flow_2 <- ": daily 4 hr emergency access performance,by patient flow group 2 \n"
   title_stub_flow_3 <- ": daily 4 hr emergency access performance,by patient flow group 3 \n"
   title_stub_flow_4 <- ": daily 4 hr emergency access performance,by patient flow group 4 \n"
   hospital_name <- "Hospital_name"
   start_date_title <- format(as.Date(start_dt), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_dt), format = "%d %B %Y")
-  chart_title_flow_a <- paste0(hospital_name, title_stub_flow_a, start_date_title, " to ", end_date_title)
+  chart_title_flow_1 <- paste0(hospital_name, title_stub_flow_1, start_date_title, " to ", end_date_title)
+  chart_title_flow_2 <- paste0(hospital_name, title_stub_flow_2, start_date_title, " to ", end_date_title)
   chart_title_flow_3 <- paste0(hospital_name, title_stub_flow_3, start_date_title, " to ", end_date_title)
   chart_title_flow_4 <- paste0(hospital_name, title_stub_flow_4, start_date_title, " to ", end_date_title)
 
@@ -81,8 +85,11 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
           qic.clshade   = TRUE)
   ## ***
 
-  pct <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_a, chart = 'pp', ylab = "percent",
+  pct_flow_1 <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_1, chart = 'pp', ylab = "percent",
                         show.grid = TRUE, multiply= 100)
+
+  pct_flow_2 <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_2, chart = 'pp', ylab = "percent",
+                               show.grid = TRUE, multiply= 100)
 
   pct_flow_3 <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_3, chart = 'pp', ylab = "percent",
                         show.grid = TRUE, multiply= 100)
@@ -90,9 +97,14 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
   pct_flow_4 <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_4, chart = 'pp', ylab = "percent",
                                show.grid = TRUE, multiply= 100)
 
-  pct$data$x <- as.Date(pct$data$x, tz = "Europe/London")
-  cht_data <- add_rule_breaks(pct$data)
-  pct <- ggplot2::ggplot(cht_data, ggplot2::aes(x, y, label = x))
+  pct_flow_1$data$x <- as.Date(pct_flow_1$data$x, tz = "Europe/London")
+  cht_data_flow_1 <- add_rule_breaks(pct_flow_1$data)
+  pct_flow_1 <- ggplot2::ggplot(cht_data_flow_1, ggplot2::aes(x, y, label = x))
+  cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
+
+  pct_flow_2$data$x <- as.Date(pct_flow_2$data$x, tz = "Europe/London")
+  cht_data_flow_2 <- add_rule_breaks(pct_flow_2$data)
+  pct_flow_2 <- ggplot2::ggplot(cht_data_flow_2, ggplot2::aes(x, y, label = x))
   cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
   pct_flow_3$data$x <- as.Date(pct_flow_3$data$x, tz = "Europe/London")
@@ -111,25 +123,40 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
   #q.st.dt <- as.Date(zoo::as.yearqtr(st.dt, format = "%Y-%m-%d"))
   #q.ed.dt <- as.Date(zoo::as.yearqtr(ed.dt, format = "%Y-%m-%d"), frac = 1) + 1
   cht_axis_breaks <- seq(st.dt, ed.dt, by = "quarters")
-  ylimlow <- min(min(pct$data$y, na.rm = TRUE),min(pct$data$lcl, na.rm = TRUE))
+  ylimlow_flow_1 <- min(min(pct_flow_1$data$y, na.rm = TRUE),min(pct_flow_1$data$lcl, na.rm = TRUE))
+  ylimlow_flow_2 <- min(min(pct_flow_2$data$y, na.rm = TRUE),min(pct_flow_2$data$lcl, na.rm = TRUE))
   ylimlow_flow_3 <- min(min(pct_flow_3$data$y, na.rm = TRUE),min(pct_flow_3$data$lcl, na.rm = TRUE))
   ylimlow_flow_4 <- min(min(pct_flow_4$data$y, na.rm = TRUE),min(pct_flow_3$data$lcl, na.rm = TRUE))
 
 
-  four_hr_plot_flow_a <- format_control_chart(pct, r1_col = "orange", r2_col = "steelblue") +
+  four_hr_plot_flow_1 <- format_control_chart(pct_flow_1, r1_col = "orange", r2_col = "steelblue") +
     ggplot2::geom_hline(ggplot2::aes(yintercept = yintercept, linetype = cutoff),
                         data = cutoff, colour = "#00BB00", linetype = 1) +
     ggplot2::scale_x_date(date_breaks = "1 month", labels = scales::date_format("%Y-%m-%d"),
                           breaks = cht_axis_breaks) + #limits = c(st.dt, ed.dt)
     ggplot2::annotate("text", ed.dt - 90, 95, vjust = -2, label = "95% Target", colour = "#00BB00") +
-    ggplot2::ggtitle(chart_title_flow_a) +
+    ggplot2::ggtitle(chart_title_flow_1) +
     ggplot2::theme(plot.title = ggplot2::element_text(size = 7, face = "bold")) +
     #ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, size = 10)) +
     ggplot2::labs(x = "Month", y = "Percentage within 4 hours",
                   caption = "*Shewart chart rules apply (see Understanding the Analysis tab for more detail) \nRule 1: Any month outside the control limits \nRule 2: Eight or more consecutive months all above, or all below, the centre line", size = 0.5) +
-    ggplot2::ylim(ylimlow, 100) +
+    ggplot2::ylim(ylimlow_flow_1, 100) +
     ggplot2::geom_text(ggplot2::aes(label = ifelse(x==max(x), format(x, '%b-%y'),'')), hjust = -0.05, vjust = 2)
 
+
+  four_hr_plot_flow_2 <- format_control_chart(pct_flow_2, r1_col = "orange", r2_col = "steelblue") +
+    ggplot2::geom_hline(ggplot2::aes(yintercept = yintercept, linetype = cutoff),
+                        data = cutoff, colour = "#00BB00", linetype = 1) +
+    ggplot2::scale_x_date(date_breaks = "1 month", labels = scales::date_format("%Y-%m-%d"),
+                          breaks = cht_axis_breaks) + #limits = c(st.dt, ed.dt)
+    ggplot2::annotate("text", ed.dt - 90, 95, vjust = -2, label = "95% Target", colour = "#00BB00") +
+    ggplot2::ggtitle(chart_title_flow_2) +
+    ggplot2::theme(plot.title = ggplot2::element_text(size = 7, face = "bold")) +
+    #ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, size = 10)) +
+    ggplot2::labs(x = "Month", y = "Percentage within 4 hours",
+                  caption = "*Shewart chart rules apply (see Understanding the Analysis tab for more detail) \nRule 1: Any month outside the control limits \nRule 2: Eight or more consecutive months all above, or all below, the centre line", size = 0.5) +
+    ggplot2::ylim(ylimlow_flow_2, 100) +
+    ggplot2::geom_text(ggplot2::aes(label = ifelse(x==max(x), format(x, '%b-%y'),'')), hjust = -0.05, vjust = 2)
 
   four_hr_plot_flow_3 <- format_control_chart(pct_flow_3, r1_col = "orange", r2_col = "steelblue") +
     ggplot2::geom_hline(ggplot2::aes(yintercept = yintercept, linetype = cutoff),
@@ -165,7 +192,7 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
 
   #text.p <- ggparagraph(text = caption, face = "italic", size = 11, color = "black")
 
-    flow_groups_plot <- ggpubr::ggarrange(four_hr_plot_flow_a, four_hr_plot_flow_3, four_hr_plot_flow_4,
+    flow_groups_plot <- ggpubr::ggarrange(four_hr_plot_flow_1, four_hr_plot_flow_2, four_hr_plot_flow_3, four_hr_plot_flow_4,
                                 ncol = 2, nrow = 2)
 
 
