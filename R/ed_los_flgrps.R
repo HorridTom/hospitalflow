@@ -12,8 +12,8 @@
 #' @examples
 ed_los_flow_grps <- function(start_date, end_date, data, plot_chart, hospital_name = "Name"){
 
-  dt_select <- spell_table %>%
-    dplyr::filter(spell_start < end_date & initial_ed_end_datetime > start_date)
+  dt_select <- data %>%
+    dplyr::filter(spell_start < end_date | initial_ed_end_datetime > start_date)
 
   dt_flow_grps <- make_flow_groups(dt_select)
 
