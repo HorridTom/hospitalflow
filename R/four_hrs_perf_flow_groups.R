@@ -16,7 +16,7 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
                                       data, time_unit = "day",  plot_chart, hospital_name = "Hospital_Name"){
 
 
-  dt_select <- weekly_ed_flgrp %>%
+  dt_select <- data %>%
     dplyr::filter(spell_start < end_dt | initial_ed_end_datetime > start_dt) %>%
     dplyr::arrange(spell_start)
 
