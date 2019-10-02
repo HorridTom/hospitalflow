@@ -1,4 +1,4 @@
-context("Weekly ed attandances by flow groups for real random data")
+context("Weekly ed attendances by flow groups for real random data")
 library(hospitalflow)
 
 test_that("Weekly ed attandances by flow groups",{
