@@ -84,11 +84,11 @@ ed_los_flow_grps <- function(start_date, end_date, data, plot_chart, hospital_na
   # Plotting the lenght of stay by the ward  - check for dual axis graphs
 
   plot_ed_los_flgrps <- ggplot2::ggplot(dt_los_flgrps, ggplot2::aes(x = Time_binned, y = Count, group = flow_groups,  fill = flow_groups)) +
-    ggplot2::geom_line(ggplot2::aes(linetype = flow_groups, color = flow_groups), size = 1.0) +
+    ggplot2::geom_line(ggplot2::aes(color = flow_groups), size = 1.0) +
     ggplot2::geom_point(ggplot2::aes(shape = flow_groups), size = 1.0) +
     ggplot2::scale_y_continuous(limits = c(0,NA)) +
     ggplot2::scale_shape_manual(values = c(7, 6, 5, 4)) +
-    ggplot2::scale_color_manual(values=c("red", "green",  "blue", "purple")) +
+    ggplot2::scale_color_manual(values=c("blue", "red", "green", "purple")) +
     ggplot2::theme_bw() +
     ggplot2::xlim("00:00", "00:15", "00:30", "00:45",
                   "1:00", "1:15", "1:30", "1:45",
