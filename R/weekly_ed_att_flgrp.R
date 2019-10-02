@@ -43,7 +43,6 @@ weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "week",
 
   # Set the title
   title_stub <- ": Weekly unscheduled ED attendance trends, "
-  hospital_name <- "Cw"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
@@ -59,14 +58,14 @@ weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "week",
 
   # plot the admissions and discharges (non-emergency appears as well )
   plot_weekly_att <- ggplot2::ggplot(count_df,  ggplot2::aes(x = Time, y = n, group = flow_groups, fill = flow_groups)) + #shape = Event,  colour = Event
-    ggplot2::geom_line(ggplot2::aes(linetype = flow_groups, color = flow_groups), size = 1.0) +
+    ggplot2::geom_line(ggplot2::aes(color = flow_groups), size = 1.0) +
     ggplot2::geom_point(ggplot2::aes(shape = flow_groups), size = 1.0) +
     ggplot2::scale_y_continuous(limits = c(0,NA)) +
     ggplot2::scale_x_datetime(labels = scales::date_format("%d-%m-%Y"),
                               breaks = scales::date_breaks(time_unit),
                               limits = plot_x_lims) +
     ggplot2::scale_shape_manual(values = c(7, 6, 5, 4)) +
-    ggplot2::scale_color_manual(values=c("red", "green",  "blue", "purple")) +
+    ggplot2::scale_color_manual(values=c("blue", "red", "green", "purple")) +
     ggplot2::theme_bw() +
     ggplot2::labs(title = chart_title,
                   subtitle = "Weekly unscheduled ED attendance, by patient flow group, n
