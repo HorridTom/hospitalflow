@@ -20,8 +20,9 @@ make_flow_groups <- function(spell_data){
 
   spell_table <- spell_data_specialty_mapped %>%
     dplyr::mutate(flow_groups = dplyr::case_when(
-      starts_with_ed == TRUE & ed_non_adm == TRUE & (disposal_code != "Died in Department" | source_referral_ae != "General Medical Practitioner") & hrg_mapp_code == 1 ~ "Flow 1" ,
-      starts_with_ed == TRUE & ed_non_adm == TRUE & (disposal_code != "Died in Department" | source_referral_ae != "General Medical Practitioner") & hrg_mapp_code == 2  ~ "Flow 2" ,
+      starts_with_ed == TRUE & ed_non_adm == TRUE & !(disposal_code == "Died in Department" | source_referral_ae == "Emergency Services") & hrg_mapp_code == 1 ~ "Flow 1" ,
+      starts_with_ed == TRUE & ed_non_adm == TRUE & (disposal_code == "Died in Department" | source_referral_ae == "Emergency Services") & hrg_mapp_code == 2  ~ "Flow 2" ,
+      starts_with_ed == TRUE & ed_non_adm == TRUE & !(disposal_code == "Died in Department" | source_referral_ae == "Emergency Services") & hrg_mapp_code == 2  ~ "Flow 2" ,
       directorate == "Medical" & starts_with_ed == TRUE & ed_admission == TRUE ~ "Flow 3",
       directorate == "Surgical" & starts_with_ed == TRUE & ed_admission == TRUE ~ "Flow 4"))
 
