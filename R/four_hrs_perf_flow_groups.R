@@ -31,7 +31,7 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
   dt_los <-  dt_flow_grps %>%
     dplyr::filter(starts_with_ed == TRUE) %>%
     dplyr::arrange(spell_start) %>%
-    dplyr::mutate(Los = difftime(spell_end, spell_start, units = c("min")),
+    dplyr::mutate(Los = difftime(initial_ed_end_datetime, spell_start, units = c("min")),
                   Hr_perf = dplyr::case_when(
                     Los <= 240 ~ "under_4hrs",
                     Los >= 240 ~ "above_4hrs"),
