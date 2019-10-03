@@ -10,9 +10,6 @@
 #' @examples
 make_flow_groups <- function(spell_data){
 
-  specialty_mapping <- readr::read_csv("D:/Rprojects/hospitalflow/data/SPECIALTY_HCPmap.csv")
-  hrg_mapping <- readr::read_rds("D:/Rprojects/hospitalflow/data/map_hrg.rds")
-
   spell_data_mapped <- dplyr::left_join(spell_data, hrg_mapping, by = c("hrg_ae_code"))
 
   spell_data_specialty_mapped <- dplyr::left_join(spell_data_mapped, specialty_mapping, by = c("main_specialty_start" = "spec_name")) %>%

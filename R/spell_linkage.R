@@ -81,6 +81,9 @@ spell_variables <- function(all_episodes) {
     dplyr::mutate(episode_class_sequence = purrr::map(data, get_episode_class_sequence)) %>%
     dplyr::mutate(admission_method_type = purrr::map(data, admission_method_class)) %>%
     dplyr::mutate(initial_ed_end_datetime = purrr::map(data, get_initial_ed_episode_end_datetime)) %>%
+    dplyr::mutate(disposal_code = purrr::map(data, get_disposal_code)) %>%
+    dplyr::mutate(hrg_ae_code = purrr::map(data, get_hrg)) %>%
+    dplyr::mutate(source_referral_ae = purrr::map(data, get_source_of_referral)) %>%
     dplyr::select(-data) %>%
     tidyr::unnest()
 
@@ -120,27 +123,48 @@ spell_variables <- function(all_episodes) {
 add_spell_variables <- function(ed_data, inpatient_data, spell_table) {
 
   inpatient_data <- inpatient_data %>% dplyr::mutate(main_specialty = addNA(main_specialty))
-  spell_table %>% dplyr::mutate(
-    main_specialty_start = purrr::map(constituent_ip_episodes, function(x) {
-      if(length(x) == 0) {NA} else {
-        inpatient_data %>% dplyr::filter(episode_id == x[[1]]) %>% dplyr::slice(1) %>% dplyr::pull(main_specialty)
+
+  spell_table %>%
+    dplyr::mutate(main_specialty_start = purrr::map(constituent_ip_episodes, function(x) {
+      if(length(x) == 0)
+      {NA}
+      else {
+        inpatient_data %>%
+          dplyr::filter(episode_id == x[[1]]) %>%
+          dplyr::slice(1) %>%
+          dplyr::pull(main_specialty)
       }
-    })
-  ) %>% tidyr::unnest(main_specialty_start) %>%
+    })) %>%
+    tidyr::unnest(main_specialty_start) %>%
     dplyr::group_by(pseudo_id) %>%
     dplyr::mutate(prev_disch = dplyr::lag(spell_end, order_by = spell_start)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(days_since_prev_disch = difftime(spell_start, prev_disch, units = "days"))
+
 }
 
+# get_main_specialty <- function(x) {
+#   if(length(x) == 0)
+#     {NA}
+#   else {
+#     inpatient_data %>%
+#       dplyr::filter(episode_id == x[[1]]) %>%
+#       dplyr::slice(1) %>%
+#       dplyr::pull(main_specialty)
+#   }
+# }
+
+
 get_episode_id_list <- function(episode_df, episode_type_to_list) {
-  ep_id_v <- episode_df %>% dplyr::filter(episode_type == episode_type_to_list) %>% dplyr::pull(episode_id)
+  ep_id_v <- episode_df %>%
+    dplyr::filter(episode_type == episode_type_to_list) %>%
+    dplyr::pull(episode_id)
   list(as.list(ep_id_v))
 }
 
-
 get_latest_gender <- function(gender_df) {
-  ordered_gender_records <- gender_df %>% dplyr::filter(!is.na(gender)) %>%
+  ordered_gender_records <- gender_df %>%
+    dplyr::filter(!is.na(gender)) %>%
     dplyr::arrange(dplyr::desc(start_datetime)) %>%
     dplyr::pull(gender)
 
@@ -225,3 +249,37 @@ get_initial_ed_episode_end_datetime <- function(spell_episodes_df) {
   }
 
 }
+
+get_disposal_code <- function(disposal_code_df){
+  disposal_code <- disposal_code_df %>%
+    dplyr::group_by(pseudo_id) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::slice(1) %>%
+    dplyr::pull(attendance_disposal)
+
+  disposal_code[1]
+}
+
+get_source_of_referral <- function(source_of_referral_df){
+  source_referral <- source_of_referral_df %>%
+    dplyr::group_by(pseudo_id) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::slice(1) %>%
+    dplyr::pull(referral_source)
+
+  source_referral[1]
+}
+
+get_hrg <- function(hrg_df){
+  hrg_code <- hrg_df %>%
+    dplyr::group_by(pseudo_id) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::slice(1) %>%
+    dplyr::pull(hrg_code)
+
+  hrg_code[1]
+}
+
+
+
+
