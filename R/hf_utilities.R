@@ -32,10 +32,10 @@ convert_rds_cols_to_char <- function(path) {
 #' @examples
 add_directorate_variable <- function(spell_table){
 
-  spec_dir_mapping <- readr::read_csv("data/SPECIALTY_HCPmap.csv")
+  df <- dplyr::left_join(spell_table, specialty_mapping, by = c("main_specialty_start" = "spec_name"))
 
-  df <- spell_table %>%
-    dplyr::left_join(spec_dir_mapping, by = c("main_specialty_start" = "spec_name"))
+  df
 
 }
+
 
