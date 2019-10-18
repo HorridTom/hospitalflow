@@ -14,7 +14,8 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    ggpubr
+    ggpubr,
+    naniar
 Imports: 
     tidyverse,
     lubridate,
