@@ -1,11 +1,11 @@
 context("ED length of stay for flow groups for real random data")
 library(hospitalflow)
 
-test_that("Weekly ed attandances by flow groups",{
+test_that("ed lenght of stay for flow groups is calculated correctly",{
 
-  correct_answers <- readRDS("testdata/ed_los_flgrps/correct_answers.rds")
+  correct_answers <- readRDS("testdata/ed_los_flows/correct_answers.rds")
 
-  ed_los_flow_groups <- readRDS("testdata/ed_los_flgrps/ed_los_flgrps.rds")
+  ed_los_flow_groups <- readRDS("testdata/ed_los_flows/ed_los_flows.rds")
 
 
   result <- ed_los_flow_grps(start_date = as.Date("2016-06-01",tz = "Europe/London"),
