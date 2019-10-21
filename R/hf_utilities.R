@@ -38,3 +38,4 @@ add_directorate_variable <- function(spell_table){
 
 }
 
+

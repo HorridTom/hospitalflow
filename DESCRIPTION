@@ -13,8 +13,7 @@ RoxygenNote: 6.1.1
 Suggests: 
     testthat,
     knitr,
-    rmarkdown,
-    ggpubr
+    rmarkdown
 Imports: 
     tidyverse,
     lubridate,
@@ -30,5 +29,7 @@ Imports:
     ggplot2,
     padr,
     grid,
-    DescTools
+    DescTools,
+    naniar,
+    ggpubr
 VignetteBuilder: knitr
