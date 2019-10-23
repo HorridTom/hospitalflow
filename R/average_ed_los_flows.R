@@ -66,14 +66,14 @@ average_ed_los_flows <- function(start_date = as.POSIXct("2012-01-01 00:00:00", 
   plt_average_flows <- ggplot2::ggplot(data =  df_padded, ggplot2::aes(x = as.numeric(Hour), y = average_arrivals,  fill = flow_groups))+
     ggplot2::geom_line(ggplot2::aes(color = flow_groups), size = 0.5) +
     ggplot2::geom_point(ggplot2::aes(shape = flow_groups), size = 1.0) +
-    ggplot2::scale_y_continuous(limits = c(0,NA)) +
+    ggplot2::scale_y_continuous(limits = c(0,NA), breaks=seq(0, round(max(df_padded$average_arrivals)), by = 60)) +
     ggplot2::scale_x_continuous(breaks = 0:23, expand = c(0, 0.2)) +
     ggplot2::scale_shape_manual(values = c(7, 6, 5, 4)) +
     ggplot2::scale_color_manual(values = c("blue", "red", "green", "purple")) +
     ggplot2::theme_bw() +
     ggplot2::labs(title = chart_title,
                   subtitle = "\nNote: results are intended for management information only",
-                  y = "Average Count", x = "Hour of the day", caption = "Source: CLAHRC NWL") +
+                  y = "Average length of stay (mins)", x = "Hour of the day", caption = "Source: CLAHRC NWL") +
     ggplot2::theme(axis.title.y = ggplot2::element_text(margin = ggplot2::margin(t = 0, r = 21, b = 0, l = 0)),
                    plot.title = ggplot2::element_text(size = 12, face = "bold"),
                    plot.subtitle = ggplot2::element_text(size = 10),
