@@ -27,6 +27,8 @@ sample_duration <- lubridate::duration(params$sample_weeks, "weeks")
 
 Package version: `r stringr::str_sub(system("git rev-parse HEAD", intern=TRUE), 1, 8)`
 
+Number of weeks used as sample: `r params$sample_weeks`
+
 ```{r import-data, cache=TRUE, echo=FALSE}
 # Import and Standardise Data
 
