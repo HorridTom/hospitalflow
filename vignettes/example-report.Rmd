@@ -12,7 +12,10 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE
 )
 
 library(magrittr)
@@ -176,8 +179,8 @@ hospitalflow::ED_day_hour_plot(startDay = start_date, endDay = end_date,
                              hospital_name = "Anytown General Hospital")
 ```
 
-Alternative presentation of this same analysis
-```{r ed-occ-1, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
+## Alternative ED occupancy by hour of week
+```{r ed-occ-1, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
 hospitalflow::occupancy_weekday_hour(start_date = as.POSIXct(start_date, tz = "Europe/London"),
                                    end_date = as.POSIXct(end_date, tz = "Europe/London"),
                                    data = example_spell_table,
