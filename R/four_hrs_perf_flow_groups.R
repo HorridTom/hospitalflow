@@ -188,7 +188,7 @@ format_control_chart <- function(cht, r1_col, r2_col, main_col = "black") {
     ggplot2::geom_line(ggplot2::aes(x,cl), size = 0.75) +
     ggplot2::geom_line(ggplot2::aes(x,ucl), size = 0.75, linetype = 2) +
     ggplot2::geom_line(ggplot2::aes(x,lcl), size = 0.75, linetype = 2) +
-    ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2) +
+    ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 1.25) +
     ggplot2::scale_color_manual("Rule triggered", values = point_colours) +
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
