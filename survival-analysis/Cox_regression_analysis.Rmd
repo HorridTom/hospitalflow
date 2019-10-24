@@ -1,11 +1,7 @@
 ---
-title: "Length of Stay Survival Analysis"
+title: "Length of Stay Cox Regression Analysis"
 output: html_notebook
 ---
-
-# Estimating the Survival Function for Discharge
-
-Based on [this](http://dwoll.de/rexrepos/posts/survivalKM.html) article.
 
 ```{r}
 library(survival)
@@ -17,7 +13,7 @@ library(ggfortify)
 #surv_data <- readRDS(file = "../data/ed_ex.rds")
 #surv_data <- readRDS(file = "../../cw-data/cw_ip_spells.rds")
 #surv_data <- readRDS(file = "../../lgt-data/data-out/spell_table_lgt_20190816_b704e260_ms.rds")
-surv_data <- readRDS(file = "../../cw-data/spell_table_cw_20190827_38ba2c47.rds")
+surv_data <- readRDS(file = "../../cw-data/spell_table_cw_20190902_b7fae6f7.rds")
 
 spec_dir_mapping <- readr::read_csv("../data/SPECIALTY_HCPmap.csv")
 surv_data <- surv_data %>% dplyr::left_join(spec_dir_mapping, by = c("main_specialty_start" = "spec_name"))
@@ -27,11 +23,16 @@ surv_data <- surv_data %>% filter(admission_method_type == "Emergency Admissions
                                   directorate == "Medical"#,
                                   #main_specialty_start %in% c("ACUTE INTERNAL MEDICINE", "GENERAL MEDICINE")
                                   ) %>%
-  mutate(start_datetime = initial_ed_end_datetime, end_datetime = spell_end,
+  mutate(start_datetime = if_else(is.na(initial_ed_end_datetime), spell_start, initial_ed_end_datetime),
+         end_datetime = spell_end,
          age_band_start = forcats::fct_drop(age_band_start))
-surv_data <- surv_data %>% mutate(los = difftime(end_datetime, start_datetime), adm_wd = weekdays(start_datetime)) %>% filter(!is.na(los))
+surv_data <- surv_data %>% mutate(los = difftime(end_datetime, start_datetime), adm_wd = weekdays(start_datetime)) %>% filter(!is.na(los)) %>%
+  mutate(days_since_prev_disch = as.numeric(replace(days_since_prev_disch, days_since_prev_disch <= 0, NA)),
+         disch_in_last_week = if_else(!is.na(days_since_prev_disch) & days_since_prev_disch <=7, TRUE, FALSE),
+         disch_in_last_month = if_else(!is.na(days_since_prev_disch) & days_since_prev_disch <=30, TRUE, FALSE),
+         admitted_before = !is.na(days_since_prev_disch))
 units(surv_data$los) <- "hours"
-clean_surv_data <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2017-09-01 00:00'))
+clean_surv_data <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2019-03-01 00:00'))
 
 
 obsLen <- 365*24 # length of observation time (censoring time = end of study)
@@ -49,7 +50,7 @@ clean_surv_data <- clean_surv_data %>% mutate(eventT = los,
 dfSurv <- clean_surv_data %>% select(eventT, obsT, status)
 dfSurv2 <- clean_surv_data %>% select(spell_number, eventT, obsT, status,
                                       adm_wd, adm_calmonth, gender, age_band_start,
-                                      start_datetime, end_datetime, adm_daytime)
+                                      start_datetime, end_datetime, adm_daytime, days_since_prev_disch, disch_in_last_week, disch_in_last_month, admitted_before)
 ```
 
 ```{r}
@@ -100,83 +101,10 @@ ggplot(data.frame(x=c(0,30L*24L)), aes(x)) +
 
 ```
 
-Next we should estimate the variability of this for typical medical population e.g. 180 medical pts.
-H: with full info can predict e.g. 3day horizon given 2day; but not for e.g. 100days.
-
-# Estimating distribution of residual occupancy
-
-So lets say we have 30 (or 300) patients who have been in hospital already for (random exponentially distributed) times (in hours):
-```{r}
-times_in_hospital_1 <- floor(rexp(30, 1/51.6))
-times_in_hospital_2 <- floor(rexp(300, 1/51.6))
-times_in_hospital_1
-times_in_hospital_2
-```
-Now use the survival function from above to estimate the probability each patient will still be in after a further 48 hours.
-```{r}
-probabilities_still_in_48h_1 <- hospitalflow::get_discharge_probability(times_in_hospital_1, S_function, 48)
-probabilities_still_in_48h_1
-probabilities_still_in_48h_2 <- hospitalflow::get_discharge_probability(times_in_hospital_2, S_function, 48)
-probabilities_still_in_48h_2
-```
-These are the parameters of individual bernoulli trials, the sum of which yields a Poisson Binomial distribution. It is possible to calculate this distribution via the discrete Fourier transform of the following vector:
-```{r}
-p1 <- probabilities_still_in_48h_1
-x1 <- (1/(length(p1)+1)) * hospitalflow::get_poisson_binomial_characteristic_values(p1)
-p2 <- probabilities_still_in_48h_2
-x2 <- (1/(length(p2)+1)) * hospitalflow::get_poisson_binomial_characteristic_values(p2)
-```
-The Poisson Binomial distribution mass function is now given by (for the sample of 30):
-```{r}
-pb_dist1 <- fft(x1)
-pb_dist1 <- tibble::tibble(prob = Re(pb_dist1)) %>% tibble::rowid_to_column("k") %>% mutate(k = k-1)
-expected_k1 <- pb_dist1 %>% dplyr::mutate(prod = prob*k) %>%
-  summarise(expectation = sum(prod)) %>% pull(expectation)
-ggplot(data = pb_dist1, aes(x = k, y = prob)) + geom_bar(stat = "identity") + geom_vline(xintercept = expected_k1, colour = "green")
-expected_k1
-```
-
-The Poisson Binomial distribution mass function is now given by (for the sample of 300):
-```{r}
-pb_dist2 <- fft(x2)
-pb_dist2 <- tibble::tibble(prob = Re(pb_dist2)) %>% tibble::rowid_to_column("k") %>% mutate(k = k-1)
-expected_k2 <- pb_dist2 %>% dplyr::mutate(prod = prob*k) %>%
-  summarise(expectation = sum(prod)) %>% pull(expectation)
-ggplot(data = pb_dist2, aes(x = k, y = prob)) + geom_bar(stat = "identity") + geom_vline(xintercept = expected_k2, colour = "green")
-expected_k2
-```
-
-
-Next step is to write a function to run this on patients actually in hospital/ward at a specified time t.
 
 ```{r}
-T1 <- strptime("2017-07-01 12:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
-ipss1 <- hospitalflow::get_inpatient_snapshot(df = surv_data, t = T1) %>% filter(!is.na(stay_duration))
-
-ipss1 <- ipss1 %>% mutate(prob_here_48h = hospitalflow::get_discharge_probability(stay_duration, S_function, 48))
-
-x_vect1 <- (1/(nrow(ipss1)+1)) * hospitalflow::get_poisson_binomial_characteristic_values(ipss1 %>% pull(prob_here_48h))
-
-pb_dist_T1 <- fft(x_vect1)
-pb_dist_T1 <- tibble::tibble(prob = Re(pb_dist_T1)) %>% tibble::rowid_to_column("k") %>% mutate(k = k-1)
-expected_k_T1 <- pb_dist_T1 %>% dplyr::mutate(prod = prob*k) %>%
-  summarise(expectation = sum(prod)) %>% pull(expectation)
-ggplot(data = pb_dist_T1, aes(x = k, y = prob)) + geom_bar(stat = "identity") + geom_vline(xintercept = expected_k_T1, colour = "green")
-expected_k_T1
+T1 <- strptime("2018-09-01 12:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
 ```
-
-Now let's see how accurate that prediction is
-
-```{r}
-ipss1_48h <- hospitalflow::get_inpatient_snapshot(df = surv_data, t = T1 + 48*60*60) %>% mutate(residual = spell_number %in% ipss1$spell_number)
-residual_T1 <- ipss1_48h %>% filter(residual == TRUE) %>% nrow()
-paste("Predicted residual occupancy: ", expected_k_T1, ". Actual residual occupancy: ", residual_T1)
-paste("Error: ", expected_k_T1 - residual_T1, ". Relative error: ", (expected_k_T1 - residual_T1)/residual_T1)
-```
-
-Note this is still using the full survival function from the whole data - in reality this could only be calculated from data prior to T1.
-
-For now let's carry on and hack together a means of getting the prediction for a range of times, to get a better feel for the distribution of error.
 
 # Predicting Residual Occupancy
 
@@ -185,7 +113,7 @@ For now let's carry on and hack together a means of getting the prediction for a
 hospitalflow::predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
 hospitalflow::get_residual_occupancy(df = surv_data, t = T1, delta_t = 48)
 
-dates <- seq(lubridate::ymd_hm('2017-01-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2017-07-31 12:00', tz = "Europe/London"), by = '1 day')
+dates <- seq(lubridate::ymd_hm('2018-08-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2019-01-31 12:00', tz = "Europe/London"), by = '1 day')
 
 model_output <- hospitalflow::run_S_func_model(df = surv_data, S_func = S_function, date_seq = dates)
 
@@ -209,7 +137,7 @@ The errors clearly show (as expected) the effect of weekends on this model - thi
 
 Next steps will be to generalise the model to include this weekly effect.
 
-## Using predictions from Cox PH Model
+## Cox PH Model
 
 ```{r coxph-model1}
 CM1 <- coxph(Surv(obsT, status) ~ adm_wd, data = dfSurv2)
@@ -284,6 +212,38 @@ model_output_CM2$diagnostics$err_plot
 ```{r}
 model_output_CM2$diagnostics$rel_err_plot
 ```
+
+## Cox model with previous admission variables added as covariates
+
+```{r eval-coxph3}
+CM3 <- coxph(Surv(obsT, status) ~ adm_wd + adm_daytime + adm_calmonth + gender + age_band_start + disch_in_last_week + disch_in_last_month + admitted_before,
+             data = dfSurv2)
+newdata3 <- ipss %>% select(obsT = stay_duration, adm_wd, adm_daytime, adm_calmonth, gender, age_band_start, disch_in_last_week, disch_in_last_month, admitted_before) %>% mutate(status = TRUE)
+newdata3d <- newdata3 %>% mutate(obsT = obsT + 48)
+CM3_prediction_1 <- predict(CM3, newdata = newdata3, type = "expected")
+CM3_prediction_2 <- predict(CM3, newdata = newdata3d, type = "expected")
+prob_here_48h_CM3 <- exp(-CM3_prediction_2)/exp(-CM3_prediction_1)
+
+model_output_CM3 <- hospitalflow::run_S_func_model(df = dfSurv2,
+                                                   coxmodel = "Surv(obsT, status) ~ adm_wd + adm_daytime + adm_calmonth + gender + age_band_start + disch_in_last_week + disch_in_last_month + admitted_before",
+                                                  date_seq = dates)
+
+summary(model_output_CM3$predictions)
+```
+
+```{r}
+model_output_CM3$diagnostics$comp_plot
+```
+
+```{r}
+model_output_CM3$diagnostics$err_plot
+```
+
+```{r}
+model_output_CM3$diagnostics$rel_err_plot
+```
+
+## Naive model for comparison
 
 ```{r naive-ts}
 naive_preds <- model_output_CM2$predictions %>% dplyr::select(dates, actual)
