@@ -1,0 +1,130 @@
+#' readmissions_ip
+#'
+#' @param start_date
+#' @param end_date
+#' @param data
+#' @param plot_chart
+#' @param hospital_name
+#' @param readmission_by
+#'
+#' @return
+#' @export
+#'
+#' @examples
+readmissions_ip <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = "Europe/London"),
+                            end_date = as.POSIXct("2016-03-31 00:00:00", tz = "Europe/London"),
+                            data, plot_chart, hospital_name, readmission_by){
+
+  dt_select <- data %>%
+    dplyr::select(pseudo_id, spell_number, spell_start, spell_end, ed_admission, admission_method_type) %>%
+    dplyr::filter(start_date <= spell_start | end_date >= spell_end) %>%
+    dplyr::filter(admission_method_type == "Emergency Admissions" & ed_admission == TRUE)
+
+#################################################################################################################
+# first, we create a table that contains the csn of the relevant cases
+# and the days since last admission
+
+dt_calc <- dt_select %>% # we take our data frame
+  dplyr::group_by(pseudo_id) %>%
+  dplyr::arrange(spell_start) %>%
+  dplyr::mutate(readm_date = lead(spell_start),
+                time_to_readm = difftime(readm_date, spell_end, units = c("days")),
+                readmission = time_to_readm <= readmission_by) %>%
+  dplyr::ungroup() %>%
+  dplyr::mutate(one_month = lubridate::round_date(spell_end, "1 month", "month"))
+
+dt_calc_disch <- dt_calc %>%
+  dplyr::group_by(one_month) %>%
+  dplyr::summarise(N = n())
+
+dt_calc_readm <- dt_calc  %>%
+  dplyr::filter(readmission == TRUE) %>%
+  dplyr::group_by(one_month) %>%
+  dplyr::summarise(Readm = n())
+
+
+dt_reamd_disch <- dplyr::left_join(dt_calc_disch, dt_calc_readm) %>%
+  na.omit()
+
+# #######################################################
+pct <- qicharts2::qic(Readm,
+                      n = N,
+                      x = one_month,
+                      data = dt_reamd_disch,
+                      chart = 'pp',
+                      #standardised = TRUE,
+                      #multiply= 100,
+                      # title = "Readmissions within 90 days, counts n*",
+                      # ylab = "Percent patients",
+                      # xlab = "Readmissions within 90 days",
+                      x.angle = 45)
+
+pct
+
+
+# Set the title
+title_stub <- ": Readmissions by "
+start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
+end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
+Days <- " days "
+chart_title <- paste0(hospital_name, title_stub, readmission_by, Days,  start_date_title, " to ", end_date_title)
+
+
+pct$data$x <- as.Date(pct$data$x, tz = "Europe/London")
+cht_data <- add_rule_breaks(pct$data)
+pct <- ggplot2::ggplot(cht_data, ggplot2::aes(x, y, label = x))
+#cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
+
+#convert arguments to dates and round to nearest quarter
+st.dt <- as.Date(start_date, format = "%Y-%m-%d", tz = "Europe/London")
+ed.dt <- as.Date(end_date, format = "%Y-%m-%d", tz = "Europe/London")
+cht_axis_breaks <- seq(st.dt, ed.dt, by = "quarters")
+#ylimlow <- min(min(pct$data$y, na.rm = TRUE),min(pct$data$lcl, na.rm = TRUE))
+
+readmission_plot <- format_control_chart(pct, r1_col = "orange", r2_col = "steelblue") +
+  ggplot2::scale_x_date(date_breaks = "1 month", labels = scales::date_format("%Y-%m-%d"),
+                        breaks = cht_axis_breaks) +
+  ggplot2::ggtitle(chart_title) +
+  ggplot2::theme(plot.title = ggplot2::element_text(size = 11, face = "bold")) +
+  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, size = 10)) +
+  ggplot2::labs(x = "Month", y = "Percentage of readmissions",
+                caption = "*Shewart chart rules apply (see Understanding the Analysis tab for more detail) \nRule 1: Any month outside the control limits \nRule 2: Eight or more consecutive months all above, or all below, the centre line", size = 10) +
+  ggplot2::geom_text(ggplot2::aes(label = ifelse(x==max(x), format(x, '%b-%y'),'')), hjust = -0.05, vjust = 2)
+
+readmission_plot
+
+if(plot_chart == TRUE){
+
+  readmission_plot
+
+}else{
+
+  readmission_plot$data
+
+}
+
+}
+
+
+format_control_chart <- function(cht, r1_col, r2_col) {
+
+  point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, "None" = "black")
+  cht +
+    ggplot2::geom_line(colour = "black", size = 0.5) +
+    ggplot2::geom_line(ggplot2::aes(x,cl), size = 0.75) +
+    ggplot2::geom_line(ggplot2::aes(x,ucl), size = 0.75, linetype = 2) +
+    ggplot2::geom_line(ggplot2::aes(x,lcl), size = 0.75, linetype = 2) +
+    ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2) +
+    ggplot2::scale_color_manual("Rule triggered*", values = point_colours) +
+    ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
+                   panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
+                   panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_blank(),
+                   axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1.0, size = 14),
+                   axis.text.y = ggplot2::element_text(size = 14), axis.title = ggplot2::element_text(size = 14),
+                   plot.title = ggplot2::element_text(size = 20, hjust = 0),
+                   plot.subtitle = ggplot2::element_text(size = 16, face = "italic"),
+                   axis.line = ggplot2::element_line(colour = "grey60"),
+                   plot.caption = ggplot2::element_text(size = 10, hjust = 0.5))
+
+}
+
