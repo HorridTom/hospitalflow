@@ -27,11 +27,11 @@ readmissions_ip <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = 
 dt_calc <- dt_select %>% # we take our data frame
   dplyr::group_by(pseudo_id) %>%
   dplyr::arrange(spell_start) %>%
-  dplyr::mutate(readm_date = lead(spell_start),
+  dplyr::mutate(readm_date = dplyr::lead(spell_start),
                 time_to_readm = difftime(readm_date, spell_end, units = c("days")),
                 readmission = time_to_readm <= readmission_by) %>%
   dplyr::ungroup() %>%
-  dplyr::mutate(one_month = lubridate::round_date(spell_end, "1 month", "month"))
+  dplyr::mutate(one_month = lubridate::floor_date(spell_end, "1 month", "month"))
 
 dt_calc_disch <- dt_calc %>%
   dplyr::group_by(one_month) %>%
@@ -46,17 +46,29 @@ dt_calc_readm <- dt_calc  %>%
 dt_reamd_disch <- dplyr::left_join(dt_calc_disch, dt_calc_readm) %>%
   na.omit()
 
+# function to plot the 4 hrs emergency performance
+# Plot all days - see Tom's AE APP
+
+## Version 0.6.0 of qicharts2 still appears to suffer from
+## the issue described here: https://github.com/anhoej/qicharts2/issues/21
+## although it looks like there is a fix. Once that fix is
+## integrated into a CRAN release, this code should be removed. ***
+options(qic.linecol   = '#5DA5DA',
+        qic.signalcol = '#F15854',
+        qic.targetcol = '#059748',
+        qic.clshade   = TRUE)
+## ***
+
+
 # #######################################################
 pct <- qicharts2::qic(Readm,
                       n = N,
                       x = one_month,
                       data = dt_reamd_disch,
                       chart = 'pp',
-                      #standardised = TRUE,
-                      #multiply= 100,
-                      # title = "Readmissions within 90 days, counts n*",
-                      # ylab = "Percent patients",
-                      # xlab = "Readmissions within 90 days",
+                      ylab = "percent",
+                      show.grid = TRUE,
+                      multiply= 100,
                       x.angle = 45)
 
 pct
@@ -64,6 +76,7 @@ pct
 
 # Set the title
 title_stub <- ": Readmissions by "
+hospital_name <- "CW"
 start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
 end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
 Days <- " days "
