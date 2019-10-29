@@ -6,7 +6,7 @@
 \usage{
 readmissions_ip(start_date = as.POSIXct("2016-01-01 00:00:00", tz =
   "Europe/London"), end_date = as.POSIXct("2016-03-31 00:00:00", tz =
-  "Europe/London"), data, readmission_by, plot_chart, hospital_name)
+  "Europe/London"), data, plot_chart, hospital_name, readmission_by)
 }
 \arguments{
 \item{readmission_by}{}

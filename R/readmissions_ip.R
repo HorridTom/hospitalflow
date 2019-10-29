@@ -118,26 +118,3 @@ if(plot_chart == TRUE){
 
 }
 
-
-format_control_chart <- function(cht, r1_col, r2_col) {
-
-  point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, "None" = "black")
-  cht +
-    ggplot2::geom_line(colour = "black", size = 0.5) +
-    ggplot2::geom_line(ggplot2::aes(x,cl), size = 0.75) +
-    ggplot2::geom_line(ggplot2::aes(x,ucl), size = 0.75, linetype = 2) +
-    ggplot2::geom_line(ggplot2::aes(x,lcl), size = 0.75, linetype = 2) +
-    ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2) +
-    ggplot2::scale_color_manual("Rule triggered*", values = point_colours) +
-    ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
-                   panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
-                   panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_blank(),
-                   axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1.0, size = 14),
-                   axis.text.y = ggplot2::element_text(size = 14), axis.title = ggplot2::element_text(size = 14),
-                   plot.title = ggplot2::element_text(size = 20, hjust = 0),
-                   plot.subtitle = ggplot2::element_text(size = 16, face = "italic"),
-                   axis.line = ggplot2::element_line(colour = "grey60"),
-                   plot.caption = ggplot2::element_text(size = 10, hjust = 0.5))
-
-}
-

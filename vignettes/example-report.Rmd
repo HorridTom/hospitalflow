@@ -32,7 +32,7 @@ Number of weeks used as sample: `r params$sample_weeks`
 ```{r import-data, cache=TRUE, echo=FALSE}
 # Import and Standardise Data
 
-import_list <- readRDS("../lgt-config/lgt_import_list.rds")
+import_list <- readRDS("../lgt-config/lgt_path_import_list.rds")
 
 # This import list uses relative paths (good for us during development)
 # which means the paths need prepending with "../" to work from the
@@ -49,7 +49,7 @@ data_list <- hospitalflow::import_and_standardise(import_list)
 
 ```{r spell-table, cache=TRUE, echo=FALSE}
 ed_data <- data_list[[1]]
-inpatient_data <- data_list[[3]]
+inpatient_data <- data_list[[4]]
 
 data_start_date <- as.Date(max(min(ed_data$start_datetime, na.rm = TRUE),
                        min(ed_data$end_datetime, na.rm = TRUE),

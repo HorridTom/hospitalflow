@@ -180,6 +180,16 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
 
 
 
+#' format_control_chart
+#'
+#' @param cht ggplot chart object
+#' @param r1_col colour to highlight rule 1 breaks
+#' @param r2_col colour to highlight rule 2 breaks
+#' @param main_col colour without highlight
+#'
+#' @return chart with formatting applied
+#'
+#' @examples
 format_control_chart <- function(cht, r1_col, r2_col, main_col = "black") {
 
   point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, "None" = main_col)
