@@ -19,10 +19,10 @@ get_factor_recode <- function(config_path) {
   column_mapping <- readRDS(file.path(config_path, "column_mapping.rds"))
 
   # get list of config files
-  config_file_list <- Sys.glob(paste0(config_path, "*.rds"))
+  config_file_list <- Sys.glob(file.path(config_path, "*.rds"))
 
   # add column for file names of factor level config files in the config path
-  column_mapping <- column_mapping %>% dplyr::mutate(config_file_name = paste0(config_path, standard, "_levels.rds"),
+  column_mapping <- column_mapping %>% dplyr::mutate(config_file_name = file.path(config_path, paste0(standard, "_levels.rds")),
                                                      factor_config_file = dplyr::if_else(config_file_name %in% config_file_list, config_file_name, NA_character_)) %>%
     dplyr::select(-config_file_name)
 
