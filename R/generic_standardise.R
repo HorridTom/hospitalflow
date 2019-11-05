@@ -19,10 +19,10 @@ get_factor_recode <- function(config_path) {
   column_mapping <- readRDS(file.path(config_path, "column_mapping.rds"))
 
   # get list of config files
-  config_file_list <- Sys.glob(paste0(config_path, "*.rds"))
+  config_file_list <- Sys.glob(file.path(config_path, "*.rds"))
 
   # add column for file names of factor level config files in the config path
-  column_mapping <- column_mapping %>% dplyr::mutate(config_file_name = paste0(config_path, standard, "_levels.rds"),
+  column_mapping <- column_mapping %>% dplyr::mutate(config_file_name = file.path(config_path, paste0(standard, "_levels.rds")),
                                                      factor_config_file = dplyr::if_else(config_file_name %in% config_file_list, config_file_name, NA_character_)) %>%
     dplyr::select(-config_file_name)
 
@@ -199,12 +199,13 @@ get_colname_mapping <- function(config_path) {
 #' data_path and config_path, whose values are character strings specifying the paths
 #' to i) a csv file to import data from and ii) a folder containing hospitalflow config
 #' files.
+#' @param remove_duplicates boolean to control whether data is de-duped (TRUE) or not (FALSE).
 #'
 #' @return list of tibbles, each containing standardised import of one data file from data_paths
 #' @export
 #'
 #' @examples
-import_and_standardise <- function(data_import_list) {
+import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
 
   # Take the data_import_list and for each element x, load the data located at data_path
   # using configuration specified by the files at config_path.
@@ -243,6 +244,13 @@ import_and_standardise <- function(data_import_list) {
 
   # Add episode ids to each tibble
   data_list <- lapply(data_list, make_episode_ids)
+
+  # If required, de-dupe each tibble based on pseudo_id, and episode start and end time
+  if(remove_duplicates) {
+    data_list <- lapply(data_list, function(x) {
+      dplyr::distinct(x, pseudo_id, start_datetime, end_datetime, .keep_all = TRUE)
+    })
+  }
 
   # Label this list of tibbles with the names of the files they came from
   data_filenames <- sapply(data_import_list, function(x) {
