@@ -60,7 +60,7 @@ occupancy_weekday_hour <- function(start_date = as.POSIXct("2015-04-01 00:00:00"
   #hospital_name <- "Chelsea & Westminster"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
-  chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
+  chart_title <- paste0(hospital_name, title_stub, "\n", start_date_title, " to ", end_date_title)
 
 
 
@@ -80,9 +80,8 @@ occupancy_weekday_hour <- function(start_date = as.POSIXct("2015-04-01 00:00:00"
     ggplot2::theme(axis.title.y = ggplot2::element_text(margin = ggplot2::margin(t = 0, r = 21, b = 0, l = 0)),
                    plot.title = ggplot2::element_text(size = 12, face = "bold"),
                    plot.subtitle = ggplot2::element_text(size = 10),
-                   legend.position = "bottom", legend.box = "hoatizontal")
+                   legend.position = "bottom", legend.box = "horizontal")
 
-  plt
 
   if(plot_chart == TRUE){
 

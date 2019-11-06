@@ -39,3 +39,6 @@ add_directorate_variable <- function(spell_table){
 }
 
 
+# , .sep = " ", .collapse = NULL
+cumulative_paste = function(x, ...)
+  Reduce(function(x1, x2) paste(x1, x2, ...), x, accumulate = TRUE)

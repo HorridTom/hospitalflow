@@ -124,7 +124,7 @@ add_spell_variables <- function(ed_data, inpatient_data, spell_table) {
 
   inpatient_data <- inpatient_data %>% dplyr::mutate(main_specialty = addNA(main_specialty))
 
-  spell_table %>%
+  spell_table <- spell_table %>%
     dplyr::mutate(main_specialty_start = purrr::map(constituent_ip_episodes, function(x) {
       if(length(x) == 0)
       {NA}
@@ -134,10 +134,46 @@ add_spell_variables <- function(ed_data, inpatient_data, spell_table) {
           dplyr::slice(1) %>%
           dplyr::pull(main_specialty)
       }
-    })) %>%
-    tidyr::unnest(main_specialty_start) %>%
+    })
+    )
+
+  if("diagnosis_code" %in% colnames(inpatient_data)) {
+    spell_table <- spell_table %>% dplyr::mutate(diagnosis_codes = purrr::map(constituent_ip_episodes, function(x) {
+      if(length(x) == 0) {NA} else {
+        inpatient_data %>% dplyr::filter(episode_id %in% x) %>% dplyr::pull(diagnosis_code) %>% paste(collapse = "#")
+      }
+    }))
+  }
+
+  if("discharge_destination" %in% colnames(inpatient_data)) {
+    spell_table <- spell_table %>% dplyr::mutate(discharge_destination = purrr::map(constituent_ip_episodes, function(x) {
+      if(length(x) == 0) {NA} else {
+        # Note: this actually just takes the discharge destination of the last episode
+        # since either this should be the only episode of the spell with this field
+        # populated, or it should be constant across (ip) episodes within the spell
+        inpatient_data %>% dplyr::filter(episode_id == x[[length(x)]]) %>% dplyr::slice(1) %>% dplyr::pull(discharge_destination)
+      }
+    }))
+  }
+
+  spell_table <- spell_table %>% tidyr::unnest(main_specialty_start) %>%
     dplyr::group_by(pseudo_id) %>%
-    dplyr::mutate(prev_disch = dplyr::lag(spell_end, order_by = spell_start)) %>%
+    dplyr::arrange(spell_start) %>%
+    dplyr::mutate(prev_disch = dplyr::lag(spell_end, order_by = spell_start))
+
+  if("discharge_destination" %in% colnames(spell_table)) {
+    spell_table <- spell_table %>%
+      dplyr::mutate(prev_disch_dest = dplyr::lag(discharge_destination, order_by = spell_start))
+  }
+
+  if("diagnosis_codes" %in% colnames(spell_table)) {
+    spell_table <- spell_table %>%
+      dplyr::mutate(prev_disch_diagnoses = dplyr::lag(diagnosis_codes, order_by = spell_start),
+                    all_prev_diagnoses = cumulative_paste(diagnosis_codes, sep = "##")
+      )
+  }
+
+  spell_table %>%
     dplyr::ungroup() %>%
     dplyr::mutate(days_since_prev_disch = difftime(spell_start, prev_disch, units = "days"))
 
