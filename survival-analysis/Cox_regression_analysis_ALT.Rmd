@@ -1,0 +1,200 @@
+---
+title: "Length of Stay Cox Regression Analysis"
+output: html_notebook
+---
+
+```{r}
+library(survival)
+library(tidyverse)
+library(ggfortify)
+```
+
+```{r}
+surv_data <- readRDS(file = "../../cw-data/spell_table_cw_20190902_b7fae6f7.rds")
+
+surv_data <- hospitalflow::add_directorate_variable(surv_data)
+
+surv_data <- surv_data %>% filter(admission_method_type == "Emergency Admissions",
+                                  !(age_band_start %in% c("1-4 yrs", "5-9 yrs", "10-14 yrs")),
+                                  directorate == "Medical"#,
+                                  #main_specialty_start %in% c("ACUTE INTERNAL MEDICINE",
+                                  #"GENERAL MEDICINE")
+  ) %>%
+  mutate(start_datetime = if_else(is.na(initial_ed_end_datetime),
+                                  spell_start, initial_ed_end_datetime),
+         end_datetime = spell_end,
+         age_band_start = forcats::fct_drop(age_band_start))
+
+surv_data <- surv_data %>% mutate(los = difftime(end_datetime, start_datetime), adm_wd = weekdays(start_datetime)) %>% filter(!is.na(los)) %>%
+  mutate(days_since_prev_disch = as.numeric(replace(days_since_prev_disch,
+                                                    days_since_prev_disch <= 0, NA)),
+         disch_in_last_week = if_else(!is.na(days_since_prev_disch) & days_since_prev_disch <=7,
+                                      TRUE, FALSE),
+         disch_in_last_month = if_else(!is.na(days_since_prev_disch) & days_since_prev_disch <=30,
+                                      TRUE, FALSE),
+         admitted_before = !is.na(days_since_prev_disch))
+
+units(surv_data$los) <- "hours"
+clean_surv_data <- surv_data %>% filter(!is.na(los) & los >= 0 &
+                                          end_datetime < lubridate::ymd_hm('2019-03-01 00:00'))
+
+
+obsLen <- 365*24 # length of observation time (censoring time = end of study)
+
+clean_surv_data <- clean_surv_data %>% mutate(eventT = los,
+                                              obsT = pmin(eventT, obsLen),
+                                              status = eventT <= obsLen,
+                                              gender = dplyr::if_else(gender == "Male", 1, 0),
+                                              adm_calmonth = as.factor(format(start_datetime, "%b")),
+                                              adm_daytime =dplyr::if_else(
+                                                dplyr::between(lubridate::hour(start_datetime), 8, 16),
+                                                1, 0))
+
+dfSurv <- clean_surv_data %>% select(eventT, obsT, status)
+dfSurv2 <- clean_surv_data %>% select(spell_number, eventT, obsT, status,
+                                      adm_wd, adm_calmonth, gender, age_band_start,
+                                      start_datetime, end_datetime, adm_daytime, days_since_prev_disch, disch_in_last_week, disch_in_last_month, admitted_before)
+```
+
+```{r}
+T1 <- strptime("2018-09-01 12:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
+```
+
+# Predicting Residual Occupancy
+
+```{r eval-coxph2}
+ipss <- hospitalflow::get_inpatient_snapshot(df = dfSurv2, t = T1) %>% filter(!is.na(stay_duration))
+
+dates <- seq(lubridate::ymd_hm('2018-08-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2019-01-31 12:00', tz = "Europe/London"), by = '1 day')
+
+CM2 <- coxph(Surv(obsT, status) ~ adm_wd + adm_daytime + adm_calmonth + gender + age_band_start, data = dfSurv2)
+#newdata2 <- ipss %>% select(obsT = stay_duration, adm_wd, adm_daytime, adm_calmonth, gender, age_band_start) %>% mutate(status = TRUE)
+#newdata2d <- newdata2 %>% mutate(obsT = obsT + 48)
+#CM2_prediction_1 <- predict(CM2, newdata = newdata2, type = "expected")
+#CM2_prediction_2 <- predict(CM2, newdata = newdata2d, type = "expected")
+#prob_here_48h_CM2 <- exp(-CM2_prediction_2)/exp(-CM2_prediction_1)
+
+#ipsss <- lapply(dates, hospitalflow::get_inpatient_snapshot, )
+predictions_data_2 <- tibble(t0 = dates) %>%
+  dplyr::mutate(newdata = purrr::map(t0, hospitalflow::get_inpatient_snapshot,
+                                     df = dfSurv2),
+                newdata_d = purrr::map(newdata, dplyr::mutate, obsT = obsT + 48),
+                pred1 = purrr::map(newdata, predict, object = CM2, type = "expected"),
+                pred2 = purrr::map(newdata_d, predict, object = CM2, type = "expected"),
+                prob_here_48h = purrr::map2(pred1, pred2, ~ exp(-.y)/exp(-.x)))
+
+predictions_data_2 <- predictions_data_2 %>%
+  dplyr::mutate(predicted = purrr::map(prob_here_48h, sum),
+                actual = purrr::map(t0, hospitalflow::get_residual_occupancy,
+                                    df = dfSurv2, delta_t = 48))
+
+# model_output_CM2 <- hospitalflow::run_S_func_model(df = dfSurv2,
+#                                                    coxmodel = "Surv(obsT, status) ~ adm_wd + adm_daytime + adm_calmonth + gender + age_band_start",
+#                                                   date_seq = dates)
+
+model_output_CM2 <- hospitalflow::evaluate_predictions(predictions_data_2 %>% rename(dates = t0))
+
+summary(model_output_CM2$predictions)
+```
+
+```{r}
+model_output_CM2$diagnostics$comp_plot
+```
+
+```{r}
+model_output_CM2$diagnostics$err_plot
+```
+
+```{r}
+model_output_CM2$diagnostics$rel_err_plot
+```
+
+## Cox model with previous admission variables added as covariates
+
+```{r eval-coxph3}
+CM3 <- coxph(Surv(obsT, status) ~ adm_wd + adm_daytime + adm_calmonth + gender + age_band_start + disch_in_last_week + disch_in_last_month + admitted_before,
+             data = dfSurv2)
+newdata3 <- ipss %>% select(obsT = stay_duration, adm_wd, adm_daytime, adm_calmonth, gender, age_band_start, disch_in_last_week, disch_in_last_month, admitted_before) %>% mutate(status = TRUE)
+newdata3d <- newdata3 %>% mutate(obsT = obsT + 48)
+CM3_prediction_1 <- predict(CM3, newdata = newdata3, type = "expected")
+CM3_prediction_2 <- predict(CM3, newdata = newdata3d, type = "expected")
+prob_here_48h_CM3 <- exp(-CM3_prediction_2)/exp(-CM3_prediction_1)
+
+model_output_CM3 <- hospitalflow::run_S_func_model(df = dfSurv2,
+                                                   coxmodel = "Surv(obsT, status) ~ adm_wd + adm_daytime + adm_calmonth + gender + age_band_start + disch_in_last_week + disch_in_last_month + admitted_before",
+                                                  date_seq = dates)
+
+summary(model_output_CM3$predictions)
+```
+
+```{r}
+model_output_CM3$diagnostics$comp_plot
+```
+
+```{r}
+model_output_CM3$diagnostics$err_plot
+```
+
+```{r}
+model_output_CM3$diagnostics$rel_err_plot
+```
+
+## Naive model for comparison
+
+```{r naive-ts}
+naive_preds <- model_output_CM2$predictions %>% dplyr::select(dates, actual)
+
+naive_preds <- naive_preds %>% dplyr::mutate(predicted = dplyr::lag(actual, 2)) %>% dplyr::filter(!is.na(predicted))
+
+naive_preds <- naive_preds %>% 
+  dplyr::mutate(error = predicted - actual, rel_error = error/actual,
+                abs_error = abs(error), abs_rel_error = abs(rel_error))
+
+prediction_comparison <- naive_preds %>% select(dates, predicted, actual) %>% gather(key = "type", value = "residual_occ", predicted, actual)
+comp_plot <- ggplot2::ggplot(data = prediction_comparison, mapping = aes(dates, residual_occ)) + ggplot2::geom_point(aes(group = type, colour = type)) + geom_line(aes(group = type, colour = type)) + ggtitle("Residual occupancy: predictions versus actual") +
+  xlab("Date of prediction") + ylab("Residual occupancy")
+
+err_plot <- ggplot2::ggplot(data = naive_preds, mapping = aes(dates, error)) + ggplot2::geom_point() + geom_line() + ggtitle("Residual occupancy: errors in predictions versus actual") +
+  xlab("Date of prediction") + ylab("Error")
+
+rel_err_plot <- ggplot2::ggplot(data = naive_preds, mapping = aes(dates, rel_error)) + ggplot2::geom_point() + geom_line() + ggtitle("Residual occupancy: relative errors in predictions versus actual") +
+  xlab("Date of prediction") + ylab("Relative Error")
+
+summary(naive_preds)
+```
+
+
+```{r}
+comp_plot
+```
+
+```{r}
+err_plot
+```
+
+```{r}
+rel_err_plot
+```
+
+AAU - more consistency 7 day
+Downstream - much less so - could assume no weekend discharges?
+
+General framework above does work to deploy and evaluate these models. However would be better to use the structure of e.g. caret!
+
+This includes:
+1. A structure to better represent (conditional) survival functions
+2. A function or function template for calculating these survival functions from (a specified, and eventually possibly rolling, "training" subset of) the data
+3. A function for applying these survival functions to the data at a given point in time to yield a delta-t horizon prediction for residual occupancy
+4. A function or functions to evaluate these predictions across a "test" range
+
+Idea: can I use the newdata argument of survfit to provide the actual covariates of snapshot data, to get a) S(t1 | covs) and b) S(t0 | covs), then compute their ratio to get the probability of still being in? If so this saves a lot of machinery in e.g. predict_residual_occupancy. - This is essentially what the Cox model approach above is doing.
+
+Evaluation by occupancy "zones" - ROC?
+Time series - esp. for delta on the predictions
+v v v Busy ED/AAU : ?more admissions
+Visualise to see the prediction before the effect
+Time since prev adm- 
+Existence of certain diagnoses previuos: chest pain, asthma, overdose, falls, found on floor, hf copd, dka
+Prb of overfull given predicted residual occupancy + distrib of expected admits over 48hrs...
+
+?incorporate lou's data?

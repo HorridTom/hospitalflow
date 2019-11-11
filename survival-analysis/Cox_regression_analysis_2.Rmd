@@ -10,9 +10,6 @@ library(ggfortify)
 ```
 
 ```{r}
-#surv_data <- readRDS(file = "../data/ed_ex.rds")
-#surv_data <- readRDS(file = "../../cw-data/cw_ip_spells.rds")
-#surv_data <- readRDS(file = "../../lgt-data/data-out/spell_table_lgt_20190816_b704e260_ms.rds")
 surv_data <- readRDS(file = "../../cw-data/spell_table_cw_20190902_b7fae6f7.rds")
 
 surv_data <- hospitalflow::add_directorate_variable(surv_data)
@@ -20,31 +17,38 @@ surv_data <- hospitalflow::add_directorate_variable(surv_data)
 surv_data <- surv_data %>% filter(admission_method_type == "Emergency Admissions",
                                   !(age_band_start %in% c("1-4 yrs", "5-9 yrs", "10-14 yrs")),
                                   directorate == "Medical"#,
-                                  #main_specialty_start %in% c("ACUTE INTERNAL MEDICINE", "GENERAL MEDICINE")
-                                  ) %>%
-  mutate(start_datetime = if_else(is.na(initial_ed_end_datetime), spell_start, initial_ed_end_datetime),
+                                  #main_specialty_start %in% c("ACUTE INTERNAL MEDICINE",
+                                  #"GENERAL MEDICINE")
+  ) %>%
+  mutate(start_datetime = if_else(is.na(initial_ed_end_datetime),
+                                  spell_start, initial_ed_end_datetime),
          end_datetime = spell_end,
          age_band_start = forcats::fct_drop(age_band_start))
+
 surv_data <- surv_data %>% mutate(los = difftime(end_datetime, start_datetime), adm_wd = weekdays(start_datetime)) %>% filter(!is.na(los)) %>%
-  mutate(days_since_prev_disch = as.numeric(replace(days_since_prev_disch, days_since_prev_disch <= 0, NA)),
-         disch_in_last_week = if_else(!is.na(days_since_prev_disch) & days_since_prev_disch <=7, TRUE, FALSE),
-         disch_in_last_month = if_else(!is.na(days_since_prev_disch) & days_since_prev_disch <=30, TRUE, FALSE),
+  mutate(days_since_prev_disch = as.numeric(replace(days_since_prev_disch,
+                                                    days_since_prev_disch <= 0, NA)),
+         disch_in_last_week = if_else(!is.na(days_since_prev_disch) & days_since_prev_disch <=7,
+                                      TRUE, FALSE),
+         disch_in_last_month = if_else(!is.na(days_since_prev_disch) & days_since_prev_disch <=30,
+                                      TRUE, FALSE),
          admitted_before = !is.na(days_since_prev_disch))
+
 units(surv_data$los) <- "hours"
-clean_surv_data <- surv_data %>% filter(!is.na(los) & los >= 0 & end_datetime < lubridate::ymd_hm('2019-03-01 00:00'))
+clean_surv_data <- surv_data %>% filter(!is.na(los) & los >= 0 &
+                                          end_datetime < lubridate::ymd_hm('2019-03-01 00:00'))
 
 
 obsLen <- 365*24 # length of observation time (censoring time = end of study)
+
 clean_surv_data <- clean_surv_data %>% mutate(eventT = los,
                                               obsT = pmin(eventT, obsLen),
                                               status = eventT <= obsLen,
                                               gender = dplyr::if_else(gender == "Male", 1, 0),
                                               adm_calmonth = as.factor(format(start_datetime, "%b")),
-                                              adm_daytime = dplyr::if_else(dplyr::between(lubridate::hour(start_datetime), 8, 16), 1, 0))
-# eventT <- clean_surv_data %>% pull(los)
-# adm_wd <- clean_surv_data %>% pull(adm_wd)
-# obsT   <- pmin(eventT, obsLen)  # observed censored event times
-# status <- eventT <= obsLen     # has event occured?
+                                              adm_daytime =dplyr::if_else(
+                                                dplyr::between(lubridate::hour(start_datetime), 8, 16),
+                                                1, 0))
 
 dfSurv <- clean_surv_data %>% select(eventT, obsT, status)
 dfSurv2 <- clean_surv_data %>% select(spell_number, eventT, obsT, status,
@@ -107,85 +111,11 @@ T1 <- strptime("2018-09-01 12:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe
 
 # Predicting Residual Occupancy
 
-```{r}
-
-hospitalflow::predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
-hospitalflow::get_residual_occupancy(df = surv_data, t = T1, delta_t = 48)
+```{r eval-coxph2}
+ipss <- hospitalflow::get_inpatient_snapshot(df = dfSurv2, t = T1) %>% filter(!is.na(stay_duration))
 
 dates <- seq(lubridate::ymd_hm('2018-08-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2019-01-31 12:00', tz = "Europe/London"), by = '1 day')
 
-model_output <- hospitalflow::run_S_func_model(df = surv_data, S_func = S_function, date_seq = dates)
-
-summary(model_output$predictions)
-```
-
-```{r}
-model_output$diagnostics$comp_plot
-```
-
-```{r}
-model_output$diagnostics$err_plot
-```
-
-```{r}
-model_output$diagnostics$rel_err_plot
-```
-
-
-The errors clearly show (as expected) the effect of weekends on this model - this naive model does not take into account any weekend effect. 
-
-Next steps will be to generalise the model to include this weekly effect.
-
-## Cox PH Model
-
-```{r coxph-model1}
-CM1 <- coxph(Surv(obsT, status) ~ adm_wd, data = dfSurv2)
-KM1S <- survfit(CM1, newdata = data.frame(adm_wd = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")))
-
-step_funs <- lapply(c(1:7), function(x) {hospitalflow::make_survival_function(KM1S[,x])})
-names(step_funs) <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
-```
-
-```{r coxph-predict1}
-ipss <- hospitalflow::get_inpatient_snapshot(df = dfSurv2, t = T1) %>% filter(!is.na(stay_duration))
-newdata1 <- ipss %>% select(obsT = stay_duration, adm_wd) %>% mutate(status = TRUE)
-newdata1d <- newdata1 %>% mutate(obsT = obsT + 48)
-CM1_prediction_1 <- predict(CM1, newdata = newdata1, type = "expected")
-CM1_prediction_2 <- predict(CM1, newdata = newdata1d, type = "expected")
-prob_here_48h_CM1 <- exp(-CM1_prediction_2)/exp(-CM1_prediction_1)
-
-
-
-predictions_CM1 <- cbind(ipss, CM1_pred_prob = prob_here_48h_CM1)
-
-sum(predictions_CM1$CM1_pred_prob)
-# Now lets embed that into predict_residual_occupancy
-
-hospitalflow::predict_residual_occupancy(df = dfSurv2, t = T1, delta_t = 48,
-                                         coxmodel = "Surv(obsT, status) ~ adm_wd")
-hospitalflow::get_residual_occupancy(df = dfSurv2, t = T1, delta_t = 48)
-```
-
-```{r eval-coxph1}
-model_output_CM <- hospitalflow::run_S_func_model(df = dfSurv2, coxmodel = "Surv(obsT, status) ~ adm_wd",
-                                                  date_seq = dates)
-
-summary(model_output_CM$predictions)
-```
-
-```{r}
-model_output_CM$diagnostics$comp_plot
-```
-
-```{r}
-model_output_CM$diagnostics$err_plot
-```
-
-```{r}
-model_output_CM$diagnostics$rel_err_plot
-```
-
-```{r eval-coxph2}
 CM2 <- coxph(Surv(obsT, status) ~ adm_wd + adm_daytime + adm_calmonth + gender + age_band_start, data = dfSurv2)
 newdata2 <- ipss %>% select(obsT = stay_duration, adm_wd, adm_daytime, adm_calmonth, gender, age_band_start) %>% mutate(status = TRUE)
 newdata2d <- newdata2 %>% mutate(obsT = obsT + 48)

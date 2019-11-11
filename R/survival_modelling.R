@@ -156,6 +156,22 @@ run_S_func_model <- function(df, S_func, coxmodel = NULL, date_seq, horizon = 48
     dplyr::mutate(error = predicted - actual, rel_error = error/actual,
                   abs_error = abs(error), abs_rel_error = abs(rel_error))
 
+  output <- evaluate_predictions(predictions)
+
+  output
+
+}
+
+
+#' evaluate_predictions
+#'
+#' @param predictions predictions tibble created by run_S_func_model
+#'
+#' @return object with evaluation results
+#' @export
+#'
+#' @examples
+evaluate_predictions <- function(predictions) {
   prediction_comparison <- predictions %>% select(dates, predicted, actual) %>% gather(key = "type", value = "residual_occ", predicted, actual)
   comp_plot <- ggplot2::ggplot(data = prediction_comparison, mapping = aes(dates, residual_occ)) + ggplot2::geom_point(aes(group = type, colour = type)) + geom_line(aes(group = type, colour = type)) + ggtitle("Residual occupancy: predictions versus actual") +
     xlab("Date of prediction") + ylab("Residual occupancy")
@@ -181,6 +197,4 @@ run_S_func_model <- function(df, S_func, coxmodel = NULL, date_seq, horizon = 48
   output$predictions <- predictions
 
   output
-
 }
-
