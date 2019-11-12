@@ -16,7 +16,7 @@ test_that("readmissions within 90 days is giving the right expected answer",{
 
   #Run four_hr_performance
   result <- readmissions_ip(start_date = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
-                          end_date = as.POSIXct("2019-06-02 00:00:00", tz = "Europe/London"),
+                          end_date = as.POSIXct("2019-12-31 00:00:00", tz = "Europe/London"),
                           data = readmissions_dt, plot_chart = FALSE, hospital_name = "Hospital_name",
                           readmission_by = 90)
 
