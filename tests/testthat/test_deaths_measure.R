@@ -3,7 +3,7 @@ library(hospitalflow)
 
 test_that("deaths by month is giving the right expected answer",{
 
-  deaths_dt <- readRDS("testdata/readmission_test/dt_deaths_test.rds")
+  deaths_dt <- readRDS("testdata/deaths_measure_test/dt_deaths_test.rds")
 
   #Specify correct results
   correct_answers <- tibble::tibble(
