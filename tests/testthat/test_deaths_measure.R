@@ -1,7 +1,7 @@
-context("Readmissions for 90 days")
+context("Deaths by month")
 library(hospitalflow)
 
-test_that("readmissions within 90 days is giving the right expected answer",{
+test_that("deaths by month is giving the right expected answer",{
 
   deaths_dt <- readRDS("testdata/readmission_test/dt_deaths_test.rds")
 
@@ -16,7 +16,7 @@ test_that("readmissions within 90 days is giving the right expected answer",{
 
 
   #Run four_hr_performance
-  result <- readmissions_ip(start_date = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
+  result <- measure_death(start_date = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
                             end_date = as.POSIXct("2019-12-31 00:00:00", tz = "Europe/London"),
                             data = deaths_dt, plot_chart = FALSE, hospital_name = "Hospital_name")
 
