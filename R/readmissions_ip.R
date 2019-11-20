@@ -35,6 +35,12 @@ readmissions_ip <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = 
       end_date - lubridate::duration(readmission_by, units = "days"), unit = "month")) %>%
     dplyr::mutate(one_month = lubridate::floor_date(spell_end, "1 month", "month"))
 
+  if(nrow(dt_calc) == 0) {
+    warning("Insufficient data to calculate monthly readmission rate.
+            Provide more than one month's worth of spell data.")
+    return(NULL)
+  }
+
   dt_calc_disch <- dt_calc %>%
     dplyr::group_by(one_month) %>%
     dplyr::summarise(N = n())
@@ -78,7 +84,6 @@ readmissions_ip <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = 
 
   # Set the title
   title_stub <- ": Readmissions by "
-  hospital_name <- "CW"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   Days <- " days "
@@ -103,8 +108,7 @@ readmissions_ip <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = 
     ggplot2::theme(plot.title = ggplot2::element_text(size = 11, face = "bold")) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, size = 10)) +
     ggplot2::labs(x = "Month", y = "Percentage of readmissions",
-                  caption = "*Shewart chart rules apply (see Understanding the Analysis tab for more detail) \nRule 1: Any month outside the control limits \nRule 2: Eight or more consecutive months all above, or all below, the centre line", size = 10) +
-    ggplot2::geom_text(ggplot2::aes(label = ifelse(x==max(x), format(x, '%b-%y'),'')), hjust = -0.05, vjust = 2)
+                  caption = "*Shewart chart rules apply (see Understanding the Analysis tab for more detail) \nRule 1: Any month outside the control limits \nRule 2: Eight or more consecutive months all above, or all below, the centre line", size = 10)
 
   readmission_plot
 
