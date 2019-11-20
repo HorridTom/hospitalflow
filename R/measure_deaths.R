@@ -15,7 +15,7 @@ measure_death <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = "E
          data, plot_chart, hospital_name){
 
   dt_select <- data %>%
-    dplyr::select(pseudo_id, spell_number, spell_start, spell_end, ed_admission, admission_method_type, disposal_code) %>%
+    dplyr::select(pseudo_id, spell_number, spell_start, spell_end, ed_admission, disposal_code) %>%
     dplyr::filter(start_date <= spell_end & end_date >= spell_start) #%>%
     #dplyr::filter(admission_method_type == "Emergency Admissions" & ed_admission == TRUE)
 
