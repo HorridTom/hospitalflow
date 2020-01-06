@@ -64,11 +64,13 @@ test_that("spell table is created correctly",{
 
   admission_method <- c("Accident and emergency", "Accident and emergency", "Booked", "Booked", "Booked", "Birth-this provider", "Birth-this provider")
 
+  discharge_method <- c(1, 2, 3, 3, 4, 5, 7)
+
   inpatient_data_age_sex <- tibble::tibble(pseudo_id, episode_id,
                                            start_datetime,
                                            end_datetime,
                                            gender,
-                                           age_band_start, admission_method) #, admission_method
+                                           age_band_start, admission_method, discharge_method) #, admission_method
 
 
   result <- make_spell_table(ed_data_age_sex, inpatient_data_age_sex, same_type_episode_lag = 1, different_type_episode_lag = 6) %>%
