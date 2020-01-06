@@ -3,7 +3,7 @@ library(hospitalflow)
 
 test_that("deaths by month is giving the right expected answer",{
 
-  deaths_dt <- readRDS("testdata/deaths_measure_test/dt_deaths_test.rds")
+  deaths_dt <- readRDS("testdata/deaths_measure_test/deaths_measure_test.rds")
 
   #Specify correct results
   correct_answers <- tibble::tibble(
@@ -16,7 +16,7 @@ test_that("deaths by month is giving the right expected answer",{
 
 
   #Run four_hr_performance
-  result <- measure_death(start_date = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
+  result <- mortality_timeser(start_date = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
                             end_date = as.POSIXct("2019-12-31 00:00:00", tz = "Europe/London"),
                             data = deaths_dt, plot_chart = FALSE, hospital_name = "Hospital_name")
 
