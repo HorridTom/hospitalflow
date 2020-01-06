@@ -86,7 +86,9 @@ spell_variables <- function(all_episodes) {
     dplyr::mutate(source_referral_ae = purrr::map(data, get_source_of_referral)) %>%
     dplyr::mutate(died_ip = purrr::map(data, get_mortality_ip)) %>%
     dplyr::select(-data) %>%
-    tidyr::unnest()
+    tidyr::unnest(cols = c(constituent_ed_episodes, constituent_ip_episodes, gender, age_band_start,
+                           episode_class_sequence, admission_method_type, initial_ed_end_datetime,
+                           disposal_code, hrg_ae_code, source_referral_ae, died_ip))
 
 
 
