@@ -1,4 +1,4 @@
-#' measure_death
+#' mortality_timeser
 #'
 #' @param start_date
 #' @param end_date
@@ -10,12 +10,12 @@
 #' @export
 #'
 #' @examples
-measure_death <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = "Europe/London"),
+mortality_timeser <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = "Europe/London"),
          end_date = as.POSIXct("2016-03-31 00:00:00", tz = "Europe/London"),
          data, plot_chart, hospital_name){
 
   dt_select <- data %>%
-    dplyr::select(pseudo_id, spell_number, spell_start, spell_end, ed_admission, disposal_code) %>%
+    dplyr::select(pseudo_id, spell_number, spell_start, spell_end, ed_admission, died_ip) %>%
     dplyr::filter(start_date <= spell_end & end_date >= spell_start) #%>%
     #dplyr::filter(admission_method_type == "Emergency Admissions" & ed_admission == TRUE)
 
@@ -32,8 +32,9 @@ measure_death <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = "E
     dplyr::group_by(one_month) %>%
     dplyr::summarise(N = n())
 
+
   dt_calc_deaths <- dt_calc  %>%
-    dplyr::filter(disposal_code == "Died in Department") %>%
+    dplyr::filter(died_ip == TRUE) %>%
     dplyr::group_by(one_month) %>%
     dplyr::summarise(Deaths = n())
 
