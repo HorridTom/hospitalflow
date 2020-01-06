@@ -4,8 +4,13 @@
 \alias{ed_occupancy_on_arrival_plot}
 \title{ed_occupancy_on_arrival_plot}
 \usage{
-ed_occupancy_on_arrival_plot(df, startDate, endDate,
-  hospital_name = "Hospital Name", plotChart = T)
+ed_occupancy_on_arrival_plot(
+  df,
+  startDate,
+  endDate,
+  hospital_name = "Hospital Name",
+  plotChart = T
+)
 }
 \arguments{
 \item{df}{dataframe of ED data with start_datetime and end_datetime representing start and end of a patient's time in ED}

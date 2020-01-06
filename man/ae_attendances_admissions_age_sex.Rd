@@ -4,9 +4,13 @@
 \alias{ae_attendances_admissions_age_sex}
 \title{ae_attendances_admissions_age_sex}
 \usage{
-ae_attendances_admissions_age_sex(start_date = as.Date("2016-01-01", tz =
-  "Europe/London"), end_date = as.Date("2017-01-01", tz =
-  "Europe/London"), data, plot_chart, hospital_name = "Hospital name")
+ae_attendances_admissions_age_sex(
+  start_date = as.Date("2016-01-01", tz = "Europe/London"),
+  end_date = as.Date("2017-01-01", tz = "Europe/London"),
+  data,
+  plot_chart,
+  hospital_name = "Hospital name"
+)
 }
 \arguments{
 \item{start_date}{date of earliest discharge to be included in the analysis}

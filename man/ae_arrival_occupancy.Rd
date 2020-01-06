@@ -4,12 +4,19 @@
 \alias{ae_arrival_occupancy}
 \title{ae_arrival_occupancy}
 \usage{
-ae_arrival_occupancy(start_date = as.POSIXct("2012-01-01 00:00:00", tz =
-  "Europe/London"), end_date = as.POSIXct("2015-01-01 00:00:00", tz =
-  "Europe/London"), data, plot_chart, hospital_name = "Hospital name")
+ae_arrival_occupancy(
+  start_date = as.POSIXct("2012-01-01 00:00:00", tz = "Europe/London"),
+  end_date = as.POSIXct("2015-01-01 00:00:00", tz = "Europe/London"),
+  data,
+  plot_chart,
+  hospital_name = "Hospital name"
+)
 }
 \arguments{
 \item{hospital_name}{}
+}
+\value{
+
 }
 \description{
 ae_arrival_occupancy

@@ -4,11 +4,19 @@
 \alias{ed_los_flow_grps}
 \title{ed_los_flow_grps}
 \usage{
-ed_los_flow_grps(start_date, end_date, data, plot_chart,
-  hospital_name = "Name")
+ed_los_flow_grps(
+  start_date,
+  end_date,
+  data,
+  plot_chart,
+  hospital_name = "Name"
+)
 }
 \arguments{
 \item{hospital_name}{}
+}
+\value{
+
 }
 \description{
 ed_los_flow_grps
