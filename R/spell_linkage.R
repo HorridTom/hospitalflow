@@ -84,8 +84,11 @@ spell_variables <- function(all_episodes) {
     dplyr::mutate(disposal_code = purrr::map(data, get_disposal_code)) %>%
     dplyr::mutate(hrg_ae_code = purrr::map(data, get_hrg)) %>%
     dplyr::mutate(source_referral_ae = purrr::map(data, get_source_of_referral)) %>%
+    dplyr::mutate(died_ip = purrr::map(data, get_mortality_ip)) %>%
     dplyr::select(-data) %>%
     tidyr::unnest()
+
+
 
   spell_table <- all_episodes %>%
     dplyr::group_by(spell_number) %>%
@@ -177,6 +180,7 @@ add_spell_variables <- function(ed_data, inpatient_data, spell_table) {
     dplyr::ungroup() %>%
     dplyr::mutate(days_since_prev_disch = difftime(spell_start, prev_disch, units = "days"))
 
+
 }
 
 # get_main_specialty <- function(x) {
@@ -189,6 +193,7 @@ add_spell_variables <- function(ed_data, inpatient_data, spell_table) {
 #       dplyr::pull(main_specialty)
 #   }
 # }
+
 
 
 get_episode_id_list <- function(episode_df, episode_type_to_list) {
@@ -271,6 +276,8 @@ admission_method_class <- function(admission_method_df) {
 
 }
 
+
+
 get_initial_ed_episode_end_datetime <- function(spell_episodes_df) {
   first_episode_of_spell <- spell_episodes_df %>%
     dplyr::arrange(start_datetime) %>%
@@ -317,5 +324,14 @@ get_hrg <- function(hrg_df){
 }
 
 
+get_mortality_ip <- function(died_ip_df){
 
+  died_ip <- died_ip_df %>%
+    dplyr::group_by(pseudo_id) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::mutate(died = dplyr::if_else(discharge_method == 4, TRUE, FALSE)) %>%
+    dplyr::pull(died)
+
+  died_ip[1]
+}
 
