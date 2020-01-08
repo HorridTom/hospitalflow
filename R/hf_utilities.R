@@ -24,15 +24,17 @@ convert_rds_cols_to_char <- function(path) {
 
 #' add_directorate_variable
 #'
-#' @param spell_table
+#' @param table a dataframe with a column containing specialties
+#' @param spec_column string containing column name containing specialties
 #'
-#' @return
+#' @return table with an additional column containing the directorate associated
+#' with the specialty for that row.
 #' @export
 #'
 #' @examples
-add_directorate_variable <- function(spell_table){
+add_directorate_variable <- function(table, spec_column = "main_specialty_start"){
 
-  df <- dplyr::left_join(spell_table, specialty_mapping, by = c("main_specialty_start" = "spec_name"))
+  df <- dplyr::left_join(table, specialty_mapping, by = setNames("spec_name", spec_column))
 
   df
 
