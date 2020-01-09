@@ -191,3 +191,33 @@ hospitalflow::occupancy_weekday_hour(start_date = as.POSIXct(start_date, tz = "E
                                    plot_chart = TRUE,
                                    hospital_name = "Anytown General Hospital")
 ```
+
+## Monthly 7-day Readmission Rate
+```{r readm-7, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
+hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/London"),
+                              end_date = as.POSIXct(end_date, tz = "Europe/London"),
+                              data = example_spell_table,
+                              plot_chart = TRUE,
+                              hospital_name = "Anytown General Hospital",
+                              readmission_by = 7)
+```
+
+## Monthly 30-day Readmission Rate
+```{r readm-30, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
+hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/London"),
+                              end_date = as.POSIXct(end_date, tz = "Europe/London"),
+                              data = example_spell_table,
+                              plot_chart = TRUE,
+                              hospital_name = "Anytown General Hospital",
+                              readmission_by = 30)
+```
+
+## Monthly 90-day Readmission Rate
+```{r readm-90, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
+hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/London"),
+                              end_date = as.POSIXct(end_date, tz = "Europe/London"),
+                              data = example_spell_table,
+                              plot_chart = TRUE,
+                              hospital_name = "Anytown General Hospital",
+                              readmission_by = 90)
+```
