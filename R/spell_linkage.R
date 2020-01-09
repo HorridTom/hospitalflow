@@ -33,7 +33,8 @@ make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1,
 make_spell_number <- function(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 6) {
 
   ed_episodes <- ed_data %>%
-    dplyr::mutate(episode_type = "ED")
+    dplyr::mutate(episode_type = "ED",
+                  ward_name = "ED") # Once merged with site metadata branch, should specify site as part of this
 
   ip_episodes <- inpatient_data %>%
     dplyr::mutate(episode_type = "IP")
@@ -74,7 +75,9 @@ spell_variables <- function(all_episodes) {
                                                        episode_type_to_list = "ED"),
                   constituent_ip_episodes = purrr::map(data,
                                                        get_episode_id_list,
-                                                       episode_type_to_list = "IP")) %>%
+                                                       episode_type_to_list = "IP"),
+                  episode_location_sequence = purrr::map(data,
+                                                         get_episode_location_list)) %>%
     dplyr::mutate(gender = purrr::map(data, get_latest_gender)) %>%
     dplyr::mutate(age_band_start = purrr::map(data, get_age_band_start)) %>%
     # dplyr::mutate(episode_type = purrr::map(data, get_episode_type)) %>%
@@ -196,6 +199,12 @@ get_episode_id_list <- function(episode_df, episode_type_to_list) {
     dplyr::filter(episode_type == episode_type_to_list) %>%
     dplyr::pull(episode_id)
   list(as.list(ep_id_v))
+}
+
+get_episode_location_list <- function(episode_df) {
+  ep_loc_v <- episode_df %>%
+    dplyr::pull(ward_name)
+  list(as.list(ep_loc_v))
 }
 
 get_latest_gender <- function(gender_df) {

@@ -10,7 +10,9 @@ test_that("spell table is created correctly",{
     spell_start = as.POSIXct(c("2019-01-02 17:00", "2019-01-03 08:00", "2019-01-03 19:00", "2019-01-01 17:00", "2019-01-02 08:00", "2019-01-03 08:00", "2019-01-04 14:00", "2019-01-05 06:00", "2019-01-04 14:00")),
     spell_end = as.POSIXct(c("2019-01-02 21:30", "2019-01-03 10:00", "2019-01-03 21:00", "2019-01-02 00:00", "2019-01-02 10:00", "2019-01-03 11:00", "2019-01-05 03:00", "2019-01-05 13:00", "2019-01-04 17:00")),
     number_of_episodes = as.character(c("2", "1", "1", "1", "1", "1", "2", "1", "1")),
-    admission_method_type = as.character(c("Emergency Admissions", "Emergency Admissions",  "Elective Admissions", NA,"Elective Admissions", "Elective Admissions", "Other Admissions", "Other Admissions", NA))
+    admission_method_type = as.character(c("Emergency Admissions", "Emergency Admissions",  "Elective Admissions", NA,"Elective Admissions", "Elective Admissions", "Other Admissions", "Other Admissions", NA)),
+    episode_location_sequence = list(list("ED", "Ward 1"), list("Ward 1"),list("Ward 2"), list("ED"), list("Ward 2"),
+                                     list("Ward 2"), list("ED", "Ward 3"), list("Ward 3"), list("ED"))
   )
 
   pseudo_id <- as.character(c("112", "113", "114", "115"))
@@ -64,15 +66,19 @@ test_that("spell table is created correctly",{
 
   admission_method <- c("Accident and emergency", "Accident and emergency", "Booked", "Booked", "Booked", "Birth-this provider", "Birth-this provider")
 
+  ward_name <- c("Ward 1", "Ward 1", "Ward 2", "Ward 2", "Ward 2", "Ward 3", "Ward 3")
+
   inpatient_data_age_sex <- tibble::tibble(pseudo_id, episode_id,
                                            start_datetime,
                                            end_datetime,
                                            gender,
-                                           age_band_start, admission_method) #, admission_method
+                                           age_band_start,
+                                           admission_method,
+                                           ward_name)
 
 
   result <- make_spell_table(ed_data_age_sex, inpatient_data_age_sex, same_type_episode_lag = 1, different_type_episode_lag = 6) %>%
-    dplyr::select(spell_number, spell_start, spell_end, number_of_episodes, admission_method_type)
+    dplyr::select(spell_number, spell_start, spell_end, number_of_episodes, admission_method_type, episode_location_sequence)
 
   result$spell_number <- as.character(result$spell_number)
   result$number_of_episodes <- as.character(result$number_of_episodes)
@@ -80,7 +86,7 @@ test_that("spell table is created correctly",{
 
 
   #Test results are correct
-  expect_equal(result, correct_answers)
+  expect_true(all.equal.list(result, correct_answers))
 
 
 })
