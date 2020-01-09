@@ -4,8 +4,7 @@
 \alias{occupancy}
 \title{occupancy}
 \usage{
-occupancy(date_time, df, start_time = "spell_start",
-  end_time = "spell_end")
+occupancy(date_time, df, start_time = "spell_start", end_time = "spell_end")
 }
 \arguments{
 \item{date_time}{datetime at which we want to know the occupancy}

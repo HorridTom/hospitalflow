@@ -9,6 +9,9 @@ get_residual_occupancy(df, t, delta_t)
 \arguments{
 \item{delta_t}{}
 }
+\value{
+
+}
 \description{
 get_residual_occupancy
 }

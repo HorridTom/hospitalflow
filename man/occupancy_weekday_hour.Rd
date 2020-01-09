@@ -4,12 +4,19 @@
 \alias{occupancy_weekday_hour}
 \title{occupancy_weekday_hour for A&E}
 \usage{
-occupancy_weekday_hour(start_date = as.POSIXct("2015-04-01 00:00:00", tz
-  = "Europe/London"), end_date = as.POSIXct("2016-04-01 00:00:00", tz =
-  "Europe/London"), data, plot_chart, hospital_name = "Hospital name")
+occupancy_weekday_hour(
+  start_date = as.POSIXct("2015-04-01 00:00:00", tz = "Europe/London"),
+  end_date = as.POSIXct("2016-04-01 00:00:00", tz = "Europe/London"),
+  data,
+  plot_chart,
+  hospital_name = "Hospital name"
+)
 }
 \arguments{
 \item{plot_chart}{}
+}
+\value{
+
 }
 \description{
 occupancy_weekday_hour for A&E

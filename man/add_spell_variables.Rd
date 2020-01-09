@@ -9,6 +9,9 @@ add_spell_variables(ed_data, inpatient_data, spell_table)
 \arguments{
 \item{spell_table}{pre-created from ed_data and inpatient_data using make_spell_table}
 }
+\value{
+
+}
 \description{
 add_spell_variables
 }

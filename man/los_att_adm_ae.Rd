@@ -4,12 +4,19 @@
 \alias{los_att_adm_ae}
 \title{lenght of stay for attendances and admissions from ED}
 \usage{
-los_att_adm_ae(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-  end_date = as.Date("2013-01-01", tz = "Europe/London"), data,
-  plot_chart, hospital_name = "Chelsea & Westminster")
+los_att_adm_ae(
+  start_date = as.Date("2012-01-01", tz = "Europe/London"),
+  end_date = as.Date("2013-01-01", tz = "Europe/London"),
+  data,
+  plot_chart,
+  hospital_name = "Chelsea & Westminster"
+)
 }
 \arguments{
 \item{hospital_name}{}
+}
+\value{
+
 }
 \description{
 lenght of stay for attendances and admissions from ED

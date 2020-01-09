@@ -4,8 +4,13 @@
 \alias{ED_day_hour_plot}
 \title{ED_day_hour_plot}
 \usage{
-ED_day_hour_plot(startDay, endDay, df, hospital_name = "Hospital Name",
-  plot_chart = T)
+ED_day_hour_plot(
+  startDay,
+  endDay,
+  df,
+  hospital_name = "Hospital Name",
+  plot_chart = T
+)
 }
 \arguments{
 \item{startDay}{Date for which the analysis starts}

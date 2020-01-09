@@ -4,12 +4,20 @@
 \alias{readmissions_ip}
 \title{readmissions_ip}
 \usage{
-readmissions_ip(start_date = as.POSIXct("2016-01-01 00:00:00", tz =
-  "Europe/London"), end_date = as.POSIXct("2016-03-31 00:00:00", tz =
-  "Europe/London"), data, readmission_by, plot_chart, hospital_name)
+readmissions_ip(
+  start_date = as.POSIXct("2016-01-01 00:00:00", tz = "Europe/London"),
+  end_date = as.POSIXct("2016-03-31 00:00:00", tz = "Europe/London"),
+  data,
+  readmission_by,
+  plot_chart,
+  hospital_name
+)
 }
 \arguments{
 \item{readmission_by}{}
+}
+\value{
+
 }
 \description{
 readmissions_ip

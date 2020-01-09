@@ -4,10 +4,16 @@
 \alias{add_directorate_variable}
 \title{add_directorate_variable}
 \usage{
-add_directorate_variable(spell_table)
+add_directorate_variable(table, spec_column = "main_specialty_start")
 }
 \arguments{
-\item{spell_table}{}
+\item{table}{a dataframe with a column containing specialties}
+
+\item{spec_column}{string containing column name containing specialties}
+}
+\value{
+table with an additional column containing the directorate associated
+with the specialty for that row.
 }
 \description{
 add_directorate_variable
