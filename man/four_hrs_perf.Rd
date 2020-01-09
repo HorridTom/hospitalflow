@@ -4,8 +4,14 @@
 \alias{four_hrs_perf}
 \title{four hour performance for ED}
 \usage{
-four_hrs_perf(start_dt, end_dt, data, time_unit = "day", plot_chart,
-  hospital_name = "Hospital_Name")
+four_hrs_perf(
+  start_dt,
+  end_dt,
+  data,
+  time_unit = "day",
+  plot_chart,
+  hospital_name = "Hospital_Name"
+)
 }
 \arguments{
 \item{start_dt}{datetime, as a POSIXct, of the earliest attendance to be included in the analysis}

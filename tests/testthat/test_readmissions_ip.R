@@ -21,7 +21,8 @@ test_that("readmissions within 90 days is giving the right expected answer",{
                           readmission_by = 90)
 
   result <- result %>%
-    dplyr::select(x, y)
+    dplyr::select(x, y) %>%
+    dplyr::slice(1:5)
 
   result$y <- round(result$y, digits = 1)
 

@@ -6,10 +6,13 @@
 data isn't  standardised
 admission_discharges}
 \usage{
-admissions_discharges(start_date = as.Date("2018-12-10", tz =
-  "Europe/London"), end_date = as.Date("2018-12-23", tz =
-  "Europe/London"), data, plot_chart,
-  hospital_name = "Chelsea & Westminster")
+admissions_discharges(
+  start_date = as.Date("2018-12-10", tz = "Europe/London"),
+  end_date = as.Date("2018-12-23", tz = "Europe/London"),
+  data,
+  plot_chart,
+  hospital_name = "Chelsea & Westminster"
+)
 }
 \arguments{
 \item{start_date}{date of earliest discharge to be included in the analysis}

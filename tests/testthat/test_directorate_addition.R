@@ -36,6 +36,8 @@ test_that("directorate is calculated correctly",{
 
 
 
+
+
   ed_data <- tibble::tibble(pseudo_id, episode_id,
                                     start_datetime,
                                     end_datetime,
@@ -65,12 +67,14 @@ test_that("directorate is calculated correctly",{
 
   main_specialty <- c("OBSTRETICS", "GENERAL SURGERY", "CARDIOLOGY", "GENERAL MEDICINE", "GENERAL MEDICINE", "Accident and Emergency", "GENERAL MEDICINE")
 
+  discharge_method <- c(1, 1, 2, 3, 4, 5, 7)
+
   inpatient_data <- tibble::tibble(pseudo_id, episode_id,
                                            start_datetime,
                                            end_datetime,
                                            gender,
                                            age_band_start, admission_method,
-                                           main_specialty)
+                                           main_specialty, discharge_method)
 
 
   # run the function make_spell_table

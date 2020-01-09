@@ -6,6 +6,9 @@
 \usage{
 age_sex()
 }
+\value{
+
+}
 \description{
 age_sex
 }

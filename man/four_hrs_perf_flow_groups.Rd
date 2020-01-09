@@ -4,12 +4,20 @@
 \alias{four_hrs_perf_flow_groups}
 \title{four hrs perf flow_groups}
 \usage{
-four_hrs_perf_flow_groups(start_dt = as.Date("2016-01-01", tz =
-  "Europe/London"), end_dt = as.Date("2016-09-01", tz = "Europe/London"),
-  data, time_unit = "day", plot_chart, hospital_name = "Hospital_Name")
+four_hrs_perf_flow_groups(
+  start_dt = as.Date("2016-01-01", tz = "Europe/London"),
+  end_dt = as.Date("2016-09-01", tz = "Europe/London"),
+  data,
+  time_unit = "day",
+  plot_chart,
+  hospital_name = "Hospital_Name"
+)
 }
 \arguments{
 \item{hospital_name}{}
+}
+\value{
+
 }
 \description{
 four hrs perf flow_groups
