@@ -57,10 +57,12 @@ teardown({
 })
 
 test_that("import_and_standardise correctly brings in data, no dupe removal",{
-  test_import_list <- list(list(data_path = tmp_data_1, config_path = tmp_config_1),
-                           list(data_path = tmp_data_2, config_path = tmp_config_2))
+  test_import_list <- list(list(data_path = tmp_data_1, config_path = tmp_config_1, site = "A", facility = "ED"),
+                           list(data_path = tmp_data_2, config_path = tmp_config_2, site = "A", facility = "IP"))
 
-  data_list <- import_and_standardise(test_import_list, remove_duplicates = FALSE)
+  data_list <- lapply(import_and_standardise(test_import_list, remove_duplicates = FALSE), function(x) {
+    x$data
+  })
 
   standardised_data_1 <- tibble::tibble(pseudo_id = c("0001", "0001", "0002", "0002"),
                                         start_datetime = as.POSIXct(c("01/01/2019 12:00:00",
@@ -95,22 +97,24 @@ test_that("import_and_standardise correctly brings in data, no dupe removal",{
   # Check two data files are imported
   expect_equal(length(data_list), 2)
 
-  # Check both data files imported and standardised have 4 rows and 5 columns
+  # Check both data files imported and standardised have 4 rows and 6 columns
   expect_equal(nrow(data_list[[1]]), 4)
   expect_equal(nrow(data_list[[2]]), 4)
-  expect_equal(ncol(data_list[[1]]), 5)
-  expect_equal(ncol(data_list[[2]]), 5)
+  expect_equal(ncol(data_list[[1]]), 6)
+  expect_equal(ncol(data_list[[2]]), 6)
 
   # Check both datasets imported and standardised correctly
-  expect_equal(data_list[[1]] %>% dplyr::select(-episode_id), standardised_data_1)
-  expect_equal(data_list[[2]] %>% dplyr::select(-episode_id), standardised_data_2)
+  expect_equal(data_list[[1]] %>% dplyr::select(-episode_id, -site), standardised_data_1)
+  expect_equal(data_list[[2]] %>% dplyr::select(-episode_id, -site), standardised_data_2)
 })
 
 test_that("import_and_standardise correctly brings in data, with dupe removal",{
-  test_import_list <- list(list(data_path = tmp_data_1, config_path = tmp_config_1),
-                           list(data_path = tmp_data_2, config_path = tmp_config_2))
+  test_import_list <- list(list(data_path = tmp_data_1, config_path = tmp_config_1, site = "A", facility = "ED"),
+                           list(data_path = tmp_data_2, config_path = tmp_config_2, site = "A", facility = "IP"))
 
-  data_list <- import_and_standardise(test_import_list, remove_duplicates = TRUE)
+  data_list <- lapply(import_and_standardise(test_import_list, remove_duplicates = TRUE), function(x) {
+    x$data
+  })
 
   standardised_data_1 <- tibble::tibble(pseudo_id = c("0001", "0001", "0002"),
                                         start_datetime = as.POSIXct(c("01/01/2019 12:00:00",
@@ -141,13 +145,13 @@ test_that("import_and_standardise correctly brings in data, with dupe removal",{
   # Check two data files are imported
   expect_equal(length(data_list), 2)
 
-  # Check both data files imported and standardised have 3 rows and 5 columns
+  # Check both data files imported and standardised have 3 rows and 6 columns
   expect_equal(nrow(data_list[[1]]), 3)
   expect_equal(nrow(data_list[[2]]), 3)
-  expect_equal(ncol(data_list[[1]]), 5)
-  expect_equal(ncol(data_list[[2]]), 5)
+  expect_equal(ncol(data_list[[1]]), 6)
+  expect_equal(ncol(data_list[[2]]), 6)
 
   # Check both datasets imported and standardised correctly
-  expect_equal(data_list[[1]] %>% dplyr::select(-episode_id), standardised_data_1)
-  expect_equal(data_list[[2]] %>% dplyr::select(-episode_id), standardised_data_2)
+  expect_equal(data_list[[1]] %>% dplyr::select(-episode_id, -site), standardised_data_1)
+  expect_equal(data_list[[2]] %>% dplyr::select(-episode_id, -site), standardised_data_2)
 })

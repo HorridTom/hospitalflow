@@ -11,6 +11,7 @@ import_and_standardise(data_import_list, remove_duplicates = TRUE)
 data_path, config_path, site, and facility. The first two of these are character strings specifying the paths
 to i) a csv file to import data from and ii) a folder containing hospitalflow config
 files. The latter two specify the site and facility (e.g. ED, IP, UCC).}
+
 \item{remove_duplicates}{boolean to control whether data is de-duped (TRUE) or not (FALSE).}
 }
 \value{

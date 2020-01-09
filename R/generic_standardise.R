@@ -270,8 +270,11 @@ import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
 
   # If required, de-dupe each tibble based on pseudo_id, and episode start and end time
   if(remove_duplicates) {
-    data_list <- lapply(data_list, function(x) {
-      dplyr::distinct(x, pseudo_id, start_datetime, end_datetime, .keep_all = TRUE)
+    data_config_list <- lapply(data_config_list, function(x) {
+      list(data = dplyr::distinct(x$data, pseudo_id, start_datetime, end_datetime, .keep_all = TRUE),
+           config_path = x$config_path,
+           site = x$site,
+           facility = x$facility)
     })
   }
 
