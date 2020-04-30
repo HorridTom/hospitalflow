@@ -301,3 +301,16 @@ Existence of certain diagnoses previuos: chest pain, asthma, overdose, falls, fo
 Prb of overfull given predicted residual occupancy + distrib of expected admits over 48hrs...
 
 ?incorporate lou's data?
+
+
+
+**********
+28th Jan 2020
+
+- need to describe variance in res occ
+- why are there so many emergency medical inpatients - 400 beds total? ~175/80 beds medicine? for monday snapshots to understand why 300 odd??
+- plot survival curves by age-band 
+
+- diagnostic prev
+- new pts : poisson
+- instances of change of specialty?
