@@ -1,0 +1,59 @@
+#' Standard format for inpatient data
+#'
+#' Datasets containing inpatient data from any hospital with columns corresponding
+#' to the columns of this dataset can be standardised to match this format
+#' via config files. Original hospital datasets which do not have all of the
+#' columns listed can still be standardised but may me that not all analyses
+#' in the HospitalFlow package can be performed.
+#'
+#' @format A data frame with upto 22 variables depending on available hospital data.
+#' Each observation corresponds to a single episode within a patient spell.
+#'
+#' \describe{
+#'   \item{pseudo_id}{Unique ID number of the patient. Original mapping back to
+#'   hospital number should remain behind the Hospital's NHS firewall}
+#'   \item{gender}{The recorded gender of the patient}
+#'   \item{age_band_start}{The age band that the patient was in at time of admission}
+#'   \item{ethnic_category}{The ethnicity of the patient recorded using the NHS data
+#'   dictionary coding system
+#'   \url{http://www.datadictionary.nhs.uk/data_dictionary/attributes/e/end/ethnic_category_code_de.asp}}
+#'   \item{start_datetime}{The datetime at which this episode began}
+#'   \item{end_datetime}{The datetime at which this episode ended}
+#'   \item{spell_number}{The number of total continuous stays of a patient up to the
+#'   current date in question}
+#'   \item{episode_number}{The number of incidents (e.g. ward moves, consulatant changes)
+#'   that a patient has during a spell up to the time in question}
+#'   \item{admission_method}{The admission method coded using the NHS data
+#'   dictionary coding system
+#'   \url{https://www.datadictionary.nhs.uk/data_dictionary/attributes/a/add/admission_method_de.asp?shownav=1?query=admission+method&rank=100&shownav=1}}
+#'   \item{source_of_admission}{The source of admission coded using the NHS data
+#'   dictionary coding system
+#'   \url{https://www.datadictionary.nhs.uk/data_dictionary/attributes/s/smo/source_of_admission_de.asp?shownav=1?query=source+of+admission&rank=87.19749&shownav=1}}
+#'   \item{discharge_method}{The discharge method coded using the NHS data
+#'   dictionary coding system
+#'   \url{https://www.datadictionary.nhs.uk/data_dictionary/attributes/d/disc/discharge_method_de.asp?shownav=1?query=discharge+method&rank=100&shownav=1}}
+#'   \item{discharge_destination}{The discharge destination coded using the NHS data
+#'   dictionary coding system
+#'   \url{https://www.datadictionary.nhs.uk/data_dictionary/attributes/d/disc/discharge_destination_de.asp?shownav=1?query=discharge+destination&rank=100&shownav=1}}
+#'   \item{patient_classification}{The patient classification coded using the NHS data
+#'   dictionary coding system
+#'   \url{https://www.datadictionary.nhs.uk/data_dictionary/attributes/p/pati/patient_classification_de.asp?shownav=1?query=patient+classification&rank=34.61654&shownav=1}}
+#'   \item{provider}{The provider at which the episode took place}
+#'   \item{hospital_site}{The hospital site at which the episode took place}
+#'   \item{main_specialty}{The main speciality coded using the NHS data
+#'   dictionary coding system
+#'   \url{https://www.datadictionary.nhs.uk/web_site_content/supporting_information/main_specialty_and_treatment_function_codes_table.asp?shownav=1?query=main+category&rank=100&shownav=1}}
+#'   \item{local_subspecialty}{}
+#'   \item{ward_category}{}
+#'   \item{ward_stay_number}{}
+#'   \item{consultant}{}
+#'   \item{diagnosis_code}{}
+#'   \item{hrg}{}
+#'
+#'
+#'
+#'
+#'
+#'
+#' }
+"inpatient_data"
