@@ -48,8 +48,8 @@ data_list <- hospitalflow::import_and_standardise(import_list)
 ```
 
 ```{r spell-table, cache=TRUE, echo=FALSE}
-ed_data <- data_list[[1]]
-inpatient_data <- data_list[[4]]
+ed_data <- data_list[[1]][[1]]
+inpatient_data <- data_list[[3]][[1]]
 
 data_start_date <- as.Date(max(min(ed_data$start_datetime, na.rm = TRUE),
                        min(ed_data$end_datetime, na.rm = TRUE),
