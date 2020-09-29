@@ -37,37 +37,37 @@ get_simulated_ed_data <- function(npat = 1000, start = as.POSIXct("2019-01-01 00
 
 
 #function to get simulated inpatient data
-# get_simulated_ip_data <- function(npat = 1000, start = as.POSIXct("2019-01-01 00:00:00"),
-#                                   end = as.POSIXct("2019-04-01 00:00:00")) {
-#   simulated_pat_data <- tibble::tibble(pseudo_id = 1001:(1001 + npat),
-#                                        gender = factor(sample(c("Male","Female"), npat, replace = TRUE))
-#   )
-#
-#   simulated_pat_data <- simulated_pat_data %>%
-#     rowwise()%>%
-#     mutate(age_band_start = get_age()) %>%
-#     mutate(ethnic_category = get_ethnic_cat()) %>%
-#     ungroup()
-#
-#   simulated_data <- get_simulated_admission_data(simulated_pat_data, start = start, end = end)
-#   simulated_data <- simulated_data[[2]]
-#
-#   simulated_data <- simulated_data %>%
-#     select(-c(pseudo_id1)) %>%
-#     rowwise() %>%
-#     mutate(admission_method <- get_admission_method()) %>%
-#     mutate(source_of_admission <- get_source_of_admission()) %>%
-#     mutate(dischareg_method <- get_discharge_method()) %>%
-#     mutate(discharge_destination <- get_discharge_destination()) %>%
-#     mutate(patient_classification <- get_patient_classification()) %>%
-#     mutate(main_speciality <- get_main_speciality()) %>%
-#     mutate(hrg_code = get_hrg_code())
-#
-#   simulated_data$episode_id <- 1:nrow(simulated_data)
-#
-#   simulated_data
-#
-# }
+get_simulated_ip_data <- function(npat = 800, start = as.POSIXct("2019-01-01 00:00:00"),
+                                  end = as.POSIXct("2019-04-01 00:00:00")) {
+  simulated_pat_data <- tibble::tibble(pseudo_id = 1001:(1000 + npat),
+                                       gender = factor(sample(c("Male","Female"), npat, replace = TRUE))
+  )
+
+  simulated_pat_data <- simulated_pat_data %>%
+    rowwise()%>%
+    mutate(age_band_start = get_age()) %>%
+    mutate(ethnic_category = get_ethnic_cat()) %>%
+    ungroup()
+
+  simulated_data <- get_simulated_admission_data(simulated_pat_data, start = start, end = end, los_rate = (1/388800))
+  simulated_data <- simulated_data[[2]]
+
+  simulated_data <- simulated_data %>%
+    select(-c(pseudo_id1)) %>%
+    rowwise() %>%
+    mutate(admission_method = get_admission_method()) %>%
+    mutate(source_of_admission = get_source_of_admission()) %>%
+    mutate(discharge_method = get_discharge_method()) %>%
+    mutate(discharge_destination = get_discharge_destination()) %>%
+    mutate(patient_classification = get_patient_classification()) %>%
+    mutate(main_speciality = get_main_speciality()) %>%
+    mutate(hrg_code = get_hrg_code())
+
+  simulated_data$episode_id <- 1:nrow(simulated_data)
+
+  simulated_data
+
+}
 
 
 ##########################################################################################
@@ -91,7 +91,7 @@ get_simulated_admission_data <- function(patient_data, fixedPerPatient = F, lamb
   generate_admissions <- function(...) {
     pseudo_id <- list(...)[["pseudo_id"]]
     num_admissions <- list(...)[["num_admissions"]]
-    tibble::tibble(pseudo_id = rep(pseudo_id, num_admissions),
+    tibble::tibble(pseudo_id1 = rep(pseudo_id, num_admissions),
                    start_datetime = as.POSIXct(random_datetimes(n = num_admissions, start = start, end = end)),
                    end_datetime = as.POSIXct(start_datetime +
                                                as.difftime(rexp(num_admissions, rate = los_rate), units = "secs"))
@@ -103,7 +103,7 @@ get_simulated_admission_data <- function(patient_data, fixedPerPatient = F, lamb
                                                    purrr::pmap(., function(...) generate_admissions(...)))
 
   list(patients = patient_data %>% dplyr::select(-admissions, -num_admissions),
-       admissions = patient_data %>% tidyr::unnest() %>% dplyr::select(-num_admissions))
+       admissions = patient_data %>% tidyr::unnest(cols = c(admissions)) %>% dplyr::select(-num_admissions))
 }
 
 
@@ -420,41 +420,41 @@ get_admission_method <- function(){
 
   ranNum <- runif(1, 0, 100)
 
-  if(ranNum >= 0.00 & ranNum < 21.96){
+  if(ranNum <= 21.96){
     admission_method <- "Accident and Emergency Department"
-  }else if(ranNum >= 21.96 & ranNum < 34.07){
+  }else if(ranNum <= 21.96){
     admission_method <- "Booked"
-  }else if(ranNum >= 34.07 & ranNum < 75.56){
+  }else if(ranNum <= 34.07){
     admission_method <- "Planned"
-  }else if(ranNum >= 75.56 & ranNum < 75.92){
+  }else if(ranNum <= 75.56){
     admission_method <- "Accident and emergency"
-  }else if(ranNum >= 75.92 & ranNum < 75.95){
+  }else if(ranNum <= 75.92){
     admission_method <- "General Practitioner"
-  }else if(ranNum >= 75.95 & ranNum < 76.44){
+  }else if(ranNum <= 75.95){
     admission_method <- "Bed bureau"
-  }else if(ranNum >= 76.44 & ranNum < 76.44){
+  }else if(ranNum <= 76.44){
     admission_method <- "Consultant Clinic"
-  }else if(ranNum >= 76.44 & ranNum < 3.96){
+  }else if(ranNum <= 76.445){
     admission_method <- "Mental Health Crisis Resolution Team"
-  }else if(ranNum >= 3.96 & ranNum < 80.4){
+  }else if(ranNum <= 80.4){
     admission_method <- "Waiting list"
-  }else if(ranNum >= 80.4 & ranNum < 80.4){
+  }else if(ranNum <= 80.41){
     admission_method <- "Transfer from another Hospital Provider"
-  }else if(ranNum >= 80.4 & ranNum < 82.5){
+  }else if(ranNum <= 80.42){
     admission_method <- "Intended home birth"
-  }else if(ranNum >= 82.5 & ranNum < 83.11){
+  }else if(ranNum <= 82.5){
     admission_method <- "Other emergency admission"
-  }else if(ranNum >= 83.11 & ranNum < 91.58){
+  }else if(ranNum <= 83.11){
     admission_method <- "Other means"
-  }else if(ranNum >= 91.58 & ranNum < 91.84){
+  }else if(ranNum <= 91.58){
     admission_method <- "Admitted ante-partum"
-  }else if(ranNum >= 91.84 & ranNum < 99.28){
+  }else if(ranNum <= 91.84){
     admission_method <- "Admitted post-partum"
-  }else if(ranNum >= 99.28 & ranNum < 99.42){
+  }else if(ranNum <= 99.28){
     admission_method <- "Birth-this provider"
-  }else if(ranNum >= 99.42 & ranNum < 99.94){
+  }else if(ranNum <= 99.42){
     admission_method <- "Birth-outside provider(not intended home)"
-  }else if(ranNum >= 99.94){
+  }else if(ranNum <= 99.94){
     admission_method <- "Transfer from other provider(non-emergency)"
   }else{
     admission_method <- NA
@@ -468,15 +468,15 @@ get_source_of_admission <- function(){
 
   ranNum <- runif(1, 0, 100)
 
-  if(ranNum >= 85.59 & ranNum < 92.83){
-    source_of_admission <- "Babies born in or on the way to hospital"
-  }else if(ranNum >= 92.83 & ranNum < 99.81){
+  if(ranNum <= 85.59 ){
     source_of_admission <- "Usual Place of Residence"
-  }else if(ranNum >= 99.81 & ranNum < 99.98){
-    source_of_admission <- "NHS other Hospital Provider"
-  }else if(ranNum >= 99.98 & ranNum < 99.99){
+  }else if(ranNum <= 92.83){
     source_of_admission <- "Temporary Place of Residence"
-  }else if(ranNum >= 99.99){
+  }else if(ranNum <= 99.81){
+    source_of_admission <- "NHS other Hospital Provider"
+  }else if(ranNum <= 99.98){
+    source_of_admission <- "Babies born in or on the way to hospital"
+  }else if(ranNum <= 99.99){
     source_of_admission <- "Non-NHS run Hospice"
   # }else if(ranNum == 0){
   #   source_of_admission <- "Penal Establishment"
@@ -500,7 +500,7 @@ get_discharge_method <- function(){
 
   if(ranNum <= 98.24182633){
     discharge_method <- "Discharged"
-  }else if(ranNum > 98.24182633 & ranNum <= 99.97155){
+  }else if(ranNum <= 99.97155){
     discharge_method <- "Patient died"
   }else{
     discharge_method <- "Stillbirth"
@@ -516,7 +516,7 @@ get_discharge_destination <- function(){
   ranNum <- runif(1, 0, 100)
 
   if(ranNum <= 96.12755){
-    n <- "Own Residence"
+    discharge_destination <- "Own Residence"
   }else if(ranNum <= 97.8723){
     discharge_destination <- "General Ward"
   }else if(ranNum <= 99){
