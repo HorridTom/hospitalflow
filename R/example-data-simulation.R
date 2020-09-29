@@ -37,12 +37,26 @@ get_simulated_ed_data <- function(npat = 1000, start = as.POSIXct("2019-01-01 00
 
 
 #function to get simulated inpatient data
-get_simulated_ip_data <- function(npat = 800, start = as.POSIXct("2019-01-01 00:00:00"),
-                                  end = as.POSIXct("2019-04-01 00:00:00")) {
+get_simulated_ip_data <- function(npat = 800,
+                                  start = as.POSIXct("2019-01-01 00:00:00"),
+                                  end = as.POSIXct("2019-04-01 00:00:00"),
+                                  ed_data = ed_data_sim) {
+
+  #get patients admistted from ED
+  ed_admissions <- ed_data %>%
+    filter(attendance_disposal == "Admitted") %>%
+    mutate(start_datetime_ip = end_datetime, admission_method = "Accident and emergency") %>%
+    select(pseudo_id, gender, age_band_start, ethnic_category, start_datetime_ip, admission_method) %>%
+    rename(start_datetime = start_datetime_ip) %>%
+    mutate(end_datetime = as.POSIXct(start_datetime +
+                                       as.difftime(rexp(1, rate = 1/(388800)), units = "secs")))
+
+  #simulate new patiens who have not come from ED
   simulated_pat_data <- tibble::tibble(pseudo_id = 1001:(1000 + npat),
                                        gender = factor(sample(c("Male","Female"), npat, replace = TRUE))
-  )
+                                       )
 
+  #combine new patients and patiens from ED
   simulated_pat_data <- simulated_pat_data %>%
     rowwise()%>%
     mutate(age_band_start = get_age()) %>%
@@ -56,6 +70,7 @@ get_simulated_ip_data <- function(npat = 800, start = as.POSIXct("2019-01-01 00:
     select(-c(pseudo_id1)) %>%
     rowwise() %>%
     mutate(admission_method = get_admission_method()) %>%
+    bind_rows(ed_admissions) %>%
     mutate(source_of_admission = get_source_of_admission()) %>%
     mutate(discharge_method = get_discharge_method()) %>%
     mutate(discharge_destination = get_discharge_destination()) %>%
