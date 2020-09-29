@@ -40,7 +40,7 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
 
   sum_4hrs_perf <- dt_los %>%
     dplyr::group_by(Time, Hr_perf, flow_groups) %>%
-    dplyr::summarise(Count = n()) %>%
+    dplyr::summarise(Count = dplyr::n()) %>%
     tidyr::drop_na() %>%
     tidyr::spread(Hr_perf, Count) %>%
     dplyr::mutate(N = under_4hrs + above_4hrs) %>%

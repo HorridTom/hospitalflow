@@ -73,7 +73,7 @@ los_distrib_method_admission <- function(start_date = as.Date("2012-01-01", tz =
   df_wrd_c <- dt_los %>%
     dplyr::filter(adm_period == TRUE & same_day_discharge == FALSE) %>%
     dplyr::group_by(losbinned, admission_method_type) %>%
-    dplyr::summarise(Count = n()) %>%
+    dplyr::summarise(Count = dplyr::n()) %>%
     na.omit()
 
   # Set the title
