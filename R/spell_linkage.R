@@ -96,7 +96,7 @@ spell_variables <- function(all_episodes) {
     dplyr::group_by(spell_number) %>%
     dplyr::summarise(spell_start = min(start_datetime, na.rm = TRUE),
                      spell_end = max(end_datetime, na.rm = TRUE),
-                     number_of_episodes = n(),
+                     number_of_episodes = dplyr::n(),
                      pseudo_id = dplyr::first(pseudo_id)) %>%
     dplyr::left_join(episode_lists, by = "spell_number") %>%
     dplyr::mutate(starts_with_ed = stringr::str_detect(episode_class_sequence, pattern = "^E.*$"),

@@ -43,12 +43,12 @@ readmissions_ip <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = 
 
   dt_calc_disch <- dt_calc %>%
     dplyr::group_by(one_month) %>%
-    dplyr::summarise(N = n())
+    dplyr::summarise(N = dplyr::n())
 
   dt_calc_readm <- dt_calc  %>%
     dplyr::filter(readmission == TRUE) %>%
     dplyr::group_by(one_month) %>%
-    dplyr::summarise(Readm = n())
+    dplyr::summarise(Readm = dplyr::n())
 
 
   dt_reamd_disch <- dplyr::left_join(dt_calc_disch, dt_calc_readm) %>%

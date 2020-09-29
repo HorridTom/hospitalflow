@@ -30,13 +30,13 @@ mortality_timeser <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz 
 
   dt_calc_disch <- dt_calc %>%
     dplyr::group_by(one_month) %>%
-    dplyr::summarise(N = n())
+    dplyr::summarise(N = dplyr::n())
 
 
   dt_calc_deaths <- dt_calc  %>%
     dplyr::filter(died_ip == TRUE) %>%
     dplyr::group_by(one_month) %>%
-    dplyr::summarise(Deaths = n())
+    dplyr::summarise(Deaths = dplyr::n())
 
 
   dt_deaths_disch <- dplyr::left_join(dt_calc_disch, dt_calc_deaths) %>%
