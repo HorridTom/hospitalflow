@@ -106,7 +106,7 @@ four_hrs_perf <- function(start_dt,
 
   }else{
 
-   four_hr_plot$data
+   four_hr_plot$data %>% tibble::as_tibble()
 
   }
 
