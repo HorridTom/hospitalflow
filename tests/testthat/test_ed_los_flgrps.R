@@ -1,9 +1,10 @@
 context("ED length of stay for flow groups for real random data")
 library(hospitalflow)
 
-test_that("ed lenght of stay for flow groups is calculated correctly",{
+test_that("ed length of stay for flow groups is calculated correctly",{
 
-  correct_answers <- readRDS("testdata/ed_los_flows/correct_answers.rds")
+  correct_answers <- readRDS("testdata/ed_los_flows/correct_answers.rds") %>%
+    dplyr::ungroup()
 
   ed_los_flow_groups <- readRDS("testdata/ed_los_flows/ed_los_flows.rds")
 

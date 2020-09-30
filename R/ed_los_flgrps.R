@@ -119,8 +119,9 @@ ed_los_flow_grps <- function(start_date, end_date, data, plot_chart, hospital_na
 
   }else{
 
-    plot_ed_los_flgrps$data %>% dplyr::select(Time_binned,flow_groups, Count)
-
+    plot_ed_los_flgrps$data %>%
+      dplyr::select(Time_binned,flow_groups, Count) %>%
+      dplyr::ungroup()
 
   }
 
