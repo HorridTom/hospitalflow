@@ -88,7 +88,8 @@ test_that("directorate is calculated correctly",{
 
  # Extract only the spell number and directorate
   result <- add_directorate_variable(dt) %>%
-    dplyr::select(spell_number, directorate)
+    dplyr::select(spell_number, directorate) %>%
+    dplyr::arrange(spell_number)
 
 
   result$spell_number <- as.character(result$spell_number)
