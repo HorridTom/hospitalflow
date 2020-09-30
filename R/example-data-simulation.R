@@ -40,7 +40,7 @@ get_simulated_ed_data <- function(npat = 1000, start = as.POSIXct("2019-01-01 00
 get_simulated_ip_data <- function(npat = 800,
                                   start = as.POSIXct("2019-01-01 00:00:00"),
                                   end = as.POSIXct("2019-04-01 00:00:00"),
-                                  ed_data = ed_data_sim) {
+                                  ed_data = example_ed_data) {
 
   #get patients admistted from ED
   ed_admissions <- ed_data %>%
@@ -75,7 +75,7 @@ get_simulated_ip_data <- function(npat = 800,
     mutate(discharge_method = get_discharge_method()) %>%
     mutate(discharge_destination = get_discharge_destination()) %>%
     mutate(patient_classification = get_patient_classification()) %>%
-    mutate(main_speciality = get_main_speciality()) %>%
+    mutate(main_specialty = get_main_specialty()) %>%
     mutate(hrg_code = get_hrg_code())
 
   simulated_data$episode_id <- 1:nrow(simulated_data)
@@ -594,7 +594,7 @@ get_patient_classification <- function(){
 
 
 #main_speciality
-get_main_speciality <- function(){
+get_main_specialty <- function(){
 
   ranNum <- runif(1, 0, 100)
 
