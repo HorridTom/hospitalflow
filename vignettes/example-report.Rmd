@@ -5,6 +5,10 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 params:
   sample_weeks: 2
+  #set all three to NA if new spell table is to be generated "~/cw-data/spell_table_cw_20190902_b7fae6f7.rds"
+  existing_spell_table_path: "~/cw-data/spell_table_cw_20190902_b7fae6f7.rds"
+  existing_ed_data_path: "~/hospitalflow/data/example_ed_data.rds"
+  existing_ip_data_path: "~/hospitalflow/data/example_inpatient_data.rds"
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -30,6 +34,8 @@ Package version: `r stringr::str_sub(system("git rev-parse HEAD", intern=TRUE), 
 Number of weeks used as sample: `r params$sample_weeks`
 
 ```{r import-data, cache=TRUE, echo=FALSE}
+if(is.na(params$existing_spell_table_path)){
+
 # Import and Standardise Data
 
 import_list <- readRDS("../lgt-config/lgt_import_list.rds")
@@ -47,50 +53,74 @@ import_list <- lapply(import_list, function(x) {
 })
 
 data_list <- hospitalflow::import_standardise_bind(import_list)
+}
 ```
 
 ```{r spell-table, cache=TRUE, echo=FALSE}
-ed_data <- data_list[["ED"]] %>% dplyr::filter(site == "QEH")
-inpatient_data <- data_list[["IP"]] %>% dplyr::filter(site == "QEH")
-
-data_start_date <- as.Date(max(min(ed_data$start_datetime, na.rm = TRUE),
+if(is.na(params$existing_spell_table_path)){
+  ed_data <- data_list[["ED"]] %>% dplyr::filter(site == "QEH")
+  inpatient_data <- data_list[["IP"]] %>% dplyr::filter(site == "QEH")
+  
+  data_start_date <- as.Date(max(min(ed_data$start_datetime, na.rm = TRUE),
                        min(ed_data$end_datetime, na.rm = TRUE),
                        min(inpatient_data$start_datetime, na.rm = TRUE),
                        min(inpatient_data$end_datetime, na.rm = TRUE)))
-data_end_date <- as.Date(min(max(ed_data$start_datetime, na.rm = TRUE),
-                     max(ed_data$end_datetime, na.rm = TRUE),
-                     max(inpatient_data$start_datetime, na.rm = TRUE),
-                     max(inpatient_data$end_datetime, na.rm = TRUE)))
+  data_end_date <- as.Date(min(max(ed_data$start_datetime, na.rm = TRUE),
+                      max(ed_data$end_datetime, na.rm = TRUE),
+                      max(inpatient_data$start_datetime, na.rm = TRUE),
+                      max(inpatient_data$end_datetime, na.rm = TRUE)))
+}else{
+  example_ed_data <- readRDS(params$existing_ed_data_path)
+  example_inpatient_data <- readRDS(params$existing_ip_data_path)
+  
+  example_spell_table <- readRDS(params$existing_spell_table_path)
+  
+  data_start_date <- as.Date(max(min(example_spell_table$spell_start, na.rm = TRUE),
+                       min(example_spell_table$spell_end, na.rm = TRUE)))
+  data_end_date <- as.Date(min(max(example_spell_table$spell_start, na.rm = TRUE),
+                      max(example_spell_table$spell_end, na.rm = TRUE)))
+}
+
 start_date <- data_start_date
 end_date <- data_end_date
 
-if(!is.na(sample_duration)) {
-  
-  data_start_date <- lubridate::ceiling_date(data_start_date, "month")
-  data_end_date <- lubridate::floor_date(data_end_date, "month")
-  
-  if(data_end_date - data_start_date > sample_duration) {
-    start_date <- data_end_date - sample_duration
-    end_date <- data_end_date
-    example_ed_data <- ed_data %>% dplyr::filter(start_datetime <= end_date,
-                                                 end_datetime >= start_date)
-    example_inpatient_data <- inpatient_data %>% dplyr::filter(start_datetime <= end_date,
-                                                               end_datetime >= start_date)
-  } else {
-    example_ed_data <- ed_data
-    example_inpatient_data <- inpatient_data
+if(is.na(params$existing_spell_table_path)){
+  if(!is.na(sample_duration)) {
+    
+    data_start_date <- lubridate::ceiling_date(data_start_date, "month")
+    data_end_date <- lubridate::floor_date(data_end_date, "month")
+    
+    if(data_end_date - data_start_date > sample_duration) {
+        start_date <- data_end_date - sample_duration
+        end_date <- data_end_date
+        
+        example_ed_data <- ed_data %>% dplyr::filter(start_datetime <= end_date,
+                                                     end_datetime >= start_date)
+        example_inpatient_data <- inpatient_data %>% dplyr::filter(start_datetime <= end_date,
+                                                                  end_datetime >= start_date)
+    
+      }else{
+        example_ed_data <- ed_data
+        example_inpatient_data <- inpatient_data
+      }
+    }else{
+      example_ed_data <- ed_data
+      example_inpatient_data <- inpatient_data
   }
-} else {
-  example_ed_data <- ed_data
-  example_inpatient_data <- inpatient_data
+  
+  example_spell_table <- hospitalflow::make_spell_table(ed_data = example_ed_data,
+                                                        inpatient_data = example_inpatient_data)
+  
+  example_spell_table <- hospitalflow::add_spell_variables(ed_data = example_ed_data,
+                                                           inpatient_data = example_inpatient_data,
+                                                           spell_table = example_spell_table)
+}else{
+  example_spell_table <- readRDS(params$existing_spell_table_path)
+  example_spell_table <- hospitalflow::add_spell_variables(ed_data = example_ed_data,
+                                                           inpatient_data = example_inpatient_data,
+                                                           spell_table = example_spell_table)
 }
 
-example_spell_table <- hospitalflow::make_spell_table(ed_data = example_ed_data,
-                                                      inpatient_data = example_inpatient_data)
-
-example_spell_table <- hospitalflow::add_spell_variables(ed_data = example_ed_data,
-                                                         inpatient_data = example_inpatient_data,
-                                                         spell_table = example_spell_table)
 ```
 ## Example dataset
 This example report is based on `r nrow(example_ed_data)` emergency department attendances and `r nrow(example_inpatient_data)` inpatient episodes of care, linked into `r nrow(example_spell_table)` hospital spells. All attendances and admissions occurred prior to `r end_date` and all discharges after `r start_date`.
