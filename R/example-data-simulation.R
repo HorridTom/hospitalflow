@@ -66,9 +66,20 @@ get_simulated_ip_data <- function(npat = 800,
   simulated_data <- get_simulated_admission_data(simulated_pat_data, start = start, end = end, los_rate = (1/388800))
   simulated_data <- simulated_data[[2]]
 
+  #add extra rows for 14 and 28 day readmissions
+  simulated_readmissions_14 <- simulated_data[rep((nrow(simulated_data) - 20):nrow(simulated_data),1),]
+  simulated_readmissions_14 <- simulated_readmissions_14 %>%
+    mutate(start_datetime = start_datetime + lubridate::days(13), end_datetime = end_datetime + lubridate::days(13))
+
+  simulated_readmissions_28 <- simulated_data[rep((nrow(simulated_data) - 40):(nrow(simulated_data) - 21),1),]
+  simulated_readmissions_28 <- simulated_readmissions_28 %>%
+    mutate(start_datetime = start_datetime + lubridate::days(27), end_datetime = end_datetime + lubridate::days(27))
+
   simulated_data <- simulated_data %>%
     select(-c(pseudo_id1)) %>%
     rowwise() %>%
+    bind_rows(simulated_readmissions_14) %>%
+    bind_rows(simulated_readmissions_28) %>%
     mutate(admission_method = get_admission_method()) %>%
     bind_rows(ed_admissions) %>%
     mutate(source_of_admission = get_source_of_admission()) %>%
@@ -383,15 +394,67 @@ get_hrg_code <- function(){
   ranNum <- round(runif(1, 1, 5))
 
   if(ranNum == 1){
-    hrg_code <- "AA123"
+    hrg_code <- "AA02Z"
   }else if(ranNum == 2){
-    hrg_code <- "BB567"
+    hrg_code <- "AA03B"
   }else if(ranNum == 3){
-    hrg_code <- "CC890"
+    hrg_code <- "AA03Z"
   }else if(ranNum == 4){
-    hrg_code <- "DD345"
+    hrg_code <- "AA18B"
   }else if(ranNum == 5){
-    hrg_code <- "EE678"
+    hrg_code <- "WA21Y"
+  }else if(ranNum == 2){
+    hrg_code <- "AA15Z"
+  }else if(ranNum == 3){
+    hrg_code <- "AA16Z"
+  }else if(ranNum == 4){
+    hrg_code <- "AA18B"
+  }else if(ranNum == 5){
+    hrg_code <- "WA22X"
+  }else if(ranNum == 2){
+    hrg_code <- "WD22Z"
+  }else if(ranNum == 3){
+    hrg_code <- "AA09Z"
+  }else if(ranNum == 4){
+    hrg_code <- "AA09B"
+  }else if(ranNum == 5){
+    hrg_code <- "WA22V"
+  }else if(ranNum == 4){
+    hrg_code <- "AA09A"
+  }else if(ranNum == 5){
+    hrg_code <- "WA21W"
+  }else if(ranNum == 2){
+    hrg_code <- "AA08Z"
+  }else if(ranNum == 3){
+    hrg_code <- "WD11Z"
+  }else if(ranNum == 4){
+    hrg_code <- "AA20A"
+  }else if(ranNum == 5){
+    hrg_code <- "AA19Z"
+  }else if(ranNum == 2){
+    hrg_code <- "WA20Y"
+  }else if(ranNum == 3){
+    hrg_code <- "WA20W"
+  }else if(ranNum == 4){
+    hrg_code <- "WA19Y"
+  }else if(ranNum == 5){
+    hrg_code <- "WA24Z"
+  }else if(ranNum == 2){
+    hrg_code <- "WA19W"
+  }else if(ranNum == 3){
+    hrg_code <- "AA08A"
+  }else if(ranNum == 4){
+    hrg_code <- "AA06Z"
+  }else if(ranNum == 5){
+    hrg_code <- "WA23X"
+  }else if(ranNum == 2){
+    hrg_code <- "WA23Y"
+  }else if(ranNum == 3){
+    hrg_code <- "VB02Z"
+  }else if(ranNum == 4){
+    hrg_code <- "VB07Z"
+  }else if(ranNum == 5){
+    hrg_code <- "VB09Z"
   }else{
     hrg_code <- NA
   }
