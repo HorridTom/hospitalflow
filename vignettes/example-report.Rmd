@@ -6,7 +6,7 @@ output: rmarkdown::html_vignette
 params:
   sample_weeks: 2
   #set all three to NA if new spell table is to be generated "~/cw-data/spell_table_cw_20190902_b7fae6f7.rds"
-  existing_spell_table_path: "~/cw-data/spell_table_cw_20190902_b7fae6f7.rds"
+  existing_spell_table_path: "~/hospitalflow/data/example_spell_table_add_vars.rds"
   existing_ed_data_path: "~/hospitalflow/data/example_ed_data.rds"
   existing_ip_data_path: "~/hospitalflow/data/example_inpatient_data.rds"
 vignette: >
@@ -86,19 +86,19 @@ end_date <- data_end_date
 
 if(is.na(params$existing_spell_table_path)){
   if(!is.na(sample_duration)) {
-    
+
     data_start_date <- lubridate::ceiling_date(data_start_date, "month")
     data_end_date <- lubridate::floor_date(data_end_date, "month")
-    
+
     if(data_end_date - data_start_date > sample_duration) {
         start_date <- data_end_date - sample_duration
         end_date <- data_end_date
-        
+
         example_ed_data <- ed_data %>% dplyr::filter(start_datetime <= end_date,
                                                      end_datetime >= start_date)
         example_inpatient_data <- inpatient_data %>% dplyr::filter(start_datetime <= end_date,
                                                                   end_datetime >= start_date)
-    
+
       }else{
         example_ed_data <- ed_data
         example_inpatient_data <- inpatient_data
@@ -107,18 +107,18 @@ if(is.na(params$existing_spell_table_path)){
       example_ed_data <- ed_data
       example_inpatient_data <- inpatient_data
   }
-  
+
   example_spell_table <- hospitalflow::make_spell_table(ed_data = example_ed_data,
                                                         inpatient_data = example_inpatient_data)
-  
+
   example_spell_table <- hospitalflow::add_spell_variables(ed_data = example_ed_data,
                                                            inpatient_data = example_inpatient_data,
                                                            spell_table = example_spell_table)
 }else{
   example_spell_table <- readRDS(params$existing_spell_table_path)
-  example_spell_table <- hospitalflow::add_spell_variables(ed_data = example_ed_data,
-                                                           inpatient_data = example_inpatient_data,
-                                                           spell_table = example_spell_table)
+  # example_spell_table <- hospitalflow::add_spell_variables(ed_data = example_ed_data,
+  #                                                          inpatient_data = example_inpatient_data,
+  #                                                          spell_table = example_spell_table)
 }
 
 ```
