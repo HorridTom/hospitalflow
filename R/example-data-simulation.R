@@ -76,7 +76,6 @@ get_simulated_ip_data <- function(npat = 800,
     mutate(start_datetime = start_datetime + lubridate::days(27), end_datetime = end_datetime + lubridate::days(27))
 
   simulated_data <- simulated_data %>%
-    select(-c(pseudo_id1)) %>%
     rowwise() %>%
     bind_rows(simulated_readmissions_14) %>%
     bind_rows(simulated_readmissions_28) %>%
@@ -87,7 +86,12 @@ get_simulated_ip_data <- function(npat = 800,
     mutate(discharge_destination = get_discharge_destination()) %>%
     mutate(patient_classification = get_patient_classification()) %>%
     mutate(main_specialty = get_main_specialty()) %>%
-    mutate(hrg_code = get_hrg_code())
+    mutate(local_subspecialty = main_specialty) %>%
+    mutate(diagnosis_code = get_diagnosis_code()) %>%
+    mutate(ward_category = get_ward_category()) %>%
+    mutate(consultant = get_consultant()) %>%
+    mutate(hrg_code = get_hrg_code()) %>%
+    select(-pseudo_id1)
 
   simulated_data$episode_id <- 1:nrow(simulated_data)
 
@@ -391,7 +395,7 @@ get_referral_source <- function(){
 #function to return randomised fake hrg_code
 get_hrg_code <- function(){
 
-  ranNum <- round(runif(1, 1, 5))
+  ranNum <- round(runif(1, 1, 31))
 
   if(ranNum == 1){
     hrg_code <- "AA02Z"
@@ -403,57 +407,57 @@ get_hrg_code <- function(){
     hrg_code <- "AA18B"
   }else if(ranNum == 5){
     hrg_code <- "WA21Y"
-  }else if(ranNum == 2){
+  }else if(ranNum == 6){
     hrg_code <- "AA15Z"
-  }else if(ranNum == 3){
+  }else if(ranNum == 7){
     hrg_code <- "AA16Z"
-  }else if(ranNum == 4){
+  }else if(ranNum == 8){
     hrg_code <- "AA18B"
-  }else if(ranNum == 5){
+  }else if(ranNum == 9){
     hrg_code <- "WA22X"
-  }else if(ranNum == 2){
+  }else if(ranNum == 10){
     hrg_code <- "WD22Z"
-  }else if(ranNum == 3){
+  }else if(ranNum == 11){
     hrg_code <- "AA09Z"
-  }else if(ranNum == 4){
+  }else if(ranNum == 12){
     hrg_code <- "AA09B"
-  }else if(ranNum == 5){
+  }else if(ranNum == 13){
     hrg_code <- "WA22V"
-  }else if(ranNum == 4){
+  }else if(ranNum == 14){
     hrg_code <- "AA09A"
-  }else if(ranNum == 5){
+  }else if(ranNum == 15){
     hrg_code <- "WA21W"
-  }else if(ranNum == 2){
+  }else if(ranNum == 16){
     hrg_code <- "AA08Z"
-  }else if(ranNum == 3){
+  }else if(ranNum == 17){
     hrg_code <- "WD11Z"
-  }else if(ranNum == 4){
+  }else if(ranNum == 18){
     hrg_code <- "AA20A"
-  }else if(ranNum == 5){
+  }else if(ranNum == 19){
     hrg_code <- "AA19Z"
-  }else if(ranNum == 2){
+  }else if(ranNum == 20){
     hrg_code <- "WA20Y"
-  }else if(ranNum == 3){
+  }else if(ranNum == 21){
     hrg_code <- "WA20W"
-  }else if(ranNum == 4){
+  }else if(ranNum == 22){
     hrg_code <- "WA19Y"
-  }else if(ranNum == 5){
+  }else if(ranNum == 23){
     hrg_code <- "WA24Z"
-  }else if(ranNum == 2){
+  }else if(ranNum == 24){
     hrg_code <- "WA19W"
-  }else if(ranNum == 3){
+  }else if(ranNum == 25){
     hrg_code <- "AA08A"
-  }else if(ranNum == 4){
+  }else if(ranNum == 26){
     hrg_code <- "AA06Z"
-  }else if(ranNum == 5){
+  }else if(ranNum == 27){
     hrg_code <- "WA23X"
-  }else if(ranNum == 2){
+  }else if(ranNum == 28){
     hrg_code <- "WA23Y"
-  }else if(ranNum == 3){
+  }else if(ranNum == 29){
     hrg_code <- "VB02Z"
-  }else if(ranNum == 4){
+  }else if(ranNum == 30){
     hrg_code <- "VB07Z"
-  }else if(ranNum == 5){
+  }else if(ranNum == 31){
     hrg_code <- "VB09Z"
   }else{
     hrg_code <- NA
@@ -698,8 +702,120 @@ get_main_specialty <- function(){
   }else if(ranNum <= 91.43656){
     main_speciality <- "ENT"
   }else{
-    main_speciality <- NA
+    main_speciality <- "RESPIRATORY MEDICINE"
   }
 
   main_speciality
 }
+
+
+#diagnosis_code
+get_diagnosis_code <- function(){
+
+  ranNum <- runif(1, 0, 19)
+
+  if(ranNum <= 1){
+    diagnosis_code <- "A409"
+  }else if(ranNum <= 2){
+    diagnosis_code <-"A492"
+  }else if(ranNum <= 3){
+    diagnosis_code <- "B179"
+  }else if(ranNum <= 4){
+    diagnosis_code <- "D643"
+  }else if(ranNum <= 5){
+    diagnosis_code <- "D821"
+  }else if(ranNum <= 6){
+    diagnosis_code <- "F458"
+  }else if(ranNum <= 7){
+    diagnosis_code <- "E880"
+  }else if(ranNum <= 8){
+    diagnosis_code <- "G030"
+  }else if(ranNum <= 9){
+    diagnosis_code <- "F681"
+  }else if(ranNum <= 10){
+    diagnosis_code <- "G048"
+  }else if(ranNum <= 11){
+    diagnosis_code <- "E209"
+  }else if(ranNum <= 12){
+    diagnosis_code <- "F500"
+  }else if(ranNum <= 13){
+    diagnosis_code <- "F801"
+  }else if(ranNum <= 14){
+    diagnosis_code <- "D093"
+  }else if(ranNum <= 15){
+    diagnosis_code <- "C717"
+  }else if(ranNum <= 16){
+    diagnosis_code <- "D222"
+  }else if(ranNum <= 17){
+    diagnosis_code <- "F99X"
+  }else if(ranNum <= 18){
+    diagnosis_code <- "G052"
+  }else{
+    diagnosis_code <- "A041"
+  }
+
+  diagnosis_code
+}
+
+
+#ward_category
+get_ward_category <- function(){
+
+  ranNum <- runif(1, 0, 100)
+
+  if(ranNum <= 10){
+    ward_category <- "Ward 1"
+  }else if(ranNum <= 20){
+    ward_category <-"Ward 2"
+  }else if(ranNum <= 30){
+    ward_category <- "Ward 3"
+  }else if(ranNum <= 40){
+    ward_category <- "Ward 4"
+  }else if(ranNum <= 50){
+    ward_category <- "Ward 5"
+  }else if(ranNum <= 60){
+    ward_category <- "Ward 6"
+  }else if(ranNum <= 70){
+    ward_category <- "Ward 7"
+  }else if(ranNum <= 80){
+    ward_category <- "Ward 8"
+  }else if(ranNum <= 90){
+    ward_category <- "Ward 9"
+  }else{
+    ward_category <- "Ward 10"
+  }
+
+  ward_category
+}
+
+
+#consultant pseudo_id
+get_consultant <- function(){
+
+  ranNum <- runif(1, 0, 100)
+
+  if(ranNum <= 10){
+    consultant <- "Consultant 1"
+  }else if(ranNum <= 20){
+    consultant <-"Consultant 2"
+  }else if(ranNum <= 30){
+    consultant <- "Consultant 3"
+  }else if(ranNum <= 40){
+    consultant <- "Consultant 4"
+  }else if(ranNum <= 50){
+    consultant <- "Consultant 5"
+  }else if(ranNum <= 60){
+    consultant <- "Consultant 6"
+  }else if(ranNum <= 70){
+    consultant <- "Consultant 7"
+  }else if(ranNum <= 80){
+    consultant <- "Consultant 8"
+  }else if(ranNum <= 90){
+    consultant <- "Consultant 9"
+  }else{
+    consultant <- "Consultant 10"
+  }
+
+  consultant
+}
+
