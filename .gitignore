@@ -30,7 +30,6 @@ rsconnect/
 /tests/testthat/testdata
 
 # Data
-/data
 inst/doc
 
 # Temporarily ignore whole vignette folder as caches contain data
