@@ -1,5 +1,6 @@
 
 #function to get simulated ed data
+#run this first and save output as example_ed_data and then get_simualted_ip_data function
 get_simulated_ed_data <- function(npat = 1000, start = as.POSIXct("2019-01-01 00:00:00"),
                                   end = as.POSIXct("2019-04-01 00:00:00")) {
   simulated_pat_data <- tibble::tibble(pseudo_id = 1:npat,
