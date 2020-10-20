@@ -15,15 +15,13 @@ test_that("deaths by month is giving the right expected answer",{
   )
 
 
-  #Run four_hr_performance
-  result <- mortality_timeser(start_date = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
+  #Run mortality_timeseries
+  result <- mortality_timeseries(start_date = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
                             end_date = as.POSIXct("2019-12-31 00:00:00", tz = "Europe/London"),
                             data = deaths_dt, plot_chart = FALSE, hospital_name = "Hospital_name")
 
   result <- result %>%
     dplyr::select(x, y)
-
-  result$y <- round(result$y, digits = 1)
 
   #Test results are correct
   expect_equal(result, correct_answers, tolerance = 0.1)

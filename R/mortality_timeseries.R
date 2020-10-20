@@ -1,4 +1,4 @@
-#' mortality_timeser
+#' mortality_timeseries
 #'
 #' @param start_date
 #' @param end_date
@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-mortality_timeser <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = "Europe/London"),
+mortality_timeseries <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = "Europe/London"),
          end_date = as.POSIXct("2016-03-31 00:00:00", tz = "Europe/London"),
          data, plot_chart, hospital_name){
 
@@ -108,7 +108,8 @@ mortality_timeser <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz 
 
   }else{
 
-    death_measure_plot$data
+    death_measure_plot$data %>% tibble::as_tibble() %>%
+      dplyr::select(x, y, n, cl, ucl, lcl, sigma.signal, rule1, rule2)
 
   }
 
