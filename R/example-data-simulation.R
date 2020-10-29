@@ -110,6 +110,8 @@ get_simulated_ip_data <- function(npat = 800,
     mutate(hrg_code = get_hrg_code()) %>%
     select(-pseudo_id1)
 
+  simulated_data$episode_id <- 1:nrow(simulated_data)
+
   simulated_data
 
 }
