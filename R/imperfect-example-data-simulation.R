@@ -1,6 +1,18 @@
+#function to get simulated ED and Inpatient data as a list
+get_imperfect_simulated_data_as_list <- function(npat = 10000, start = as.POSIXct("2019-01-01 00:00:00"),
+                                       end = as.POSIXct("2020-01-01 00:00:00")){
+
+
+  example_ed_data <- get_simulated_ed_data(npat = npat, start = start, end = end)
+  example_inpatient_data <- get_simulated_ip_data(npat = npat, start = start, end = end,
+                                                  ed_data = example_ed_data)
+
+  example_data <- list(example_ed_data, example_inpatient_data)
+
+}
+
 
 #function to get simulated ed data
-#run this first and save output as example_ed_data and then get_simualted_ip_data function
 get_simulated_ed_data <- function(npat = 1000, start = as.POSIXct("2019-01-01 00:00:00"),
                                   end = as.POSIXct("2019-04-01 00:00:00")) {
   simulated_pat_data <- tibble::tibble(pseudo_id = 1:npat,
@@ -72,9 +84,13 @@ get_simulated_ip_data <- function(npat = 800,
   simulated_readmissions_14 <- simulated_readmissions_14 %>%
     mutate(start_datetime = start_datetime + lubridate::days(13), end_datetime = end_datetime + lubridate::days(13))
 
-  simulated_readmissions_28 <- simulated_data[rep((nrow(simulated_data) - 40):(nrow(simulated_data) - 21),1),]
+  simulated_readmissions_28 <- simulated_data[rep((nrow(simulated_data) - 60):(nrow(simulated_data) - 21),1),]
   simulated_readmissions_28 <- simulated_readmissions_28 %>%
     mutate(start_datetime = start_datetime + lubridate::days(27), end_datetime = end_datetime + lubridate::days(27))
+
+  simulated_readmissions_90 <- simulated_data[rep((nrow(simulated_data) - 150):(nrow(simulated_data) - 61),1),]
+  simulated_readmissions_90 <- simulated_readmissions_90 %>%
+    mutate(start_datetime = start_datetime + lubridate::days(89), end_datetime = end_datetime + lubridate::days(89))
 
   simulated_data <- simulated_data %>%
     rowwise() %>%
@@ -93,8 +109,6 @@ get_simulated_ip_data <- function(npat = 800,
     mutate(consultant = get_consultant()) %>%
     mutate(hrg_code = get_hrg_code()) %>%
     select(-pseudo_id1)
-
-  simulated_data$episode_id <- 1:nrow(simulated_data)
 
   simulated_data
 
