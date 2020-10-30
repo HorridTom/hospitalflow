@@ -13,8 +13,12 @@
 #'
 #' @examples
 weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "week",
-                                plot_chart, hospital_name, restrict_plot_range = TRUE){
+                                plot_chart, hospital_name, restrict_plot_range = TRUE,
+                                config_path = "lgt-config/ed"){
 
+  #get time zone from config file - assumed that time zone is the same for all time variables
+  datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
+  time_zone <- datetime_formats$time_zone[1]
 
   #selecting the date and creating the flow groups
   dt_select <- data %>%
@@ -49,8 +53,8 @@ weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "week",
 
 
   if(restrict_plot_range) {
-    plot_x_lims <- c(as.POSIXct(start_date, tz = "Europe/London"),
-                     as.POSIXct(end_date, tz = "Europe/London"))
+    plot_x_lims <- c(as.POSIXct(start_date, tz = time_zone),
+                     as.POSIXct(end_date, tz = time_zone))
   } else {
     plot_x_lims <- c(min(count_df %>% dplyr::pull(Time)),
                      max(count_df %>% dplyr::pull(Time)))
