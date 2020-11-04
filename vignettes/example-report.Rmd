@@ -5,6 +5,7 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 params:
   sample_weeks: 2
+  timezone_config_path: "lgt-config/ed"
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -46,7 +47,7 @@ import_list <- lapply(import_list, function(x) {
   facility = x$facility)
 })
 
-data_list <- hospitalflow::import_standardise_bind(import_list)
+data_list <- hospitalflow::import_standardise_bind(import_list, tz_config_path = params$timezone_config_path)
 ```
 
 ```{r spell-table, cache=TRUE, echo=FALSE}
@@ -101,7 +102,8 @@ This example report is based on `r nrow(example_ed_data)` emergency department a
 hospitalflow::ae_attendances_admissions_age_sex(start_date = start_date, end_date = end_date,
                                                 data = example_spell_table,
                                                 plot_chart = TRUE,
-                                                hospital_name = "Anytown General Hospital")
+                                                hospital_name = "Anytown General Hospital",
+                                                config_path = params$timezone_config_path)
 ```
 
 ## Arrival Occupancy
@@ -111,7 +113,8 @@ hospitalflow::ae_arrival_occupancy(start_date = as.POSIXct(start_date, tz = "Eur
                                    end_date = as.POSIXct(end_date, tz = "Europe/London"),
                                    data = example_spell_table,
                                    plot_chart = TRUE,
-                                   hospital_name = "Anytown General Hospital")
+                                   hospital_name = "Anytown General Hospital",
+                                   config_path = params$timezone_config_path)
 ```
 
 ## Four hour performance by flow group
@@ -122,7 +125,8 @@ hospitalflow::four_hrs_perf_flow_groups(start_dt = as.Date(start_date),
                                    data = example_spell_table,
                                    time_unit = "day",
                                    plot_chart = TRUE,
-                                   hospital_name = "Anytown General Hospital")
+                                   hospital_name = "Anytown General Hospital",
+                                   config_path = params$timezone_config_path)
 ```
 
 ## Duration in ED by flow group
@@ -142,7 +146,8 @@ hospitalflow::ed_los_flow_grps(start_date = start_date, end_date = end_date,
 hospitalflow::los_att_adm_ae(start_date = start_date, end_date = end_date,
                              data = example_spell_table,
                              plot_chart = TRUE,
-                             hospital_name = "Anytown General Hospital")
+                             hospital_name = "Anytown General Hospital", 
+                             config_path = params$timezone_config_path)
 ```
 
 ## Duration in ED by flow group
@@ -151,7 +156,8 @@ hospitalflow::los_att_adm_ae(start_date = start_date, end_date = end_date,
 hospitalflow::average_ed_los_flows(start_date = start_date, end_date = end_date,
                              data = example_spell_table,
                              plot_chart = TRUE,
-                             hospital_name = "Anytown General Hospital")
+                             hospital_name = "Anytown General Hospital", 
+                             config_path = params$timezone_config_path)
 ```
 
 
@@ -163,7 +169,8 @@ hospitalflow::average_ed_los_flows(start_date = start_date, end_date = end_date,
 hospitalflow::admissions_discharges(start_date = start_date, end_date = end_date,
                                     data = example_spell_table,
                                     plot_chart = TRUE,
-                                    hospital_name = "Anytown General Hospital")
+                                    hospital_name = "Anytown General Hospital", 
+                                    config_path = params$timezone_config_path)
 ```
 
 
@@ -173,7 +180,8 @@ hospitalflow::admissions_discharges(start_date = start_date, end_date = end_date
 hospitalflow::los_distrib_method_admission(start_date = start_date, end_date = end_date,
                                            data = example_spell_table,
                                            plot_chart = TRUE,
-                                           hospital_name = "Anytown General Hospital")
+                                           hospital_name = "Anytown General Hospital", 
+                                           config_path = params$timezone_config_path)
 ```
 
 ## ED occupancy by hour of week
@@ -191,7 +199,8 @@ hospitalflow::occupancy_weekday_hour(start_date = as.POSIXct(start_date, tz = "E
                                    end_date = as.POSIXct(end_date, tz = "Europe/London"),
                                    data = example_spell_table,
                                    plot_chart = TRUE,
-                                   hospital_name = "Anytown General Hospital")
+                                   hospital_name = "Anytown General Hospital", 
+                                   config_path = params$timezone_config_path)
 ```
 
 ## Monthly 7-day Readmission Rate
@@ -201,7 +210,8 @@ hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/L
                               data = example_spell_table,
                               plot_chart = TRUE,
                               hospital_name = "Anytown General Hospital",
-                              readmission_by = 7)
+                              readmission_by = 7, 
+                              config_path = params$timezone_config_path)
 ```
 
 ## Monthly 30-day Readmission Rate
@@ -211,7 +221,8 @@ hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/L
                               data = example_spell_table,
                               plot_chart = TRUE,
                               hospital_name = "Anytown General Hospital",
-                              readmission_by = 30)
+                              readmission_by = 30, 
+                              config_path = params$timezone_config_path)
 ```
 
 ## Monthly 90-day Readmission Rate
@@ -221,5 +232,6 @@ hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/L
                               data = example_spell_table,
                               plot_chart = TRUE,
                               hospital_name = "Anytown General Hospital",
-                              readmission_by = 90)
+                              readmission_by = 90, 
+                              config_path = params$timezone_config_path)
 ```

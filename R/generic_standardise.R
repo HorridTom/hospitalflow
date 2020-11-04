@@ -337,8 +337,8 @@ bind_into_facilities <- function(data_config_list) {
 #' tibble is formed by row binding all imported data for that facility.
 #' @export
 #'
-import_standardise_bind <- function(data_import_list) {
-  data_config_list <- import_and_standardise(data_import_list)
+import_standardise_bind <- function(data_import_list, tz_config_path = "lgt-config/ed") {
+  data_config_list <- import_and_standardise(data_import_list, tz_config_path)
   bind_into_facilities(data_config_list)
 }
 
