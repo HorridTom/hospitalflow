@@ -15,9 +15,17 @@
 #' end_date = "2015-01-01 00:00:00",
 #' data = test_data_age_sex_att_adm, plot_chart = TRUE)
 #' }
-ae_attendances_admissions_age_sex <- function(start_date = as.Date("2016-01-01", tz = "Europe/London"),
-                                              end_date = as.Date("2017-01-01", tz = "Europe/London"),
-                                              data, plot_chart, hospital_name = "Hospital name"){
+ae_attendances_admissions_age_sex <- function(start_date = as.Date("2016-01-01"),
+                                              end_date = as.Date("2017-01-01"),
+                                              data, plot_chart, hospital_name = "Hospital name",
+                                              config_path = "lgt-config/ed"){
+
+  #get time zone from config file - assumed that time zone is the same for all time variables
+  datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
+  time_zone <- datetime_formats$time_zone[1]
+
+  start_date <- as.POSIXct(start_date, tz = time_zone)
+  end_date <- as.POSIXct(end_date, tz = time_zone)
 
   dt <- data %>%
     dplyr::filter(spell_start <= end_date & spell_end >= start_date) %>%
@@ -101,8 +109,13 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2016-01-01",
 #' @return
 #' @export
 #'
-age_sex <- function() {
-  ae_attendances_admissions_age_sex(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-                                    end_date = as.Date("2015-01-01", tz = "Europe/London"),
+age_sex <- function(config_path = "lgt-config/ed") {
+
+  #get time zone from config file - assumed that time zone is the same for all time variables
+  datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
+  time_zone <- datetime_formats$time_zone[1]
+
+  ae_attendances_admissions_age_sex(start_date = as.Date("2012-01-01", tz = time_zone),
+                                    end_date = as.Date("2015-01-01", tz = time_zone),
                                     data = hospitalflow::cw_disch_201201_201507_782cfa21_stddt_s, plot_chart = TRUE, hospital_name = "Hospital name")
 }

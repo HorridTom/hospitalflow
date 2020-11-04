@@ -205,7 +205,12 @@ get_colname_mapping <- function(config_path) {
 #' @export
 #'
 #' @examples
-import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
+import_and_standardise <- function(data_import_list, remove_duplicates = TRUE,
+                                   tz_config_path = "lgt-config/ed") {
+
+  #get time zone from config file - assumed that time zone is the same for all time variables
+  datetime_formats <- readRDS(file.path(tz_config_path, "datetime_formats.rds"))
+  time_zone <- datetime_formats$time_zone[1]
 
   # Take the data_import_list and for each element x, load the data located at data_path
   # using configuration specified by the files at config_path.
@@ -213,7 +218,7 @@ import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
   # get_import_col_types from the config files.
   data_config_list <- lapply(data_import_list,
                              function(x) {list(data = readr::read_csv(x$data_path,
-                                                                      locale = readr::locale(tz = 'Europe/London'),
+                                                                      locale = readr::locale(tz = time_zone),
                                                                       col_types = eval(rlang::call2(readr::cols,
                                                                                                     !!!get_import_col_types(x$config_path),
                                                                                                     .default = readr::col_skip()))),

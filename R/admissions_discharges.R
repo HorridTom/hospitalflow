@@ -27,12 +27,17 @@
 ###################################
 # Admission Discharges ############
 #####################################################################################################
-admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europe/London"),
-                                  end_date = as.Date("2018-12-23",tz = "Europe/London"),
-                                  data, plot_chart, hospital_name = "Chelsea & Westminster"){
+admissions_discharges <- function(start_date = as.Date("2018-12-10"),
+                                  end_date = as.Date("2018-12-23"),
+                                  data, plot_chart, hospital_name = "Chelsea & Westminster",
+                                  config_path = "lgt-config/ed"){
 
-  # start_date = as.Date("2017-01-01", tz = "Europe/London")
-  # end_date = as.Date("2017-02-01",tz = "Europe/London")
+  #get time zone from config file - assumed that time zone is the same for all time variables
+  datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
+  time_zone <- datetime_formats$time_zone[1]
+
+  start_date <- as.POSIXct(start_date, tz = time_zone)
+  end_date <- as.POSIXct(end_date, tz = time_zone)
 
   #selecting the variables needed, with new variables created
   admission_discharge <- data  %>%
@@ -193,8 +198,8 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
 #' @export
 #'
 adm_disch_day_of_week <- function() {
-  admissions_discharges(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-                                    end_date = as.Date("2015-01-01", tz = "Europe/London"),
+  admissions_discharges(start_date = as.Date("2012-01-01", tz = time_zone),
+                                    end_date = as.Date("2015-01-01", tz = time_zone),
                                     data = hospitalflow::cw_disch_201201_201507_782cfa21_stddt_s, plot_chart = TRUE, hospital_name = "Chelsea & Westminster")
 }
 

@@ -10,9 +10,17 @@
 #' @export
 #'
 #' @examples
-los_att_adm_ae <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-                           end_date = as.Date("2013-01-01", tz = "Europe/London"),
-                           data, plot_chart, hospital_name = "Chelsea & Westminster"){
+los_att_adm_ae <- function(start_date = as.Date("2012-01-01"),
+                           end_date = as.Date("2013-01-01"),
+                           data, plot_chart, hospital_name = "Chelsea & Westminster",
+                           config_path = "lgt-config/ed"){
+
+  #get time zone from config file - assumed that time zone is the same for all time variables
+  datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
+  time_zone <- datetime_formats$time_zone[1]
+
+  start_date <- as.POSIXct(start_date, tz = time_zone)
+  end_date <- as.POSIXct(end_date, tz = time_zone)
 
   df <- data %>%
     dplyr::select(spell_number, spell_start, spell_end, spell_class_col, initial_ed_end_datetime) %>%

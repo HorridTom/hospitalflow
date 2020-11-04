@@ -10,8 +10,17 @@
 #' @export
 #'
 #' @examples
-los_distrib_method_admission <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"), end_date = as.Date("2015-01-01", tz = "Europe/London"),
-                                         data, plot_chart, hospital_name = "Hospital Name"){
+los_distrib_method_admission <- function(start_date = as.Date("2012-01-01"),
+                                         end_date = as.Date("2015-01-01"),
+                                         data, plot_chart, hospital_name = "Hospital Name",
+                                         config_path = "lgt-config/ed"){
+
+  #get time zone from config file - assumed that time zone is the same for all time variables
+  datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
+  time_zone <- datetime_formats$time_zone[1]
+
+  start_date <- as.POSIXct(start_date, tz = time_zone)
+  end_date <- as.POSIXct(end_date, tz = time_zone)
 
 
   #subseting data set

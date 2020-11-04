@@ -18,7 +18,12 @@
 #' @examples
 four_hrs_perf <- function(start_dt,
                           end_dt,
-                          data, time_unit = "day", plot_chart, hospital_name = "Hospital_Name"){
+                          data, time_unit = "day", plot_chart, hospital_name = "Hospital_Name",
+                          config_path = "lgt-config/ed"){
+
+  #get time zone from config file - assumed that time zone is the same for all time variables
+  datetime_formats <- readRDS(file.path(config_path, "datetime_formats.rds"))
+  time_zone <- datetime_formats$time_zone[1]
 
   dt_select <- data %>%
     dplyr::select(pseudo_id, start_datetime, end_datetime) %>%
@@ -71,14 +76,14 @@ four_hrs_perf <- function(start_dt,
   pct <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf, chart = 'pp', ylab = "percent",
                         show.grid = TRUE, multiply= 100)
 
-  pct$data$x <- as.Date(pct$data$x, tz = "Europe/London")
+  pct$data$x <- as.Date(pct$data$x, tz = time_zone)
   cht_data <- add_rule_breaks(pct$data)
   pct <- ggplot2::ggplot(cht_data, ggplot2::aes(x, y, label = x))
   cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
   #convert arguments to dates and round to nearest quarter
-  st.dt <- as.Date(start_dt, format = "%Y-%m-%d", tz = "Europe/London")
-  ed.dt <- as.Date(end_dt, format = "%Y-%m-%d", tz = "Europe/London")
+  st.dt <- as.Date(start_dt, format = "%Y-%m-%d", tz = time_zone)
+  ed.dt <- as.Date(end_dt, format = "%Y-%m-%d", tz = time_zone)
   #q.st.dt <- as.Date(zoo::as.yearqtr(st.dt, format = "%Y-%m-%d"))
   #q.ed.dt <- as.Date(zoo::as.yearqtr(ed.dt, format = "%Y-%m-%d"), frac = 1) + 1
   cht_axis_breaks <- seq(st.dt, ed.dt, by = "quarters")
