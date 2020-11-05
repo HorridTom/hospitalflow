@@ -2,6 +2,7 @@
 #'
 #' @param data
 #' @param plot_chart
+#' @param config_path path to the ed config folder
 #'
 #' @return
 #' @export

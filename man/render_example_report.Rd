@@ -4,7 +4,10 @@
 \alias{render_example_report}
 \title{render_example_report}
 \usage{
-render_example_report(sample_weeks = 4)
+render_example_report(
+  sample_weeks = 4,
+  timezone_config_path = "../lgt-config/ed"
+)
 }
 \arguments{
 \item{sample_weeks}{The number of weeks of sample data to use for the report.}

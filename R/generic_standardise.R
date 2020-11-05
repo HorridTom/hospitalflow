@@ -200,13 +200,14 @@ get_colname_mapping <- function(config_path) {
 #' to i) a csv file to import data from and ii) a folder containing hospitalflow config
 #' files. The latter two specify the site and facility (e.g. ED, IP, UCC).
 #' @param remove_duplicates boolean to control whether data is de-duped (TRUE) or not (FALSE).
+#' @param tz_config_path path to the ed config folder
 #'
 #' @return list of tibbles, each containing standardised import of one data file from data_paths
 #' @export
 #'
 #' @examples
-import_and_standardise <- function(data_import_list, remove_duplicates = TRUE,
-                                   tz_config_path = "lgt-config/ed") {
+import_and_standardise <- function(data_import_list, remove_duplicates = TRUE ,tz_config_path = "../lgt-config/ed"
+                                   ) {
 
   #get time zone from config file - assumed that time zone is the same for all time variables
   datetime_formats <- readRDS(file.path(tz_config_path, "datetime_formats.rds"))
@@ -332,13 +333,15 @@ bind_into_facilities <- function(data_config_list) {
 #' data_path, config_path, site, and facility. The first two of these are character strings specifying the paths
 #' to i) a csv file to import data from and ii) a folder containing hospitalflow config
 #' files. The latter two specify the site and facility (e.g. ED, IP, UCC).
+#' @param tz_config_path path to the ed config folder
 #'
 #' @return list of as many tibbles as there are unique values of facility in the provided config list. Each
 #' tibble is formed by row binding all imported data for that facility.
 #' @export
 #'
-import_standardise_bind <- function(data_import_list, tz_config_path = "lgt-config/ed") {
-  data_config_list <- import_and_standardise(data_import_list, tz_config_path)
+import_standardise_bind <- function(data_import_list, tz_config_path = "lgt-config/ed"
+                                    ) {
+  data_config_list <- import_and_standardise(data_import_list, tz_config_path = tz_config_path)
   bind_into_facilities(data_config_list)
 }
 

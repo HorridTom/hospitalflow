@@ -5,7 +5,7 @@
 #' @export
 #'
 #' @examples
-render_example_report <- function(sample_weeks = 4) {
+render_example_report <- function(sample_weeks = 4, timezone_config_path = "../lgt-config/ed") {
 
   system.time(rmarkdown::render(input = "vignettes/example-report.Rmd",
                                 output_format = "beamer_presentation",
@@ -13,6 +13,6 @@ render_example_report <- function(sample_weeks = 4) {
                                                      gsub(":","-",paste(strsplit(x = toString(Sys.time()),split = " ")[[1]], collapse="-")),
                                                      "_", stringr::str_sub(system("git rev-parse HEAD", intern=TRUE), 1, 8),
                                                      ".pdf"),
-                                params = list(sample_weeks = sample_weeks)
+                                params = list(sample_weeks = sample_weeks, timezone_config_path = timezone_config_path)
   ))
 }

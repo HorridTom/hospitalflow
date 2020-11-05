@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 params:
   sample_weeks: 2
-  timezone_config_path: "lgt-config/ed"
+  timezone_config_path: "../lgt-config/ed"
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -31,7 +31,7 @@ Package version: `r stringr::str_sub(system("git rev-parse HEAD", intern=TRUE), 
 Number of weeks used as sample: `r params$sample_weeks`
 
 ```{r import-data, cache=TRUE, echo=FALSE}
-# Import and Standardise Data
+ # Import and Standardise Data
 
 import_list <- readRDS("../lgt-config/lgt_import_list.rds")
 

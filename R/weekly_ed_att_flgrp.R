@@ -7,6 +7,7 @@
 #' @param hospital_name
 #' @param restrict_plot_range whether to zoom the plot to only the range
 #' specified by start_date and end_date
+#' @param config_path path to the ed config folder
 #'
 #' @return
 #' @export

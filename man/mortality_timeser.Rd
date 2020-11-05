@@ -5,15 +5,16 @@
 \title{mortality_timeser}
 \usage{
 mortality_timeser(
-  start_date = as.POSIXct("2016-01-01 00:00:00", tz = "Europe/London"),
-  end_date = as.POSIXct("2016-03-31 00:00:00", tz = "Europe/London"),
+  start_date = as.POSIXct("2016-01-01 00:00:00"),
+  end_date = as.POSIXct("2016-03-31 00:00:00"),
   data,
   plot_chart,
-  hospital_name
+  hospital_name,
+  config_path = "lgt-config/ed"
 )
 }
 \arguments{
-\item{hospital_name}{}
+\item{config_path}{path to the ed config folder}
 }
 \value{
 

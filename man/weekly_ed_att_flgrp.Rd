@@ -11,12 +11,15 @@ weekly_ed_att_flgrp(
   time_unit = "week",
   plot_chart,
   hospital_name,
-  restrict_plot_range = TRUE
+  restrict_plot_range = TRUE,
+  config_path = "lgt-config/ed"
 )
 }
 \arguments{
 \item{restrict_plot_range}{whether to zoom the plot to only the range
 specified by start_date and end_date}
+
+\item{config_path}{path to the ed config folder}
 }
 \value{
 

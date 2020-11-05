@@ -5,16 +5,17 @@
 \title{readmissions_ip}
 \usage{
 readmissions_ip(
-  start_date = as.POSIXct("2016-01-01 00:00:00", tz = "Europe/London"),
-  end_date = as.POSIXct("2016-03-31 00:00:00", tz = "Europe/London"),
+  start_date = as.POSIXct("2016-01-01 00:00:00"),
+  end_date = as.POSIXct("2016-03-31 00:00:00"),
   data,
   readmission_by,
   plot_chart,
-  hospital_name
+  hospital_name,
+  config_path = "lgt-config/ed"
 )
 }
 \arguments{
-\item{readmission_by}{}
+\item{config_path}{path to the ed config folder}
 }
 \value{
 

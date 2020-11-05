@@ -6,6 +6,7 @@
 #' @param plot_chart
 #' @param hospital_name
 #' @param readmission_by
+#' @param config_path path to the ed config folder
 #'
 #' @return
 #' @export

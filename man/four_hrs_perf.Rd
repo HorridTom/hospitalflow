@@ -10,7 +10,8 @@ four_hrs_perf(
   data,
   time_unit = "day",
   plot_chart,
-  hospital_name = "Hospital_Name"
+  hospital_name = "Hospital_Name",
+  config_path = "lgt-config/ed"
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ in the same format as lubridate::round_date}
 \item{plot_chart}{if TRUE return chart, otherwise if FALSE return dataframe}
 
 \item{hospital_name}{the hospital name for which the analysis are undertaken}
+
+\item{config_path}{path to the ed config folder}
 
 \item{end_date}{datetime, as a POSIXct, of the latest attendance to be included in the analysis}
 }

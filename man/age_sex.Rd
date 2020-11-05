@@ -4,7 +4,10 @@
 \alias{age_sex}
 \title{age_sex}
 \usage{
-age_sex()
+age_sex(config_path = "lgt-config/ed")
+}
+\arguments{
+\item{config_path}{path to the ed config folder}
 }
 \value{
 

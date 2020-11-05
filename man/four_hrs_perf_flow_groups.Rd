@@ -5,16 +5,17 @@
 \title{four hrs perf flow_groups}
 \usage{
 four_hrs_perf_flow_groups(
-  start_dt = as.Date("2016-01-01", tz = "Europe/London"),
-  end_dt = as.Date("2016-09-01", tz = "Europe/London"),
+  start_dt = as.Date("2016-01-01"),
+  end_dt = as.Date("2016-09-01"),
   data,
   time_unit = "day",
   plot_chart,
-  hospital_name = "Hospital_Name"
+  hospital_name = "Hospital_Name",
+  config_path = "lgt-config/ed"
 )
 }
 \arguments{
-\item{hospital_name}{}
+\item{config_path}{path to the ed config folder}
 }
 \value{
 

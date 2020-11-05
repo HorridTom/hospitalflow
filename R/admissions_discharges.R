@@ -13,6 +13,7 @@
 #' EpisodeNumber - the episode id
 #' WardCode - the ward for the episode
 #' @param plot_chart if TRUE return chart, otherwise if FALSE return dataframe
+#' @param config_path path to the ed config folder
 #'
 #' @return Chart or dataframe showing average Admissions and Discharges by the day of the week
 #' @export

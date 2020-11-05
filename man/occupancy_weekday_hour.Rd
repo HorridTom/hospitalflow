@@ -5,15 +5,16 @@
 \title{occupancy_weekday_hour for A&E}
 \usage{
 occupancy_weekday_hour(
-  start_date = as.POSIXct("2015-04-01 00:00:00", tz = "Europe/London"),
-  end_date = as.POSIXct("2016-04-01 00:00:00", tz = "Europe/London"),
+  start_date = as.POSIXct("2015-04-01 00:00:00"),
+  end_date = as.POSIXct("2016-04-01 00:00:00"),
   data,
   plot_chart,
-  hospital_name = "Hospital name"
+  hospital_name = "Hospital name",
+  config_path = "lgt-config/ed"
 )
 }
 \arguments{
-\item{plot_chart}{}
+\item{config_path}{path to the ed config folder}
 }
 \value{
 

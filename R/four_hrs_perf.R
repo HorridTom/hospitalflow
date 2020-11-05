@@ -10,6 +10,7 @@
 #' in the same format as lubridate::round_date
 #' @param plot_chart if TRUE return chart, otherwise if FALSE return dataframe
 #' @param hospital_name the hospital name for which the analysis are undertaken
+#' @param config_path path to the ed config folder
 #'
 #' @return Chart or dataframe showing 4 hour performance at the
 #' aggregation unit chosen

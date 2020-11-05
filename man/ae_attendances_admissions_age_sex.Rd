@@ -5,11 +5,12 @@
 \title{ae_attendances_admissions_age_sex}
 \usage{
 ae_attendances_admissions_age_sex(
-  start_date = as.Date("2016-01-01", tz = "Europe/London"),
-  end_date = as.Date("2017-01-01", tz = "Europe/London"),
+  start_date = as.Date("2016-01-01"),
+  end_date = as.Date("2017-01-01"),
   data,
   plot_chart,
-  hospital_name = "Hospital name"
+  hospital_name = "Hospital name",
+  config_path = "lgt-config/ed"
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ ae_attendances_admissions_age_sex(
 \item{plot_chart}{if TRUE return chart, otherwise if FALSE return dataframe}
 
 \item{hospital_name}{this is a string specifying the hospital name for the chart title}
+
+\item{config_path}{path to the ed config folder}
 }
 \value{
 Chart or dataframe showing A&E Attendances and Admissions by Gender and Age

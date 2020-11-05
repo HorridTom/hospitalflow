@@ -5,6 +5,7 @@
 #' @param data hospital episode data
 #' @param plot_chart if TRUE return chart, otherwise if FALSE return dataframe
 #' @param hospital_name this is a string specifying the hospital name for the chart title
+#' @param config_path path to the ed config folder
 #'
 #' @return Chart or dataframe showing A&E Attendances and Admissions by Gender and Age
 #' @export
@@ -105,6 +106,7 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2016-01-01")
 
 
 #' age_sex
+#' @param config_path path to the ed config folder
 #'
 #' @return
 #' @export

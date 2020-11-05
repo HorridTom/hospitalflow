@@ -5,15 +5,16 @@
 \title{ae_arrival_occupancy}
 \usage{
 ae_arrival_occupancy(
-  start_date = as.POSIXct("2012-01-01 00:00:00", tz = "Europe/London"),
-  end_date = as.POSIXct("2015-01-01 00:00:00", tz = "Europe/London"),
+  start_date = as.POSIXct("2012-01-01 00:00:00"),
+  end_date = as.POSIXct("2015-01-01 00:00:00"),
   data,
   plot_chart,
-  hospital_name = "Hospital name"
+  hospital_name = "Hospital name",
+  config_path = "lgt-config/ed"
 )
 }
 \arguments{
-\item{hospital_name}{}
+\item{config_path}{path to the ed config folder}
 }
 \value{
 

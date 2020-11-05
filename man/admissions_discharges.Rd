@@ -7,11 +7,12 @@ data isn't  standardised
 admission_discharges}
 \usage{
 admissions_discharges(
-  start_date = as.Date("2018-12-10", tz = "Europe/London"),
-  end_date = as.Date("2018-12-23", tz = "Europe/London"),
+  start_date = as.Date("2018-12-10"),
+  end_date = as.Date("2018-12-23"),
   data,
   plot_chart,
-  hospital_name = "Chelsea & Westminster"
+  hospital_name = "Chelsea & Westminster",
+  config_path = "lgt-config/ed"
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ EpisodeNumber - the episode id
 WardCode - the ward for the episode}
 
 \item{plot_chart}{if TRUE return chart, otherwise if FALSE return dataframe}
+
+\item{config_path}{path to the ed config folder}
 }
 \value{
 Chart or dataframe showing average Admissions and Discharges by the day of the week

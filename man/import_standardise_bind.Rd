@@ -4,13 +4,15 @@
 \alias{import_standardise_bind}
 \title{import_standardise_bind}
 \usage{
-import_standardise_bind(data_import_list)
+import_standardise_bind(data_import_list, tz_config_path = "lgt-config/ed")
 }
 \arguments{
 \item{data_import_list}{list of named lists, each named list has four elements called
 data_path, config_path, site, and facility. The first two of these are character strings specifying the paths
 to i) a csv file to import data from and ii) a folder containing hospitalflow config
 files. The latter two specify the site and facility (e.g. ED, IP, UCC).}
+
+\item{tz_config_path}{path to the ed config folder}
 }
 \value{
 list of as many tibbles as there are unique values of facility in the provided config list. Each

@@ -4,7 +4,11 @@
 \alias{import_and_standardise}
 \title{import_and_standardise}
 \usage{
-import_and_standardise(data_import_list, remove_duplicates = TRUE)
+import_and_standardise(
+  data_import_list,
+  remove_duplicates = TRUE,
+  tz_config_path = "../lgt-config/ed"
+)
 }
 \arguments{
 \item{data_import_list}{list of named lists, each named list has four elements called
@@ -13,6 +17,8 @@ to i) a csv file to import data from and ii) a folder containing hospitalflow co
 files. The latter two specify the site and facility (e.g. ED, IP, UCC).}
 
 \item{remove_duplicates}{boolean to control whether data is de-duped (TRUE) or not (FALSE).}
+
+\item{tz_config_path}{path to the ed config folder}
 }
 \value{
 list of tibbles, each containing standardised import of one data file from data_paths

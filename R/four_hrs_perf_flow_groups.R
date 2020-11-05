@@ -6,6 +6,7 @@
 #' @param time_unit
 #' @param plot_chart
 #' @param hospital_name
+#' @param config_path path to the ed config folder
 #'
 #' @return
 #' @export
