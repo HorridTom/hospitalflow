@@ -1,4 +1,18 @@
-#function to get simulated ED and Inpatient data as a list
+#' get_imperfect_simulated_data_as_list
+#'
+#' @param npat number of patients to be simulated for ED and Inpatient datasets each.
+#' Some patients from the ED dataset will also be in the Inpatient data if they were admitted.
+#' @param start the start datetime of the simulation period.
+#' @param end the end datetime of the simulation period.
+#'
+#'
+#' @return list containing a dataframe of simulated, non-standardised ED data and the corresponsing
+#' Inpatient dataframe.
+#'
+#' @export
+#'
+#function to get imperfect (i.e. non-standard column names and levels) simulated ED and
+#Inpatient data as a list
 get_imperfect_simulated_data_as_list <- function(npat = 10000, start = as.POSIXct("2019-01-01 00:00:00"),
                                        end = as.POSIXct("2020-01-01 00:00:00")){
 
