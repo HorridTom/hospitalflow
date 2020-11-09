@@ -29,7 +29,7 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2016-01-01",
     dplyr::filter(spell_class_col == "ed_non_admission" | spell_class_col == "ed_comp_non_admission" | spell_class_col == "ed_admission" | spell_class_col == "ed_comp_admission") %>%
     dplyr::filter(gender != "Other" ) %>%
     dplyr::group_by(gender, age_band_start) %>%
-    dplyr::summarize(value= n()) %>%
+    dplyr::summarize(value= dplyr::n(), .groups = "drop") %>%
     dplyr::mutate(group = dplyr::case_when(gender == "Female" ~ "Female attendances",
                                     gender == "Male" ~ "Male attendances"))
 
@@ -37,7 +37,7 @@ ae_attendances_admissions_age_sex <- function(start_date = as.Date("2016-01-01",
     dplyr::filter(spell_class_col == "ed_admission" | spell_class_col == "ed_comp_admission") %>%
     dplyr::filter(gender != "Other" ) %>%
     dplyr::group_by(gender, age_band_start) %>%
-    dplyr::summarize(value = n()) %>%
+    dplyr::summarize(value = dplyr::n(), .groups = "drop") %>%
     dplyr::mutate(group =  dplyr::case_when(gender == "Female" ~ "Female admitted",
                                             gender == "Male" ~ "Male admitted"))
 

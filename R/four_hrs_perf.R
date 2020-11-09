@@ -40,7 +40,7 @@ four_hrs_perf <- function(start_dt,
 
   sum_4hrs_perf <- dt_los %>%
     dplyr::group_by(Time, Hr_perf) %>%
-    dplyr::summarise(Count = n()) %>%
+    dplyr::summarise(Count = dplyr::n()) %>%
     tidyr::drop_na() %>%
     tidyr::spread(Hr_perf, Count) %>%
     dplyr::mutate(N = under_4hrs + above_4hrs) %>%
@@ -106,7 +106,7 @@ four_hrs_perf <- function(start_dt,
 
   }else{
 
-   four_hr_plot$data
+   four_hr_plot$data %>% tibble::as_tibble()
 
   }
 
