@@ -1,13 +1,9 @@
-#' Standard format for inpatient data
+#' Simulated inpatient data in standardised format.
 #'
-#' Datasets containing inpatient data, with each row corresponding to an episode
-#' of care and columns corresponding to the columns of this dataset, can be
-#' standardised to match this format via config files. Datasets which do not
-#' have all of the columns listed can still be standardised but it may be that not
-#' all analyses in the hospitalflow package can be performed.
+#' A dataset containing simulated, standardised Inpatient data.
 #'
-#' @format A data frame with up to 22 variables, depending on available hospital data.
-#' Each observation corresponds to a single episode within a patient spell.
+#' @format A data frame with 18 (out of a possible 22 lised here) variables, depending on
+#' available hospital data. Each observation corresponds to a single episode within a patient spell.
 #'
 #' \describe{
 #'   \item{pseudo_id}{Unique ID number of the patient. Original mapping back to
@@ -66,7 +62,7 @@
 #'   \item{diagnosis_code}{A string formed by concatenating the ICD diagnosis
 #'   codes for that patient stay in the format of a single column with an
 #'   identifiable separator}
-#'   \item{hrg}{Healthcare Resource Group code. Standard groupings of clinically
+#'   \item{hrg_code}{Healthcare Resource Group code. Standard groupings of clinically
 #'   similar treatments which use common levels of healthcare resource, and
 #'   which are currently used as a means of determining fair and equitable
 #'   reimbursement for care services}
