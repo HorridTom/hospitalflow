@@ -176,15 +176,6 @@ hospitalflow::los_distrib_method_admission(start_date = start_date, end_date = e
                                            hospital_name = "Anytown General Hospital")
 ```
 
-## ED occupancy by hour of week
-
-```{r ed-occ-2, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-hospitalflow::ED_day_hour_plot(startDay = start_date, endDay = end_date,
-                             df = example_ed_data,
-                             plot_chart = TRUE,
-                             hospital_name = "Anytown General Hospital")
-```
-
 ## Alternative ED occupancy by hour of week
 ```{r ed-occ-1, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
 hospitalflow::occupancy_weekday_hour(start_date = as.POSIXct(start_date, tz = "Europe/London"),
