@@ -49,8 +49,8 @@ weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "week",
 
 
   if(restrict_plot_range) {
-    plot_x_lims <- c(as.POSIXct(start_date, tz = "Europe/London"),
-                     as.POSIXct(end_date, tz = "Europe/London"))
+    plot_x_lims <- c(as.POSIXct(start_date),
+                     as.POSIXct(end_date))
   } else {
     plot_x_lims <- c(min(count_df %>% dplyr::pull(Time)),
                      max(count_df %>% dplyr::pull(Time)))

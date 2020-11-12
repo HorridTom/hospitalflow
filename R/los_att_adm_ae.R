@@ -10,9 +10,8 @@
 #' @export
 #'
 #' @examples
-los_att_adm_ae <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-                           end_date = as.Date("2013-01-01", tz = "Europe/London"),
-                           data, plot_chart, hospital_name = "Chelsea & Westminster"){
+los_att_adm_ae <- function(start_date, end_date, data, plot_chart,
+                           hospital_name = "Chelsea & Westminster"){
 
   df <- data %>%
     dplyr::select(spell_number, spell_start, spell_end, spell_class_col, initial_ed_end_datetime) %>%

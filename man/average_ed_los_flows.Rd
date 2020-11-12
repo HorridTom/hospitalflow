@@ -5,8 +5,8 @@
 \title{Title}
 \usage{
 average_ed_los_flows(
-  start_date = as.POSIXct("2012-01-01 00:00:00", tz = "Europe/London"),
-  end_date = as.POSIXct("2015-01-01 00:00:00", tz = "Europe/London"),
+  start_date,
+  end_date,
   data,
   plot_chart,
   hospital_name = "Hospital name"

@@ -10,9 +10,8 @@
 #' @export
 #'
 #' @examples
-ae_arrival_occupancy <- function(start_date = as.POSIXct("2012-01-01 00:00:00", tz = "Europe/London"),
-                                     end_date = as.POSIXct("2015-01-01 00:00:00", tz = "Europe/London"),
-                                     data, plot_chart, hospital_name = "Hospital name"){
+ae_arrival_occupancy <- function(start_date, end_date, data, plot_chart,
+                                 hospital_name = "Hospital name"){
 
   dt_los <- data %>%
     dplyr::select(spell_number, spell_start, initial_ed_end_datetime, spell_class_col, starts_with_ed) %>%

@@ -27,12 +27,7 @@
 ###################################
 # Admission Discharges ############
 #####################################################################################################
-admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europe/London"),
-                                  end_date = as.Date("2018-12-23",tz = "Europe/London"),
-                                  data, plot_chart, hospital_name = "Chelsea & Westminster"){
-
-  # start_date = as.Date("2017-01-01", tz = "Europe/London")
-  # end_date = as.Date("2017-02-01",tz = "Europe/London")
+admissions_discharges <- function(start_date, end_date, data, plot_chart, hospital_name){
 
   #selecting the variables needed, with new variables created
   admission_discharge <- data  %>%
@@ -193,9 +188,7 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
 #' @export
 #'
 adm_disch_day_of_week <- function() {
-  admissions_discharges(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-                                    end_date = as.Date("2015-01-01", tz = "Europe/London"),
-                                    data = hospitalflow::cw_disch_201201_201507_782cfa21_stddt_s, plot_chart = TRUE, hospital_name = "Chelsea & Westminster")
+  admissions_discharges(start_date, end_date, data, plot_chart = TRUE, hospital_name)
 }
 
 

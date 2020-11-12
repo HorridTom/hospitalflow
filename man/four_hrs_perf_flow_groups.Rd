@@ -5,8 +5,8 @@
 \title{four hrs perf flow_groups}
 \usage{
 four_hrs_perf_flow_groups(
-  start_dt = as.Date("2016-01-01", tz = "Europe/London"),
-  end_dt = as.Date("2016-09-01", tz = "Europe/London"),
+  start_dt,
+  end_dt,
   data,
   time_unit = "day",
   plot_chart,
