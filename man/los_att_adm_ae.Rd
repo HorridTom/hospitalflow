@@ -4,13 +4,7 @@
 \alias{los_att_adm_ae}
 \title{lenght of stay for attendances and admissions from ED}
 \usage{
-los_att_adm_ae(
-  start_date,
-  end_date,
-  data,
-  plot_chart,
-  hospital_name = "Chelsea & Westminster"
-)
+los_att_adm_ae(start_date, end_date, data, plot_chart, hospital_name)
 }
 \arguments{
 \item{hospital_name}{}

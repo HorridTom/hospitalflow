@@ -76,9 +76,12 @@ four_hrs_perf <- function(start_dt,
   pct <- ggplot2::ggplot(cht_data, ggplot2::aes(x, y, label = x))
   cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
+  #get time zone of data
+  time_zone <- attr(data$spell_start, "tzone")
+
   #convert arguments to dates and round to nearest quarter
-  st.dt <- as.Date(start_dt, format = "%Y-%m-%d")
-  ed.dt <- as.Date(end_dt, format = "%Y-%m-%d")
+  st.dt <- as.Date(start_dt, format = "%Y-%m-%d", tz = time_zone)
+  ed.dt <- as.Date(end_dt, format = "%Y-%m-%d", tz = time_zone)
   #q.st.dt <- as.Date(zoo::as.yearqtr(st.dt, format = "%Y-%m-%d"))
   #q.ed.dt <- as.Date(zoo::as.yearqtr(ed.dt, format = "%Y-%m-%d"), frac = 1) + 1
   cht_axis_breaks <- seq(st.dt, ed.dt, by = "quarters")

@@ -18,6 +18,13 @@
 ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_chart,
                                               hospital_name = "Hospital name"){
 
+  #get time zone of data
+  time_zone <- attr(data$spell_start, "tzone")
+
+  #set input dates to have the same time zone as the data
+  start_date <- as.Date(start_date, tz = time_zone)
+  end_date <- as.Date(end_date, tz = time_zone)
+
   dt <- data %>%
     dplyr::filter(spell_start <= end_date & spell_end >= start_date) %>%
     dplyr::select(spell_number, spell_start, spell_end, gender, age_band_start, spell_class_col)

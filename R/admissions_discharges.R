@@ -29,6 +29,13 @@
 #####################################################################################################
 admissions_discharges <- function(start_date, end_date, data, plot_chart, hospital_name){
 
+  #get time zone of data
+  time_zone <- attr(data$spell_start, "tzone")
+
+  #set input dates to have the same time zone as the data
+  start_date <- as.Date(start_date, tz = time_zone)
+  end_date <- as.Date(end_date, tz = time_zone)
+
   #selecting the variables needed, with new variables created
   admission_discharge <- data  %>%
     dplyr::select(spell_number, spell_start, spell_end, spell_class_col) %>%

@@ -13,6 +13,13 @@
 ae_arrival_occupancy <- function(start_date, end_date, data, plot_chart,
                                  hospital_name = "Hospital name"){
 
+  #get time zone of data
+  time_zone <- attr(data$spell_start, "tzone")
+
+  #set input dates to have the same time zone as the data
+  start_date <- as.POSIXct(start_date, tz = time_zone)
+  end_date <- as.POSIXct(end_date, tz = time_zone)
+
   dt_los <- data %>%
     dplyr::select(spell_number, spell_start, initial_ed_end_datetime, spell_class_col, starts_with_ed) %>%
     dplyr::mutate(Same_day_discharge = as.numeric(difftime(initial_ed_end_datetime, spell_start, unit = c("min")))) %>%
