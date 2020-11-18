@@ -42,10 +42,13 @@
 #'   \item{died_ip}{A boolean of whether the patient died during the spell}
 #'   \item{starts_with_ed}{A boolean of whether the spell starts with an ED episode}
 #'   \item{ed_non_adm}{A boolean of whether the spell was entirely in ED with no admission}
-#'   \item{ed_comp_non_adm}{}
+#'   \item{ed_comp_non_adm}{A boolean of whether the spell is a made up of more than one
+#'    ED episode with no admission}
 #'   \item{ed_admission}{A boolean of whether the spell involves an admission from ED}
-#'   \item{ed_comp_adm}{}
-#'   \item{direct_comp_adm}{}
+#'   \item{ed_comp_adm}{A boolean of whether the spell is a composite ED admission.
+#'   I.e. The spell starts with an ED episode followed by any number of inpatient episodes. }
+#'   \item{direct_comp_adm}{A boolean of whether the spell is made up of any number of
+#'   inpatient episodes that did not start in ED}
 #'   \item{direct_admission}{A boolean of whether the spell involves a direct admission}
 #'   \item{spell_class_col}{The type of admission/non-admission was involved, derived from
 #'   the booleans in the previous columns}
