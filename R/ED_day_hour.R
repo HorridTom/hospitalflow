@@ -19,7 +19,7 @@ ED_day_hour <- function(startDay, endDay, df){
   df <- dplyr::filter(df, start_datetime <= endDay, end_datetime >= startDay)
 
   dateTime <- seq(as.POSIXlt(startDay), as.POSIXlt(endDay), by="hours")
-  hourly_occupancy <- sapply(dateTime, hospitalflow::occupancy, df, "start_datetime", "end_datetime")
+  hourly_occupancy <- sapply(dateTime, hospitalflow::occupancy, df, df_type = "ED table")
   occupancy_df <- data.frame(dateTime, hourly_occupancy)
 
   occupancy_df <- occupancy_df %>%

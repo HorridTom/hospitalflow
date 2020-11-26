@@ -12,9 +12,9 @@ ED_day_hour_test_data <- tibble::tibble(pseudo_id, start_datetime, end_datetime)
 
 testthat::test_that("Occupancy is calculated correctly for constructed data",{
 
-  occupancy_day1 <- occupancy(as.POSIXct("2013-01-01 12:00:00"), df = ED_day_hour_test_data, start_time = "start_datetime", end_time = "end_datetime")
-  occupancy_day6 <- occupancy(as.POSIXct("2013-01-06 12:00:00"), df = ED_day_hour_test_data, start_time = "start_datetime", end_time = "end_datetime")
-  occupancy_day13 <- occupancy(as.POSIXct("2013-01-13 12:00:00"), df = ED_day_hour_test_data, start_time = "start_datetime", end_time = "end_datetime")
+  occupancy_day1 <- occupancy(time_instance = as.POSIXct("2013-01-01 12:00:00"), df = ED_day_hour_test_data, )
+  occupancy_day6 <- occupancy(time_instance = as.POSIXct("2013-01-06 12:00:00"), df = ED_day_hour_test_data, df_type = "ED table")
+  occupancy_day13 <- occupancy(time_instance = as.POSIXct("2013-01-13 12:00:00"), df = ED_day_hour_test_data, df_type = "ED table")
   occupancies <- c(occupancy_day1, occupancy_day6, occupancy_day13)
 
   testthat::expect_equal(occupancies, c(2,5,3))
@@ -106,9 +106,9 @@ test_data_uhl_ed_sample <- readRDS("testdata/test_data_uhl_ed_sample.rds")
 
 testthat::test_that("Occupancy is calculated correctly for real data",{
 
-  occupancy_day1 <- hospitalflow::occupancy(as.POSIXct("2016-10-01 12:00:00"), df = test_data_uhl_ed_sample, start_time = "start_datetime", end_time = "end_datetime")
-  occupancy_day7 <- hospitalflow::occupancy(as.POSIXct("2016-10-07 12:00:00"), df = test_data_uhl_ed_sample, start_time = "start_datetime", end_time = "end_datetime")
-  occupancy_day13 <- hospitalflow::occupancy(as.POSIXct("2016-10-13 12:00:00"), df = test_data_uhl_ed_sample, start_time = "start_datetime", end_time = "end_datetime")
+  occupancy_day1 <- hospitalflow::occupancy(time_instance = as.POSIXct("2016-10-01 12:00:00"), df = test_data_uhl_ed_sample, df_type = "ED table")
+  occupancy_day7 <- hospitalflow::occupancy(time_instance = as.POSIXct("2016-10-07 12:00:00"), df = test_data_uhl_ed_sample, df_type = "ED table")
+  occupancy_day13 <- hospitalflow::occupancy(time_instance = as.POSIXct("2016-10-13 12:00:00"), df = test_data_uhl_ed_sample, df_type = "ED table")
   occupancies <- c(occupancy_day1, occupancy_day7, occupancy_day13)
 
   testthat::expect_equal(occupancies, c(1,2,0))

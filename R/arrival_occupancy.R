@@ -41,7 +41,7 @@ ae_arrival_occupancy <- function(start_date = as.POSIXct("2012-01-01 00:00:00", 
 
   time_hr <- seq(from = start_date, to = end_date, by = "hour")
 
-  occupancy_vct <- sapply(time_hr, occupancy, df = dt_calc, start_time = "spell_start", end_time = "initial_ed_end_datetime")
+  occupancy_vct <- sapply(time_hr, occupancy, df = dt_calc, df_type = "spell table modified")
 
   occupancy_df <- tibble::tibble(time_hr, occupancy_vct)
 
