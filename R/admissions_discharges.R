@@ -27,7 +27,7 @@
 ###################################
 # Admission Discharges ############
 #####################################################################################################
-admissions_discharges <- function(start_date, end_date, data, plot_chart, hospital_name){
+admissions_discharges <- function(start_date, end_date, data, plot_chart, hospital_name = "Hospial name"){
 
   #get time zone of data
   time_zone <- attr(data$spell_start, "tzone")
