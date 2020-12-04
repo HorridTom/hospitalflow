@@ -1,4 +1,12 @@
-#function to create the moves table from the ED table and inpatient table
+#' make_moves_table
+#'
+#' @param ed_data standard ED data
+#' @param inpatient_data standard inpatient data
+#'
+#' @return moves table
+#' @export
+#'
+#' @examples
 make_moves_table <- function(ed_data = test_ed_data_sample,
                              inpatient_data = test_ip_data_sample){
 
@@ -11,8 +19,8 @@ make_moves_table <- function(ed_data = test_ed_data_sample,
     # dplyr::mutate(episode_order = dplyr::row_number()) %>%
     # dplyr::mutate(total_eps_in_spell = dplyr::n()) %>%
     dplyr::group_modify(~ dplyr::add_row(.x, ward_category = "External Outgoing")) %>%
-    dplyr::mutate(pseudo_id = ifelse(is.na(pseudo_id), dplyr::lag(pseudo_id), pseudo_id)) %>%
-    dplyr::mutate(start_datetime = dplyr::if_else(is.na(start_datetime), dplyr::lag(end_datetime), start_datetime)) %>%
+    dplyr::mutate(pseudo_id = ifelse(is.na(pseudo_id), dplyr::lag(pseudo_id), pseudo_id)) %>% #add comment
+    dplyr::mutate(start_datetime = dplyr::if_else(is.na(start_datetime), dplyr::lag(end_datetime), start_datetime)) %>% #add comment
     dplyr::rename(move_datetime = start_datetime, move_to = ward_category) %>%
     dplyr::mutate(move_from = dplyr::lag(move_to)) %>%
     dplyr::mutate(move_from = ifelse(is.na(move_from), "External Incoming", move_from)) %>%

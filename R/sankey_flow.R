@@ -1,8 +1,27 @@
-library(networkD3)
-library(dplyr)
+#' plot_flow_diagram
+#'
+#' @param moves_table table of patient episode moves within and outside the hospital
+#' @param ward_level boolean of whether the analysis is done ward by ward or by
+#' hospital category (e.g. Mecical, Surgical, Acute etc.)
+#' @param start the datetime from which the moves should be counted
+#' @param end the datetime from which the moves should stop being counted
+#' @param selected_levels a vector of strings stating the wards or categories
+#' that should be included in the analysis
+#' e.g. c("External Incoming", "Medical", "Surgical", "External Outgoing")
+#'
+#' @return spell table
+#' @export
+#'
+#' @examples
+plot_flow_diagram <- function(moves_table, ward_level = F,
+                              start = min(moves_table$move_datetime), end = max(moves_table$move_datetime),
+                              selected_levels = NULL#,
+                              #remove_static_moves = F
+                              ){
 
-plot_flow_diagram <- function(moves_table, ward_level = F, #selected_levels = NULL
-                              selected_levels = c("External Incoming", "Medical", "Surgical", "External Outgoing")){
+  #filters moves table between start and end
+  moves_table <- moves_table %>%
+    dplyr::filter(move_datetime >= as.POSIXct(start) & move_datetime < as.POSIXct(end))
 
   #if ward level is TRUE, diagram will be made ward by ward, if false, it will be done my category
   if(ward_level == F){
@@ -21,7 +40,7 @@ plot_flow_diagram <- function(moves_table, ward_level = F, #selected_levels = NU
   links <- dplyr::count(moves_table, move_from, move_to) %>%
     dplyr::rename(source = move_from, target = move_to, value = n)
 
-  # From these flows we need to create a node data frame: it lists every entities involved in the flow
+  # a node data frame: it lists every entities involved in the flow
   nodes <- data.frame(
     name=c(as.character(links$source),
            as.character(links$target)) %>% unique()
@@ -32,10 +51,11 @@ plot_flow_diagram <- function(moves_table, ward_level = F, #selected_levels = NU
   links$IDtarget <- match(links$target, nodes$name)-1
 
   # Make the Network
-  p <- sankeyNetwork(Links = links, Nodes = nodes,
+  p <- networkD3::sankeyNetwork(Links = links, Nodes = nodes,
                      Source = "IDsource", Target = "IDtarget",
                      Value = "value", NodeID = "name",
-                     sinksRight=FALSE)
+                     sinksRight=FALSE,
+                     fontSize = 12)
   p
 }
 
