@@ -15,8 +15,8 @@
 #' @examples
 plot_flow_diagram <- function(moves_table, ward_level = F,
                               start = min(moves_table$move_datetime), end = max(moves_table$move_datetime),
-                              selected_levels = NULL#,
-                              #remove_static_moves = F
+                              selected_levels = NULL,
+                              remove_static_moves = F
                               ){
 
   #filters moves table between start and end
@@ -36,6 +36,11 @@ plot_flow_diagram <- function(moves_table, ward_level = F,
       dplyr::filter(move_from %in% selected_levels & move_to %in% selected_levels)
   }
 
+  if(remove_static_moves == T){
+    moves_table <- moves_table %>%
+      dplyr::filter(move_from != move_to)
+  }
+
   # A connection data frame is a list of flows with intensity for each flow
   links <- dplyr::count(moves_table, move_from, move_to) %>%
     dplyr::rename(source = move_from, target = move_to, value = n)
@@ -44,11 +49,14 @@ plot_flow_diagram <- function(moves_table, ward_level = F,
   nodes <- data.frame(
     name=c(as.character(links$source),
            as.character(links$target)) %>% unique()
-  )
+  ) ####add group
 
   # With networkD3, connection must be provided using id, not using real name like in the links dataframe.. So we need to reformat it.
   links$IDsource <- match(links$source, nodes$name)-1
   links$IDtarget <- match(links$target, nodes$name)-1
+
+  #prepare colour scale
+  #my_color <- 'd3.scaleOrdinal() .domain(["group_A", "group_B","group_C", "group_D", "group_E", "group_F", "group_G", "group_H"]) .range(["blue", "blue" , "blue", "red", "red", "yellow", "purple", "purple"])'
 
   # Make the Network
   p <- networkD3::sankeyNetwork(Links = links, Nodes = nodes,
