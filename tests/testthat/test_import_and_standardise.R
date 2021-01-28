@@ -57,8 +57,16 @@ teardown({
 })
 
 test_that("import_and_standardise correctly brings in data, no dupe removal",{
-  test_import_list <- list(list(data_path = tmp_data_1, config_path = tmp_config_1, site = "A", facility = "ED"),
-                           list(data_path = tmp_data_2, config_path = tmp_config_2, site = "A", facility = "IP"))
+  test_import_list <- list(list(data_path = tmp_data_1,
+                                config_path = tmp_config_1,
+                                site = "A",
+                                facility = "ED",
+                                time_zone = "Europe/London"),
+                           list(data_path = tmp_data_2,
+                                config_path = tmp_config_2,
+                                site = "A",
+                                facility = "IP",
+                                time_zone = "Europe/London"))
 
   data_list <- lapply(import_and_standardise(test_import_list, remove_duplicates = FALSE), function(x) {
     x$data
@@ -109,8 +117,16 @@ test_that("import_and_standardise correctly brings in data, no dupe removal",{
 })
 
 test_that("import_and_standardise correctly brings in data, with dupe removal",{
-  test_import_list <- list(list(data_path = tmp_data_1, config_path = tmp_config_1, site = "A", facility = "ED"),
-                           list(data_path = tmp_data_2, config_path = tmp_config_2, site = "A", facility = "IP"))
+  test_import_list <- list(list(data_path = tmp_data_1,
+                                config_path = tmp_config_1,
+                                site = "A",
+                                facility = "ED",
+                                time_zone = "Europe/London"),
+                           list(data_path = tmp_data_2,
+                                config_path = tmp_config_2,
+                                site = "A",
+                                facility = "IP",
+                                time_zone = "Europe/London"))
 
   data_list <- lapply(import_and_standardise(test_import_list, remove_duplicates = TRUE), function(x) {
     x$data

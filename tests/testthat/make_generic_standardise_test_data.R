@@ -50,11 +50,24 @@ make_generic_standardise_test_correct_result <- function() {
 
 make_generic_standardise_test_import_list <- function() {
   list(list(data_path = "testdata/generic_standardise/ed1.csv",
-            config_path = "testdata/generic_standardise/ed_config/", site = "A", facility = "ED"),
+            config_path = "testdata/generic_standardise/ed_config/",
+            site = "A",
+            facility = "ED",
+            time_zone = "Europe/London"),
        list(data_path = "testdata/generic_standardise/ed2.csv",
-            config_path = "testdata/generic_standardise/ed_config/", site = "B", facility = "ED"),
+            config_path = "testdata/generic_standardise/ed_config/",
+            site = "B",
+            facility = "ED",
+            time_zone = "Europe/London"),
        list(data_path = "testdata/generic_standardise/ip1.csv",
-            config_path = "testdata/generic_standardise/ip_config/", site = NA, facility = "IP"),
+            config_path = "testdata/generic_standardise/ip_config/",
+            site = NA,
+            facility = "IP",
+            time_zone = "Europe/London"),
        list(data_path = "testdata/generic_standardise/ip2.csv",
-            config_path = "testdata/generic_standardise/ip_config/", site = NA, facility = "IP"))
+            config_path = "testdata/generic_standardise/ip_config/",
+            site = NA,
+            facility = "IP",
+            time_zone = "Europe/London")
+  )
 }
