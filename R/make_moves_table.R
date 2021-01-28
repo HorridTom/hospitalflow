@@ -8,9 +8,10 @@
 #'
 #' @examples
 make_moves_table <- function(ed_data = test_ed_data_sample,
-                             inpatient_data = test_ip_data_sample){
+                             inpatient_data = test_ip_data_sample,
+                             all_episodes){
 
-  all_episodes <- hospitalflow::make_spell_number(ed_data, inpatient_data)
+  #all_episodes <- hospitalflow::make_spell_number(ed_data, inpatient_data)
   moves_table <- all_episodes %>%
     dplyr::select(pseudo_id, start_datetime, end_datetime, ward_category,episode_id, episode_type, spell_number) %>%
     dplyr::mutate(ward_category = dplyr::if_else(episode_type == "ED", "ED", ward_category)) %>%

@@ -7,13 +7,14 @@
 #' @param different_type_episode_lag the maximum amount of time two episodes of different type
 #' can be separated by and still be classified as part of the same spell.
 #'
-#' @return spell table
+#' @return named list containing the spell table and the all_episodes table
 #' @export
 #'
 #' @examples
 make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 6) {
   all_episodes <- make_spell_number(ed_data, inpatient_data, same_type_episode_lag, different_type_episode_lag)
-  spell_variables(all_episodes)
+  spell_table <- spell_variables(all_episodes)
+  spells_episodes_tables <- list(spell_table = spell_table, all_episodes = all_episodes)
 }
 
 
