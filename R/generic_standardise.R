@@ -209,7 +209,6 @@ import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
 
   #get timezone from config
   datetime_formats <- readRDS(file.path(data_import_list[[1]]$config_path, "datetime_formats.rds"))
-  time_zone <- datetime_formats$time_zone[1]
 
   # Take the data_import_list and for each element x, load the data located at data_path
   # using configuration specified by the files at config_path.
@@ -217,13 +216,14 @@ import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
   # get_import_col_types from the config files.
   data_config_list <- lapply(data_import_list,
                              function(x) {list(data = readr::read_csv(x$data_path,
-                                                                      locale = readr::locale(tz = time_zone),
+                                                                      locale = readr::locale(tz = x$time_zone),
                                                                       col_types = eval(rlang::call2(readr::cols,
                                                                                                     !!!get_import_col_types(x$config_path),
                                                                                                     .default = readr::col_skip()))),
                                                config_path = x$config_path,
                                                site = x$site,
-                                               facility = x$facility)
+                                               facility = x$facility,
+                                               time_zone = x$time_zone)
     })
 
   # Rename the columns in each imported dataset, using the name mapping onto standard hospitalflow
@@ -236,7 +236,8 @@ import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
                                                                     ),
                                     config_path = x$config_path,
                                     site = x$site,
-                                    facility = x$facility)
+                                    facility = x$facility,
+                                    time_zone = x$time_zone)
                                })
 
   # Recode factors
@@ -246,7 +247,8 @@ import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
                                                              !!!get_factor_recode(x$config_path))),
                                config_path = x$config_path,
                                site = x$site,
-                               facility = x$facility)
+                               facility = x$facility,
+                               time_zone = x$time_zone)
                              })
 
   # If no site column has been imported, create one and populate with the configured site value
@@ -269,7 +271,8 @@ import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
     list(data = make_episode_ids(x$data),
          config_path = x$config_path,
          site = x$site,
-         facility = x$facility)
+         facility = x$facility,
+         time_zone = x$time_zone)
          })
 
   # If required, de-dupe each tibble based on pseudo_id, and episode start and end time
@@ -278,7 +281,8 @@ import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
       list(data = dplyr::distinct(x$data, pseudo_id, start_datetime, end_datetime, .keep_all = TRUE),
            config_path = x$config_path,
            site = x$site,
-           facility = x$facility)
+           facility = x$facility,
+           time_zone = x$time_zone)
     })
   }
 
