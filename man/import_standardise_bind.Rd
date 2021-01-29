@@ -14,7 +14,8 @@ files. The latter two specify the site and facility (e.g. ED, IP, UCC).}
 }
 \value{
 list of as many tibbles as there are unique values of facility in the provided config list. Each
-tibble is formed by row binding all imported data for that facility.
+tibble is formed by row binding all imported data for that facility. N.B. when sites with different time zones
+are bound together, all datetimes are converted to have the same time zone by R default.
 }
 \description{
 import_standardise_bind

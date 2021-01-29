@@ -337,7 +337,8 @@ bind_into_facilities <- function(data_config_list) {
 #' files. The latter two specify the site and facility (e.g. ED, IP, UCC).
 #'
 #' @return list of as many tibbles as there are unique values of facility in the provided config list. Each
-#' tibble is formed by row binding all imported data for that facility.
+#' tibble is formed by row binding all imported data for that facility. N.B. when sites with different time zones
+#' are bound together, all datetimes are converted to have the same time zone by R default.
 #' @export
 #'
 import_standardise_bind <- function(data_import_list) {
