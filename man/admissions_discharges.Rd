@@ -6,7 +6,13 @@
 data isn't  standardised
 admission_discharges}
 \usage{
-admissions_discharges(start_date, end_date, data, plot_chart, hospital_name)
+admissions_discharges(
+  start_date,
+  end_date,
+  data,
+  plot_chart,
+  hospital_name = "Hospial name"
+)
 }
 \arguments{
 \item{start_date}{date of earliest discharge to be included in the analysis}
