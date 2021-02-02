@@ -47,7 +47,8 @@ import_list <- lapply(import_list, function(x) {
   list(data_path = paste0("../", x$data_path),
   config_path = paste0("../", x$config_path),
   site = x$site,
-  facility = x$facility)
+  facility = x$facility,
+  time_zone = x$time_zone)
 })
 
 data_list <- hospitalflow::import_standardise_bind(import_list)
