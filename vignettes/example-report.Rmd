@@ -112,9 +112,9 @@ example_all_episodes <- example_spell_list$all_episodes
 example_spell_table <- hospitalflow::add_spell_variables(ed_data = example_ed_data,
                                                          inpatient_data = example_inpatient_data,
                                                          spell_table = example_spell_table)
-# example_moves_table <- hospitalflow::make_moves_table(ed_data = example_ed_data,
-#                                                       inpatient_data = example_inpatient_data,
-#                                                       all_episodes = example_all_episodes)
+example_moves_table <- hospitalflow::make_moves_table(ed_data = example_ed_data,
+                                                       inpatient_data = example_inpatient_data,
+                                                       all_episodes = example_all_episodes)
 ```
 ## Example dataset
 This example report is based on `r nrow(example_ed_data)` emergency department attendances and `r nrow(example_inpatient_data)` inpatient episodes of care, linked into `r nrow(example_spell_table)` hospital spells. All attendances and admissions occurred prior to `r end_date` and all discharges after `r start_date`.
