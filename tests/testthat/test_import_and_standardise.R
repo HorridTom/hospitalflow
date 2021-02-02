@@ -171,3 +171,54 @@ test_that("import_and_standardise correctly brings in data, with dupe removal",{
   expect_equal(data_list[[1]] %>% dplyr::select(-episode_id, -site), standardised_data_1)
   expect_equal(data_list[[2]] %>% dplyr::select(-episode_id, -site), standardised_data_2)
 })
+
+
+test_that("import_and_standardise correctly sets time zone",{
+  test_import_list <- list(list(data_path = tmp_data_1,
+                                config_path = tmp_config_1,
+                                site = "A",
+                                facility = "ED",
+                                time_zone = "Pacific/Auckland"),
+                           list(data_path = tmp_data_2,
+                                config_path = tmp_config_2,
+                                site = "A",
+                                facility = "IP",
+                                time_zone = "Pacific/Auckland"))
+
+  data_list <- lapply(import_and_standardise(test_import_list, remove_duplicates = TRUE), function(x) {
+    x$data
+  })
+
+  standardised_data_1 <- tibble::tibble(pseudo_id = c("0001", "0001", "0002"),
+                                        start_datetime = as.POSIXct(c("01/01/2019 12:00:00",
+                                                                      "01/02/2019 13:00:00",
+                                                                      "01/01/2019 14:23:00"),
+                                                                    tz = "Pacific/Auckland",
+                                                                    format = "%d/%m/%Y %H:%M:%S"),
+                                        end_datetime = as.POSIXct(c("01/01/2019 15:00:00",
+                                                                    "01/02/2019 15:12:00",
+                                                                    "01/01/2019 20:01:00"),
+                                                                  tz = "Pacific/Auckland",
+                                                                  format = "%d/%m/%Y %H:%M:%S"),
+                                        gender = factor(c("Male", "Male", "Female")))
+
+  standardised_data_2 <- tibble::tibble(pseudo_id = c("0001", "0002", "0003"),
+                                        start_datetime = as.POSIXct(c("2019-02-01 13:10:00",
+                                                                      "2019-02-01 15:18:00",
+                                                                      "2019-02-03 11:35:00"),
+                                                                    tz = "Pacific/Auckland",
+                                                                    format = "%Y-%m-%d %H:%M:%S"),
+                                        end_datetime = as.POSIXct(c("2019-02-07 09:37:00",
+                                                                    "2019-02-03 17:48:00",
+                                                                    "2019-02-20 12:19:00"),
+                                                                  tz = "Pacific/Auckland",
+                                                                  format = "%Y-%m-%d %H:%M:%S"),
+                                        gender = factor(c("Male", "Female", "Female")))
+
+  # Check that the time zone has been set to "Pacific/Auckland"
+  expect_equal(attr(data_list[[1]]$start_datetime, "tzone"), attr(standardised_data_1$start_datetime, "tzone"))
+  expect_equal(attr(data_list[[1]]$end_datetime, "tzone"), attr(standardised_data_1$end_datetime, "tzone"))
+  expect_equal(attr(data_list[[2]]$start_datetime, "tzone"), attr(standardised_data_2$start_datetime, "tzone"))
+  expect_equal(attr(data_list[[2]]$end_datetime, "tzone"), attr(standardised_data_2$end_datetime, "tzone"))
+
+})
