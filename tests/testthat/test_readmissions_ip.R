@@ -22,7 +22,8 @@ test_that("readmissions within 90 days is giving the right expected answer",{
 
   result <- result %>%
     dplyr::select(x, y) %>%
-    dplyr::slice(1:5)
+    dplyr::slice(1:5) %>%
+    tibble::as_tibble()
 
   result$y <- round(result$y, digits = 1)
 
