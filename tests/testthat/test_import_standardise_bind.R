@@ -9,7 +9,7 @@ test_that("Example data are correctly imported, standardised, and bound", {
   test_data_list <- make_generic_standardise_test_data()
   test_data_names <- names(test_data_list)
   lapply(test_data_names, function(x) {
-    readr::write_csv(test_data_list[[x]], path = file.path("testdata", "generic_standardise", paste(x, ".csv", sep = "")))
+    readr::write_csv(test_data_list[[x]], file = file.path("testdata", "generic_standardise", paste(x, ".csv", sep = "")))
   })
 
   # Set up import list
