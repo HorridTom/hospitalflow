@@ -8,7 +8,7 @@
 #'
 #'
 #' @return A dataframe with mean, Q1, Q3, max and min occupancy for each hour of the week
-#'
+#' @export
 #'
 #' @examples
 ED_day_hour <- function(startDay, endDay, df){

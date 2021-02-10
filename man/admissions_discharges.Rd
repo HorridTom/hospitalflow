@@ -7,11 +7,11 @@ data isn't  standardised
 admission_discharges}
 \usage{
 admissions_discharges(
-  start_date = as.Date("2018-12-10", tz = "Europe/London"),
-  end_date = as.Date("2018-12-23", tz = "Europe/London"),
+  start_date,
+  end_date,
   data,
   plot_chart,
-  hospital_name = "Chelsea & Westminster"
+  hospital_name = "Hospial name"
 )
 }
 \arguments{

@@ -15,6 +15,12 @@
 weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "week",
                                 plot_chart, hospital_name, restrict_plot_range = TRUE){
 
+  #get time zone of data
+  time_zone <- attr(data$spell_start, "tzone")
+
+  #set input dates to have the same time zone as the data
+  start_date <- as.POSIXct(start_date, tz = time_zone)
+  end_date <- as.POSIXct(end_date, tz = time_zone)
 
   #selecting the date and creating the flow groups
   dt_select <- data %>%
@@ -49,8 +55,8 @@ weekly_ed_att_flgrp <- function(start_date, end_date, data, time_unit = "week",
 
 
   if(restrict_plot_range) {
-    plot_x_lims <- c(as.POSIXct(start_date, tz = "Europe/London"),
-                     as.POSIXct(end_date, tz = "Europe/London"))
+    plot_x_lims <- c(as.POSIXct(start_date, tz = time_zone),
+                     as.POSIXct(end_date, tz = time_zone))
   } else {
     plot_x_lims <- c(min(count_df %>% dplyr::pull(Time)),
                      max(count_df %>% dplyr::pull(Time)))

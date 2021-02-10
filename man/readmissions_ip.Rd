@@ -5,8 +5,8 @@
 \title{readmissions_ip}
 \usage{
 readmissions_ip(
-  start_date = as.POSIXct("2016-01-01 00:00:00", tz = "Europe/London"),
-  end_date = as.POSIXct("2016-03-31 00:00:00", tz = "Europe/London"),
+  start_date,
+  end_date,
   data,
   readmission_by,
   plot_chart,

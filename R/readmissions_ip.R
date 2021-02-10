@@ -11,9 +11,14 @@
 #' @export
 #'
 #' @examples
-readmissions_ip <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = "Europe/London"),
-                            end_date = as.POSIXct("2016-03-31 00:00:00", tz = "Europe/London"),
-                            data, readmission_by , plot_chart, hospital_name){
+readmissions_ip <- function(start_date, end_date, data, readmission_by , plot_chart, hospital_name){
+
+  #get time zone of data
+  time_zone <- attr(data$spell_start, "tzone")
+
+  #set input dates to have the same time zone as the data
+  start_date <- as.POSIXct(start_date, tz = time_zone)
+  end_date <- as.POSIXct(end_date, tz = time_zone)
 
   dt_select <- data %>%
     dplyr::select(pseudo_id, spell_number, spell_start, spell_end, ed_admission, admission_method_type) %>%
@@ -90,14 +95,14 @@ readmissions_ip <- function(start_date = as.POSIXct("2016-01-01 00:00:00", tz = 
   chart_title <- paste0(hospital_name, title_stub, readmission_by, Days,  start_date_title, " to ", end_date_title)
 
 
-  pct$data$x <- as.Date(pct$data$x, tz = "Europe/London")
+  pct$data$x <- as.Date(pct$data$x, tz = time_zone)
   cht_data <- add_rule_breaks(pct$data)
   pct <- ggplot2::ggplot(cht_data, ggplot2::aes(x, y, label = x))
   #cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
   #convert arguments to dates and round to nearest quarter
-  st.dt <- as.Date(start_date, format = "%Y-%m-%d", tz = "Europe/London")
-  ed.dt <- as.Date(end_date, format = "%Y-%m-%d", tz = "Europe/London")
+  st.dt <- as.Date(start_date, format = "%Y-%m-%d", tz = time_zone)
+  ed.dt <- as.Date(end_date, format = "%Y-%m-%d", tz = time_zone)
   cht_axis_breaks <- seq(st.dt, ed.dt, by = "quarters")
   #ylimlow <- min(min(pct$data$y, na.rm = TRUE),min(pct$data$lcl, na.rm = TRUE))
 
