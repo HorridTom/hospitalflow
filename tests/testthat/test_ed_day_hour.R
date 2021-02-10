@@ -10,7 +10,7 @@ end_datetime <- c("2013-01-11 23:54:00", "2013-01-03 23:54:01", "2013-01-10 23:4
                   "2013-01-12 23:55:03", "2013-01-13 23:45:04", "2013-01-14 22:56:05")
 ED_day_hour_test_data <- tibble::tibble(pseudo_id, start_datetime, end_datetime)
 
-testthat::test_that("Occupancy is calculated correctly for constructed data",{
+test_that("Occupancy is calculated correctly for constructed data",{
 
   occupancy_day1 <- occupancy(as.POSIXct("2013-01-01 12:00:00"), df = ED_day_hour_test_data, start_time = "start_datetime", end_time = "end_datetime")
   occupancy_day6 <- occupancy(as.POSIXct("2013-01-06 12:00:00"), df = ED_day_hour_test_data, start_time = "start_datetime", end_time = "end_datetime")
@@ -23,7 +23,7 @@ testthat::test_that("Occupancy is calculated correctly for constructed data",{
 
 occupancy_df_test <- ED_day_hour("2013-01-01","2013-01-15", df = ED_day_hour_test_data)
 
-testthat::test_that("Average is calculated correctly for constructed data",{
+test_that("Average is calculated correctly for constructed data",{
 
   # averages at 12:00:00 each day
   average_mon <- occupancy_df_test[[13,"average"]]
@@ -40,7 +40,7 @@ testthat::test_that("Average is calculated correctly for constructed data",{
 })
 
 
-testthat::test_that("Q1 is calculated correctly for constructed data",{
+test_that("Q1 is calculated correctly for constructed data",{
 
   q1_mon <- occupancy_df_test[[13,"Q1"]]
   q1_tues <- occupancy_df_test[[37,"Q1"]]
@@ -55,7 +55,7 @@ testthat::test_that("Q1 is calculated correctly for constructed data",{
 
 })
 
-testthat::test_that("Q3 is calculated correctly for constructed data",{
+test_that("Q3 is calculated correctly for constructed data",{
 
   q3_mon <- occupancy_df_test[[13,"Q3"]]
   q3_tues <- occupancy_df_test[[37,"Q3"]]
@@ -70,7 +70,7 @@ testthat::test_that("Q3 is calculated correctly for constructed data",{
 
 })
 
-testthat::test_that("Max is calculated correctly for constructed data",{
+test_that("Max is calculated correctly for constructed data",{
 
   max_mon <- occupancy_df_test[[13,"Max"]]
   max_tues <- occupancy_df_test[[37,"Max"]]
@@ -85,7 +85,7 @@ testthat::test_that("Max is calculated correctly for constructed data",{
 
 })
 
-testthat::test_that("Min is calculated correctly for constructed data",{
+test_that("Min is calculated correctly for constructed data",{
 
   min_mon <- occupancy_df_test[[13,"Min"]]
   min_tues <- occupancy_df_test[[37,"Min"]]
@@ -104,7 +104,7 @@ testthat::test_that("Min is calculated correctly for constructed data",{
 # real data sample
 test_data_uhl_ed_sample <- readRDS("testdata/test_data_uhl_ed_sample.rds")
 
-testthat::test_that("Occupancy is calculated correctly for real data",{
+test_that("Occupancy is calculated correctly for real data",{
 
   occupancy_day1 <- hospitalflow::occupancy(as.POSIXct("2016-10-01 12:00:00"), df = test_data_uhl_ed_sample, start_time = "start_datetime", end_time = "end_datetime")
   occupancy_day7 <- hospitalflow::occupancy(as.POSIXct("2016-10-07 12:00:00"), df = test_data_uhl_ed_sample, start_time = "start_datetime", end_time = "end_datetime")
@@ -117,7 +117,7 @@ testthat::test_that("Occupancy is calculated correctly for real data",{
 
 occupancy_df_test_real <- ED_day_hour("2016-10-01","2016-10-15", df = test_data_uhl_ed_sample)
 
-testthat::test_that("Average is calculated correctly for real data",{
+test_that("Average is calculated correctly for real data",{
 
   average_mon <- occupancy_df_test_real[[13,"average"]]
   average_tues <- occupancy_df_test_real[[37,"average"]]
@@ -133,7 +133,7 @@ testthat::test_that("Average is calculated correctly for real data",{
 })
 
 
-testthat::test_that("Q1 is calculated correctly for real data",{
+test_that("Q1 is calculated correctly for real data",{
 
   q1_mon <- occupancy_df_test_real[[13,"Q1"]]
   q1_tues <- occupancy_df_test_real[[37,"Q1"]]
@@ -148,7 +148,7 @@ testthat::test_that("Q1 is calculated correctly for real data",{
 
 })
 
-testthat::test_that("Q3 is calculated correctly for real data",{
+test_that("Q3 is calculated correctly for real data",{
 
   q3_mon <- occupancy_df_test_real[[13,"Q3"]]
   q3_tues <- occupancy_df_test_real[[37,"Q3"]]
@@ -163,7 +163,7 @@ testthat::test_that("Q3 is calculated correctly for real data",{
 
 })
 
-testthat::test_that("Max is calculated correctly for real data",{
+test_that("Max is calculated correctly for real data",{
 
   max_mon <- occupancy_df_test_real[[13,"Max"]]
   max_tues <- occupancy_df_test_real[[37,"Max"]]
@@ -178,7 +178,7 @@ testthat::test_that("Max is calculated correctly for real data",{
 
 })
 
-testthat::test_that("Min is calculated correctly for real data",{
+test_that("Min is calculated correctly for real data",{
 
   min_mon <- occupancy_df_test_real[[13,"Min"]]
   min_tues <- occupancy_df_test_real[[37,"Min"]]
