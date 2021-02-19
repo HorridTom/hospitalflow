@@ -4,8 +4,9 @@ author: "CLAHRC NWL Information Intelligence Team"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 params:
-  sample_weeks: 2
-  sample_no_of_patients: 500
+  sample_weeks: 1
+  sample_no_of_patients: 50
+  import_list_path: "../lgt-config/lgt_import_list.rds"
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -36,7 +37,7 @@ Number of patients sampled: `r params$sample_no_of_patients`
 ```{r import-data, cache=TRUE, echo=FALSE}
 # Import and Standardise Data
 
-import_list <- readRDS("../lgt-config/lgt_import_list.rds")
+import_list <- readRDS(params$import_list_path)
 
 # This import list uses relative paths (good for us during development)
 # which means the paths need prepending with "../" to work from the
@@ -55,8 +56,8 @@ data_list <- hospitalflow::import_standardise_bind(import_list)
 ```
 
 ```{r spell-table, cache=TRUE, echo=FALSE}
-ed_data <- data_list[["ED"]] %>% dplyr::filter(site == "QEH")
-inpatient_data <- data_list[["IP"]] %>% dplyr::filter(site == "QEH")
+ed_data <- data_list[["ED"]]
+inpatient_data <- data_list[["IP"]]
 
 data_start_date <- as.Date(max(min(ed_data$start_datetime, na.rm = TRUE),
                        min(ed_data$end_datetime, na.rm = TRUE),
