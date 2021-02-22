@@ -17,7 +17,7 @@ test_that("four hour performance is giving the right expected answer",{
 
 
   #Run four_hr_performance
-  result <- four_hrs_perf(start_dt = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
+  result <- hospitalflow::four_hrs_perf(start_dt = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
                           end_dt = as.POSIXct("2019-06-02 00:00:00", tz = "Europe/London"),
                           data = four_hr_performance, time_unit = "month",
                           plot_chart = FALSE, hospital_name = "Hospital_name")
