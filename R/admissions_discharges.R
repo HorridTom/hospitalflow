@@ -65,7 +65,7 @@ admissions_discharges <- function(start_date, end_date, data, plot_chart, hospit
   # Place the new list, with dates, into a tibble and format it accordingly.
   # DO the same as with the adm column by finding the weekday, and merged with the admission table
 
-  df_adm_date <- tibble::as.tibble(df_period)
+  df_adm_date <- tibble::as_tibble(df_period)
 
   df_adm_wkday <- df_adm_date  %>%
     dplyr::rename(adm  = "value") %>%
@@ -100,7 +100,7 @@ admissions_discharges <- function(start_date, end_date, data, plot_chart, hospit
 
 
   #creating a period
-  df_disch_date <- tibble::as.tibble(df_period)
+  df_disch_date <- tibble::as_tibble(df_period)
 
   # creating new variables Weekday, Day in the period generated above
   df_disch_wkday <- df_disch_date  %>%

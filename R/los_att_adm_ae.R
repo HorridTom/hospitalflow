@@ -129,7 +129,9 @@ Note: (i) results are intended for management information only",
 
   }else{
 
-    att_plot_t_binned$data %>% dplyr::select(Time_binned, Variable, Value)
+    att_plot_t_binned$data %>%
+      tibble::as_tibble() %>%
+      dplyr::select(Time_binned, Variable, Value)
 
   }
 

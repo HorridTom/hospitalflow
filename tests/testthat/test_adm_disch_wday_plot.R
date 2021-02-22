@@ -3,7 +3,6 @@ library(hospitalflow)
 
 test_that("Admission numbers by day of the Week for improvised data",{
 
-  load("testdata/test_sample_data.rda")
 
   #Specify correct results
   correct_answers <- tibble::tibble(
@@ -50,7 +49,7 @@ test_that("Admission numbers by day of the Week for improvised data",{
     dplyr::arrange(Weekday, Event)
 
   #Test results are correct
-  expect_equal(as.data.frame(result), as.data.frame(correct_answers), tolerance = 0.01)
+  expect_equal(tibble::as_tibble(result), tibble::as_tibble(correct_answers), tolerance = 0.01)
 
 
 })
