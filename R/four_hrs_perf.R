@@ -72,7 +72,7 @@ four_hrs_perf <- function(start_dt,
                         show.grid = TRUE, multiply= 100)
 
   #get time zone of data
-  time_zone <- attr(data$spell_start, "tzone")
+  time_zone <- attr(data$start_datetime, "tzone")
 
   pct$data$x <- as.Date(pct$data$x, tz = time_zone)
   cht_data <- add_rule_breaks(pct$data)
