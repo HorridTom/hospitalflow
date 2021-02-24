@@ -1,6 +1,10 @@
 #' render_example_report
 #'
 #' @param sample_weeks The number of weeks of sample data to use for the report.
+#' @param sample_no_of_patients The sample size of patients to be used. If this
+#' value is not sepecified, the total number of patients in the data set will be used.
+#' @param import_list_path The path to the import_list for the data that you want to
+#' use for the report.
 #' @return The system.time output for the time taken to render the report.
 #' @export
 #'

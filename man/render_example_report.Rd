@@ -4,10 +4,20 @@
 \alias{render_example_report}
 \title{render_example_report}
 \usage{
-render_example_report(sample_weeks = 4)
+render_example_report(
+  sample_weeks = 4,
+  sample_no_of_patients = 500,
+  import_list_path = "../example-config/example_import_list.rds"
+)
 }
 \arguments{
 \item{sample_weeks}{The number of weeks of sample data to use for the report.}
+
+\item{sample_no_of_patients}{The sample size of patients to be used. If this
+value is not sepecified, the total number of patients in the data set will be used.}
+
+\item{import_list_path}{The path to the import_list for the data that you want to
+use for the report.}
 }
 \value{
 The system.time output for the time taken to render the report.
