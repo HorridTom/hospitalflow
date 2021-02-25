@@ -8,7 +8,7 @@ render_example_report(
   sample_weeks = 4,
   sample_no_of_patients = 500,
   import_list_path = "../example-config/example_import_list.rds",
-  output_dir = paste0("vignettes/example-reports")
+  output_dir = "vignettes/example-reports"
 )
 }
 \arguments{

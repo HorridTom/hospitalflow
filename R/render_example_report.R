@@ -12,7 +12,7 @@
 #' @examples
 render_example_report <- function(sample_weeks = 4, sample_no_of_patients = 500,
                                   import_list_path = "../example-config/example_import_list.rds",
-                                  output_dir = paste0("vignettes/example-reports")) {
+                                  output_dir = "vignettes/example-reports") {
 
   system.time(rmarkdown::render(input = "vignettes/example-report.Rmd",
                                 output_format = "beamer_presentation",
@@ -21,6 +21,7 @@ render_example_report <- function(sample_weeks = 4, sample_no_of_patients = 500,
                                                      "_", stringr::str_sub(system("git rev-parse HEAD", intern=TRUE), 1, 8),
                                                      ".pdf"),
                                 output_dir = output_dir,
+                                intermediates_dir = "vignettes/intermediates",
                                 params = list(sample_weeks = sample_weeks, sample_no_of_patients = sample_no_of_patients,
                                               import_list_path = import_list_path)
   ))
