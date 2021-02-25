@@ -20,7 +20,7 @@ render_example_report <- function(sample_weeks = 4, sample_no_of_patients = 500,
                                 #                      gsub(":","-",paste(strsplit(x = toString(Sys.time()),split = " ")[[1]], collapse="-")),
                                 #                      "_", stringr::str_sub(system("git rev-parse HEAD", intern=TRUE), 1, 8),
                                 #                      ".pdf"),
-                                output_file = paste0("example-report_",Sys.Date()),
+                                output_file = paste0("example-report_",Sys.Date(),".pdf"),
                                 output_dir = output_dir,
                                 params = list(sample_weeks = sample_weeks, sample_no_of_patients = sample_no_of_patients,
                                               import_list_path = import_list_path)
