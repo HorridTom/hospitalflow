@@ -7,7 +7,8 @@
 render_example_report(
   sample_weeks = 4,
   sample_no_of_patients = 500,
-  import_list_path = "../example-config/example_import_list.rds"
+  import_list_path = "../example-config/example_import_list.rds",
+  output_dir = paste0("vignettes/example-reports")
 )
 }
 \arguments{
@@ -18,6 +19,8 @@ value is not sepecified, the total number of patients in the data set will be us
 
 \item{import_list_path}{The path to the import_list for the data that you want to
 use for the report.}
+
+\item{output_dir}{The directory in which the output report will be saved.}
 }
 \value{
 The system.time output for the time taken to render the report.
