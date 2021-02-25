@@ -12,7 +12,7 @@
 #' @examples
 render_example_report <- function(sample_weeks = 4, sample_no_of_patients = 500,
                                   import_list_path = "../example-config/example_import_list.rds",
-                                  output_dir = "vignettes/example-reports/testdir") {
+                                  output_dir) {
 
   system.time(rmarkdown::render(input = "vignettes/example-report.Rmd",
                                 output_format = "beamer_presentation",
