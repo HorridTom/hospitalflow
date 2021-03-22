@@ -10,19 +10,23 @@
 #' @export
 #'
 #' @examples
-render_example_report <- function(sample_weeks = 4, sample_no_of_patients = 500,
+render_example_report <- function(title = "Example Hospital Flow Report",
+                                  author = "CLAHRC NWL Information Intelligence Team",
+                                  hospital_name = "Anytown General Hospital",
+                                  sample_weeks = 4,
+                                  sample_no_of_patients = 500,
                                   import_list_path = "../example-config/example_import_list.rds",
                                   output_dir) {
 
   system.time(rmarkdown::render(input = "vignettes/example-report.Rmd",
                                 output_format = "beamer_presentation",
-                                # output_file = paste0("example-report_",
-                                #                      gsub(":","-",paste(strsplit(x = toString(Sys.time()),split = " ")[[1]], collapse="-")),
-                                #                      "_", stringr::str_sub(system("git rev-parse HEAD", intern=TRUE), 1, 8),
-                                #                      ".pdf"),
-                                output_file = paste0("example-report_",Sys.Date(),".pdf"),
+                                output_file = paste0(gsub(" ","_",hospital_name),"_",gsub(":","-",paste(strsplit(x = toString(Sys.time()),split = " ")[[1]], collapse="-")),".pdf"),
                                 output_dir = output_dir,
-                                params = list(sample_weeks = sample_weeks, sample_no_of_patients = sample_no_of_patients,
-                                              import_list_path = import_list_path)
+                                params = list(sample_weeks = sample_weeks,
+                                              sample_no_of_patients = sample_no_of_patients,
+                                              import_list_path = import_list_path,
+                                              title = title,
+                                              author = author,
+                                              hospital_name = hospital_name)
   ))
 }
