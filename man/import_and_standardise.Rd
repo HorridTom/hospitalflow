@@ -4,13 +4,15 @@
 \alias{import_and_standardise}
 \title{import_and_standardise}
 \usage{
-import_and_standardise(data_import_list)
+import_and_standardise(data_import_list, remove_duplicates = TRUE)
 }
 \arguments{
-\item{data_import_list}{list of named lists, each named list has two elements called
-data_path and config_path, whose values are character strings specifying the paths
+\item{data_import_list}{list of named lists, each named list has four elements called
+data_path, config_path, site, and facility. The first two of these are character strings specifying the paths
 to i) a csv file to import data from and ii) a folder containing hospitalflow config
-files.}
+files. The latter two specify the site and facility (e.g. ED, IP, UCC).}
+
+\item{remove_duplicates}{boolean to control whether data is de-duped (TRUE) or not (FALSE).}
 }
 \value{
 list of tibbles, each containing standardised import of one data file from data_paths

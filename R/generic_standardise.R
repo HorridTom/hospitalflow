@@ -19,10 +19,10 @@ get_factor_recode <- function(config_path) {
   column_mapping <- readRDS(file.path(config_path, "column_mapping.rds"))
 
   # get list of config files
-  config_file_list <- Sys.glob(paste0(config_path, "*.rds"))
+  config_file_list <- Sys.glob(file.path(config_path, "*.rds"))
 
   # add column for file names of factor level config files in the config path
-  column_mapping <- column_mapping %>% dplyr::mutate(config_file_name = paste0(config_path, standard, "_levels.rds"),
+  column_mapping <- column_mapping %>% dplyr::mutate(config_file_name = file.path(config_path, paste0(standard, "_levels.rds")),
                                                      factor_config_file = dplyr::if_else(config_file_name %in% config_file_list, config_file_name, NA_character_)) %>%
     dplyr::select(-config_file_name)
 
@@ -195,16 +195,20 @@ get_colname_mapping <- function(config_path) {
 
 #' import_and_standardise
 #'
-#' @param data_import_list list of named lists, each named list has two elements called
-#' data_path and config_path, whose values are character strings specifying the paths
+#' @param data_import_list list of named lists, each named list has four elements called
+#' data_path, config_path, site, and facility. The first two of these are character strings specifying the paths
 #' to i) a csv file to import data from and ii) a folder containing hospitalflow config
-#' files.
+#' files. The latter two specify the site and facility (e.g. ED, IP, UCC).
+#' @param remove_duplicates boolean to control whether data is de-duped (TRUE) or not (FALSE).
 #'
 #' @return list of tibbles, each containing standardised import of one data file from data_paths
 #' @export
 #'
 #' @examples
-import_and_standardise <- function(data_import_list) {
+import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
+
+  #get timezone from config
+  datetime_formats <- readRDS(file.path(data_import_list[[1]]$config_path, "datetime_formats.rds"))
 
   # Take the data_import_list and for each element x, load the data located at data_path
   # using configuration specified by the files at config_path.
@@ -212,11 +216,14 @@ import_and_standardise <- function(data_import_list) {
   # get_import_col_types from the config files.
   data_config_list <- lapply(data_import_list,
                              function(x) {list(data = readr::read_csv(x$data_path,
-                                                                      locale = readr::locale(tz = 'Europe/London'),
+                                                                      locale = readr::locale(tz = x$time_zone),
                                                                       col_types = eval(rlang::call2(readr::cols,
                                                                                                     !!!get_import_col_types(x$config_path),
                                                                                                     .default = readr::col_skip()))),
-                                               config_path = x$config_path)
+                                               config_path = x$config_path,
+                                               site = x$site,
+                                               facility = x$facility,
+                                               time_zone = x$time_zone)
     })
 
   # Rename the columns in each imported dataset, using the name mapping onto standard hospitalflow
@@ -227,7 +234,10 @@ import_and_standardise <- function(data_import_list) {
                                                                     get_colname_mapping(x$config_path) %>%
                                                                       dplyr::filter(provided %in% colnames(x$data))
                                                                     ),
-                                    config_path = x$config_path)
+                                    config_path = x$config_path,
+                                    site = x$site,
+                                    facility = x$facility,
+                                    time_zone = x$time_zone)
                                })
 
   # Recode factors
@@ -235,23 +245,55 @@ import_and_standardise <- function(data_import_list) {
                              function(x) {
                                list(data = eval(rlang::call2(dplyr::mutate, .data = x$data,
                                                              !!!get_factor_recode(x$config_path))),
-                               config_path = x$config_path)
+                               config_path = x$config_path,
+                               site = x$site,
+                               facility = x$facility,
+                               time_zone = x$time_zone)
                              })
 
-  # Extract the data as a tibble for each imported file, and return as a list of these tibbles.
-  data_list <- lapply(data_config_list, function(x) x$data)
+  # If no site column has been imported, create one and populate with the configured site value
+  data_config_list <- lapply(data_config_list, function(x) {
+    if("site" %in% colnames(x$data)) {
+      if(!is.na(x$site)) warning(
+        "Site is specified both as a column in the data and through config. Config value will be ignored."
+        )
+    } else {
+      x$data <- x$data %>% dplyr::mutate(site = x$site)
+    }
+    x
+  })
 
-  # Add episode ids to each tibble
-  data_list <- lapply(data_list, make_episode_ids)
+  # Extract the data as a tibble for each imported file, and return as a list of these tibbles.
+  # data_list <- lapply(data_config_list, function(x) x$data)
+
+  # Add episode ids to each data tibble
+  data_config_list <- lapply(data_config_list, function(x) {
+    list(data = make_episode_ids(x$data),
+         config_path = x$config_path,
+         site = x$site,
+         facility = x$facility,
+         time_zone = x$time_zone)
+         })
+
+  # If required, de-dupe each tibble based on pseudo_id, and episode start and end time
+  if(remove_duplicates) {
+    data_config_list <- lapply(data_config_list, function(x) {
+      list(data = dplyr::distinct(x$data, pseudo_id, start_datetime, end_datetime, .keep_all = TRUE),
+           config_path = x$config_path,
+           site = x$site,
+           facility = x$facility,
+           time_zone = x$time_zone)
+    })
+  }
 
   # Label this list of tibbles with the names of the files they came from
   data_filenames <- sapply(data_import_list, function(x) {
     tools::file_path_sans_ext(basename(x[["data_path"]]))
     })
-  data_list <- setNames(data_list, data_filenames)
+  data_config_list <- setNames(data_config_list, data_filenames)
 
-  # Return named list of tibbles
-  data_list
+  # Return named list of lists with data tibbles and config metadata
+  data_config_list
 }
 
 
@@ -268,7 +310,60 @@ make_episode_ids <- function(episode_data) {
 }
 
 
-# lgt_data_import_list <- list(list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_ED.csv",
+#' bind_into_facilities
+#'
+#' @param data_config_list
+#'
+#' @return list of as many tibbles as there are unique values of facility in the provided config list. Each
+#' tibble is formed by row binding all imported data for that facility.
+#' @export
+#'
+bind_into_facilities <- function(data_config_list) {
+  fac_list <- unique(sapply(data_config_list, function(x) x$facility))
+  standardised_data <- lapply(fac_list, function(x) {
+    fac_data_config_list <- filter_config_list(data_config_list, field = "facility", value = x)
+    fac_data_list <- lapply(fac_data_config_list, function(x) x$data)
+    dplyr::bind_rows(fac_data_list)
+  })
+  setNames(standardised_data, fac_list)
+}
+
+
+#' import_standardise_bind
+#'
+#' @param data_import_list list of named lists, each named list has four elements called
+#' data_path, config_path, site, and facility. The first two of these are character strings specifying the paths
+#' to i) a csv file to import data from and ii) a folder containing hospitalflow config
+#' files. The latter two specify the site and facility (e.g. ED, IP, UCC).
+#'
+#' @return list of as many tibbles as there are unique values of facility in the provided config list. Each
+#' tibble is formed by row binding all imported data for that facility. N.B. when sites with different time zones
+#' are bound together, all datetimes are converted to have the same time zone by R default.
+#' @export
+#'
+import_standardise_bind <- function(data_import_list) {
+  data_config_list <- import_and_standardise(data_import_list)
+  bind_into_facilities(data_config_list)
+}
+
+
+#' filter_config_list
+#'
+#' @param config_list a configuration list (of lists)
+#' @param field the field of the inner lists to filter on
+#' @param value the value of the field to filter to
+#'
+#' @return list of only those inner lists where field == value
+#' @export
+#'
+filter_config_list <- function(config_list, field, value) {
+  config_list <- lapply(config_list, function(x) {
+    if(x[[field]] == value) {x} else {NA}
+  })
+  config_list[!is.na(config_list)]
+}
+
+# lgt__data_import_list <- list(list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_QEH_20190107_ED.csv",
 #                                    config_path = "lgt-config/ed/"),
 #                               list(data_path = "../lgt-data/data-extract-201901/CLAHRCExtractToSend_UHL_20190104_AW.csv",
 #                                    config_path =  "lgt-config/aw/"),

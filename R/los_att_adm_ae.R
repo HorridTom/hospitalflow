@@ -10,9 +10,15 @@
 #' @export
 #'
 #' @examples
-los_att_adm_ae <- function(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-                           end_date = as.Date("2013-01-01", tz = "Europe/London"),
-                           data, plot_chart, hospital_name = "Chelsea & Westminster"){
+los_att_adm_ae <- function(start_date, end_date, data, plot_chart,
+                           hospital_name){
+
+  #get time zone of data
+  time_zone <- attr(data$spell_start, "tzone")
+
+  #set input dates to have the same time zone as the data
+  start_date <- as.Date(start_date, tz = time_zone)
+  end_date <- as.Date(end_date, tz = time_zone)
 
   df <- data %>%
     dplyr::select(spell_number, spell_start, spell_end, spell_class_col, initial_ed_end_datetime) %>%
@@ -123,7 +129,9 @@ Note: (i) results are intended for management information only",
 
   }else{
 
-    att_plot_t_binned$data %>% dplyr::select(Time_binned, Variable, Value)
+    att_plot_t_binned$data %>%
+      tibble::as_tibble() %>%
+      dplyr::select(Time_binned, Variable, Value)
 
   }
 

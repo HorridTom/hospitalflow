@@ -11,10 +11,15 @@
 #' @export
 #'
 #' @examples
-four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Europe/London"),
-                                      end_dt = as.Date("2016-09-01", tz = "Europe/London"),
-                                      data, time_unit = "day",  plot_chart, hospital_name = "Hospital_Name"){
+four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day",
+                                      plot_chart, hospital_name = "Hospital_Name"){
 
+  #get time zone of data
+  time_zone <- attr(data$spell_start, "tzone")
+
+  #set input dates to have the same time zone as the data
+  start_dt <- as.Date(start_dt, tz = time_zone)
+  end_dt <- as.Date(end_dt, tz = time_zone)
 
   dt_select <- data %>%
     dplyr::filter(spell_start < end_dt | initial_ed_end_datetime > start_dt) %>%
@@ -40,7 +45,7 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
 
   sum_4hrs_perf <- dt_los %>%
     dplyr::group_by(Time, Hr_perf, flow_groups) %>%
-    dplyr::summarise(Count = n()) %>%
+    dplyr::summarise(Count = dplyr::n()) %>%
     tidyr::drop_na() %>%
     tidyr::spread(Hr_perf, Count) %>%
     dplyr::mutate(N = under_4hrs + above_4hrs) %>%
@@ -90,29 +95,29 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
   pct_flow_4 <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_4, chart = 'pp', ylab = "percent",
                                show.grid = TRUE, multiply= 100)
 
-  pct_flow_1$data$x <- as.Date(pct_flow_1$data$x, tz = "Europe/London")
+  pct_flow_1$data$x <- as.Date(pct_flow_1$data$x, tz = time_zone)
   cht_data_flow_1 <- add_rule_breaks(pct_flow_1$data)
   pct_flow_1 <- ggplot2::ggplot(cht_data_flow_1, ggplot2::aes(x, y, label = x))
   cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
-  pct_flow_2$data$x <- as.Date(pct_flow_2$data$x, tz = "Europe/London")
+  pct_flow_2$data$x <- as.Date(pct_flow_2$data$x, tz = time_zone)
   cht_data_flow_2 <- add_rule_breaks(pct_flow_2$data)
   pct_flow_2 <- ggplot2::ggplot(cht_data_flow_2, ggplot2::aes(x, y, label = x))
   cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
-  pct_flow_3$data$x <- as.Date(pct_flow_3$data$x, tz = "Europe/London")
+  pct_flow_3$data$x <- as.Date(pct_flow_3$data$x, tz = time_zone)
   cht_data_flow_3 <- add_rule_breaks(pct_flow_3$data)
   pct_flow_3 <- ggplot2::ggplot(cht_data_flow_3, ggplot2::aes(x, y, label = x))
   cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
-  pct_flow_4$data$x <- as.Date(pct_flow_4$data$x, tz = "Europe/London")
+  pct_flow_4$data$x <- as.Date(pct_flow_4$data$x, tz = time_zone)
   cht_data_flow_4 <- add_rule_breaks(pct_flow_4$data)
   pct_flow_4 <- ggplot2::ggplot(cht_data_flow_4, ggplot2::aes(x, y, label = x))
   cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
   #ensure passed arguments are dates
-  st.dt <- as.Date(start_dt, format = "%Y-%m-%d", tz = "Europe/London")
-  ed.dt <- as.Date(end_dt, format = "%Y-%m-%d", tz = "Europe/London")
+  st.dt <- as.Date(start_dt, format = "%Y-%m-%d", tz = time_zone)
+  ed.dt <- as.Date(end_dt, format = "%Y-%m-%d", tz = time_zone)
   #q.st.dt <- as.Date(zoo::as.yearqtr(st.dt, format = "%Y-%m-%d"))
   #q.ed.dt <- as.Date(zoo::as.yearqtr(ed.dt, format = "%Y-%m-%d"), frac = 1) + 1
 
@@ -180,6 +185,16 @@ four_hrs_perf_flow_groups <- function(start_dt = as.Date("2016-01-01", tz = "Eur
 
 
 
+#' format_control_chart
+#'
+#' @param cht ggplot chart object
+#' @param r1_col colour to highlight rule 1 breaks
+#' @param r2_col colour to highlight rule 2 breaks
+#' @param main_col colour without highlight
+#'
+#' @return chart with formatting applied
+#'
+#' @examples
 format_control_chart <- function(cht, r1_col, r2_col, main_col = "black") {
 
   point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, "None" = main_col)

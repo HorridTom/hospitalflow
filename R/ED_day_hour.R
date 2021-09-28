@@ -8,7 +8,7 @@
 #'
 #'
 #' @return A dataframe with mean, Q1, Q3, max and min occupancy for each hour of the week
-#'
+#' @export
 #'
 #' @examples
 ED_day_hour <- function(startDay, endDay, df){
@@ -78,10 +78,10 @@ ED_day_hour_plot <- function(startDay, endDay, df,
     ggplot2::theme(legend.position = "bottom") +
     ggplot2::geom_ribbon(data = occupancy_df,
                          ggplot2::aes(ymin = Q1, ymax = Q3, fill = "interquartile range"),
-                         alpha = "0.2") +
+                         alpha = 0.2) +
     ggplot2::geom_ribbon(data = occupancy_df,
                          ggplot2::aes(ymin = Min, ymax = Max, fill = "range"),
-                         alpha = "0.2") +
+                         alpha = 0.2) +
     ggplot2::scale_colour_manual("",
                                  values = "red") +
     ggplot2::scale_fill_manual("",

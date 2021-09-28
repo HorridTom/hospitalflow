@@ -40,7 +40,7 @@ four_hrs_perf <- function(start_dt,
 
   sum_4hrs_perf <- dt_los %>%
     dplyr::group_by(Time, Hr_perf) %>%
-    dplyr::summarise(Count = n()) %>%
+    dplyr::summarise(Count = dplyr::n()) %>%
     tidyr::drop_na() %>%
     tidyr::spread(Hr_perf, Count) %>%
     dplyr::mutate(N = under_4hrs + above_4hrs) %>%
@@ -71,14 +71,17 @@ four_hrs_perf <- function(start_dt,
   pct <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf, chart = 'pp', ylab = "percent",
                         show.grid = TRUE, multiply= 100)
 
-  pct$data$x <- as.Date(pct$data$x, tz = "Europe/London")
+  #get time zone of data
+  time_zone <- attr(data$start_datetime, "tzone")
+
+  pct$data$x <- as.Date(pct$data$x, tz = time_zone)
   cht_data <- add_rule_breaks(pct$data)
   pct <- ggplot2::ggplot(cht_data, ggplot2::aes(x, y, label = x))
   cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
   #convert arguments to dates and round to nearest quarter
-  st.dt <- as.Date(start_dt, format = "%Y-%m-%d", tz = "Europe/London")
-  ed.dt <- as.Date(end_dt, format = "%Y-%m-%d", tz = "Europe/London")
+  st.dt <- as.Date(start_dt, format = "%Y-%m-%d", tz = time_zone)
+  ed.dt <- as.Date(end_dt, format = "%Y-%m-%d", tz = time_zone)
   #q.st.dt <- as.Date(zoo::as.yearqtr(st.dt, format = "%Y-%m-%d"))
   #q.ed.dt <- as.Date(zoo::as.yearqtr(ed.dt, format = "%Y-%m-%d"), frac = 1) + 1
   cht_axis_breaks <- seq(st.dt, ed.dt, by = "quarters")
@@ -106,31 +109,8 @@ four_hrs_perf <- function(start_dt,
 
   }else{
 
-   four_hr_plot$data
+   four_hr_plot$data %>% tibble::as_tibble()
 
   }
-
-}
-
-
-format_control_chart <- function(cht, r1_col, r2_col) {
-
-  point_colours <- c("Rule 1" = r1_col, "Rule 2" = r2_col, "None" = "black")
-  cht +
-    ggplot2::geom_line(colour = "black", size = 0.5) +
-    ggplot2::geom_line(ggplot2::aes(x,cl), size = 0.75) +
-    ggplot2::geom_line(ggplot2::aes(x,ucl), size = 0.75, linetype = 2) +
-    ggplot2::geom_line(ggplot2::aes(x,lcl), size = 0.75, linetype = 2) +
-    ggplot2::geom_point(ggplot2::aes(colour = highlight), size = 2) +
-    ggplot2::scale_color_manual("Rule triggered*", values = point_colours) +
-    ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
-                   panel.grid.major.x = ggplot2::element_line(colour = "grey80"),
-                   panel.grid.minor = ggplot2::element_blank(), panel.background = ggplot2::element_blank(),
-                   axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1.0, size = 14),
-                   axis.text.y = ggplot2::element_text(size = 14), axis.title = ggplot2::element_text(size = 14),
-                   plot.title = ggplot2::element_text(size = 20, hjust = 0),
-                   plot.subtitle = ggplot2::element_text(size = 16, face = "italic"),
-                   axis.line = ggplot2::element_line(colour = "grey60"),
-                   plot.caption = ggplot2::element_text(size = 10, hjust = 0.5))
 
 }

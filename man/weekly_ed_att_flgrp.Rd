@@ -4,12 +4,22 @@
 \alias{weekly_ed_att_flgrp}
 \title{weekly_ed_att_flgrp}
 \usage{
-weekly_ed_att_flgrp(start_date, end_date, data, time_unit = "week",
-  plot_chart, hospital_name, restrict_plot_range = TRUE)
+weekly_ed_att_flgrp(
+  start_date,
+  end_date,
+  data,
+  time_unit = "week",
+  plot_chart,
+  hospital_name,
+  restrict_plot_range = TRUE
+)
 }
 \arguments{
 \item{restrict_plot_range}{whether to zoom the plot to only the range
 specified by start_date and end_date}
+}
+\value{
+
 }
 \description{
 weekly_ed_att_flgrp

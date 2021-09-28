@@ -4,8 +4,12 @@
 \alias{make_spell_number}
 \title{make_spell_number}
 \usage{
-make_spell_number(ed_data, inpatient_data, same_type_episode_lag = 1,
-  different_type_episode_lag = 6)
+make_spell_number(
+  ed_data,
+  inpatient_data,
+  same_type_episode_lag = 1,
+  different_type_episode_lag = 6
+)
 }
 \arguments{
 \item{ed_data}{standard ED data}

@@ -4,12 +4,19 @@
 \alias{los_distrib_method_admission}
 \title{los_distrib_method_admission}
 \usage{
-los_distrib_method_admission(start_date = as.Date("2012-01-01", tz =
-  "Europe/London"), end_date = as.Date("2015-01-01", tz =
-  "Europe/London"), data, plot_chart, hospital_name = "Hospital Name")
+los_distrib_method_admission(
+  start_date,
+  end_date,
+  data,
+  plot_chart,
+  hospital_name = "Hospital Name"
+)
 }
 \arguments{
 \item{hospital_name}{}
+}
+\value{
+
 }
 \description{
 los_distrib_method_admission

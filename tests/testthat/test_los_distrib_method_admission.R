@@ -50,7 +50,9 @@ test_that("Length of stay for admitted patients, for improvised data",{
   # result$admission_method_type <- as.character(result$admission_method_type)
   result$Count <- as.numeric(result$Count)
 
-  result_data <- result %>% dplyr::select(losbinned, admission_method_type, Count)
+  result_data <- result %>%
+    dplyr::select(losbinned, admission_method_type, Count) %>%
+    tibble::as_tibble()
 
   #Test results are correct
   expect_equal(result_data, correct_answers, tolerance = 0.1)
@@ -73,7 +75,8 @@ test_that("Length of stay for admitted patients, for real data",{
   correct_answers <- readr::read_csv("testdata/los_distrib_queh_sample_tests/correct_answers.csv")
 
   correct_answers <- correct_answers %>%
-    dplyr::select(losbinned, admission_method_type, Count)
+    dplyr::select(losbinned, admission_method_type, Count) %>%
+    tibble::as_tibble()
 
 
   #Run Admission Discharges graph - with min and max dates chosen based on spell_Start and spell_end
@@ -84,6 +87,8 @@ test_that("Length of stay for admitted patients, for real data",{
   # result$admission_method_type <- as.character(result$admission_method_type)
   result$Count <- as.numeric(result$Count)
   result$losbinned <- as.character(result$losbinned)
+
+  result <- result %>% tibble::as_tibble()
 
 
   #Test results are correct

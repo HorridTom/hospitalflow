@@ -27,12 +27,14 @@
 ###################################
 # Admission Discharges ############
 #####################################################################################################
-admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europe/London"),
-                                  end_date = as.Date("2018-12-23",tz = "Europe/London"),
-                                  data, plot_chart, hospital_name = "Chelsea & Westminster"){
+admissions_discharges <- function(start_date, end_date, data, plot_chart, hospital_name = "Hospial name"){
 
-  # start_date = as.Date("2017-01-01", tz = "Europe/London")
-  # end_date = as.Date("2017-02-01",tz = "Europe/London")
+  #get time zone of data
+  time_zone <- attr(data$spell_start, "tzone")
+
+  #set input dates to have the same time zone as the data
+  start_date <- as.Date(start_date, tz = time_zone)
+  end_date <- as.Date(end_date, tz = time_zone)
 
   #selecting the variables needed, with new variables created
   admission_discharge <- data  %>%
@@ -63,7 +65,7 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
   # Place the new list, with dates, into a tibble and format it accordingly.
   # DO the same as with the adm column by finding the weekday, and merged with the admission table
 
-  df_adm_date <- tibble::as.tibble(df_period)
+  df_adm_date <- tibble::as_tibble(df_period)
 
   df_adm_wkday <- df_adm_date  %>%
     dplyr::rename(adm  = "value") %>%
@@ -98,7 +100,7 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
 
 
   #creating a period
-  df_disch_date <- tibble::as.tibble(df_period)
+  df_disch_date <- tibble::as_tibble(df_period)
 
   # creating new variables Weekday, Day in the period generated above
   df_disch_wkday <- df_disch_date  %>%
@@ -193,9 +195,7 @@ admissions_discharges <- function(start_date = as.Date("2018-12-10", tz = "Europ
 #' @export
 #'
 adm_disch_day_of_week <- function() {
-  admissions_discharges(start_date = as.Date("2012-01-01", tz = "Europe/London"),
-                                    end_date = as.Date("2015-01-01", tz = "Europe/London"),
-                                    data = hospitalflow::cw_disch_201201_201507_782cfa21_stddt_s, plot_chart = TRUE, hospital_name = "Chelsea & Westminster")
+  admissions_discharges(start_date, end_date, data, plot_chart = TRUE, hospital_name)
 }
 
 

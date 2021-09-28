@@ -84,14 +84,19 @@ spell_variables <- function(all_episodes) {
     dplyr::mutate(disposal_code = purrr::map(data, get_disposal_code)) %>%
     dplyr::mutate(hrg_ae_code = purrr::map(data, get_hrg)) %>%
     dplyr::mutate(source_referral_ae = purrr::map(data, get_source_of_referral)) %>%
+    dplyr::mutate(died_ip = purrr::map(data, get_mortality_ip)) %>%
     dplyr::select(-data) %>%
-    tidyr::unnest()
+    tidyr::unnest(cols = c(constituent_ed_episodes, constituent_ip_episodes, gender, age_band_start,
+                           episode_class_sequence, admission_method_type, initial_ed_end_datetime,
+                           disposal_code, hrg_ae_code, source_referral_ae, died_ip))
+
+
 
   spell_table <- all_episodes %>%
     dplyr::group_by(spell_number) %>%
     dplyr::summarise(spell_start = min(start_datetime, na.rm = TRUE),
                      spell_end = max(end_datetime, na.rm = TRUE),
-                     number_of_episodes = n(),
+                     number_of_episodes = dplyr::n(),
                      pseudo_id = dplyr::first(pseudo_id)) %>%
     dplyr::left_join(episode_lists, by = "spell_number") %>%
     dplyr::mutate(starts_with_ed = stringr::str_detect(episode_class_sequence, pattern = "^E.*$"),
@@ -177,6 +182,7 @@ add_spell_variables <- function(ed_data, inpatient_data, spell_table) {
     dplyr::ungroup() %>%
     dplyr::mutate(days_since_prev_disch = difftime(spell_start, prev_disch, units = "days"))
 
+
 }
 
 # get_main_specialty <- function(x) {
@@ -189,6 +195,7 @@ add_spell_variables <- function(ed_data, inpatient_data, spell_table) {
 #       dplyr::pull(main_specialty)
 #   }
 # }
+
 
 
 get_episode_id_list <- function(episode_df, episode_type_to_list) {
@@ -271,6 +278,8 @@ admission_method_class <- function(admission_method_df) {
 
 }
 
+
+
 get_initial_ed_episode_end_datetime <- function(spell_episodes_df) {
   first_episode_of_spell <- spell_episodes_df %>%
     dplyr::arrange(start_datetime) %>%
@@ -317,5 +326,14 @@ get_hrg <- function(hrg_df){
 }
 
 
+get_mortality_ip <- function(died_ip_df){
 
+  died_ip <- died_ip_df %>%
+    dplyr::group_by(pseudo_id) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::mutate(died = dplyr::if_else(discharge_method == 4, TRUE, FALSE)) %>%
+    dplyr::pull(died)
+
+  died_ip[1]
+}
 

@@ -6,6 +6,9 @@
 \usage{
 adm_disch_day_of_week()
 }
+\value{
+
+}
 \description{
 adm_disch_day_of_week
 }

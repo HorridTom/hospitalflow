@@ -9,6 +9,9 @@ add_directorate_variable(spell_table)
 \arguments{
 \item{spell_table}{}
 }
+\value{
+
+}
 \description{
 add_directorate_variable
 }
