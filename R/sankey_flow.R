@@ -14,10 +14,20 @@
 #'
 #' @examples
 plot_flow_diagram <- function(moves_table, ward_level = F,
-                              start = min(moves_table$move_datetime), end = max(moves_table$move_datetime),
+                              start = NULL,
+                              end = NULL,
                               selected_levels = NULL,
                               remove_static_moves = F
                               ){
+
+  #set defualt start and end unless specified
+  if(is.null(start)){
+    start <- min(moves_table$move_datetime)
+  }
+
+  if(is.null(end)){
+    end <- max(moves_table$move_datetime)
+  }
 
   #filters moves table between start and end
   moves_table <- moves_table %>%

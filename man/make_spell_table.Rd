@@ -23,7 +23,7 @@ can be separated by and still be classified as part of the same spell.}
 can be separated by and still be classified as part of the same spell.}
 }
 \value{
-spell table
+named list containing the spell table and the all_episodes table
 }
 \description{
 make_spell_table

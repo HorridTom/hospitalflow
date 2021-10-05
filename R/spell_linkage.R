@@ -22,6 +22,8 @@ make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1,
 #'
 #' @param ed_data standard ED data
 #' @param inpatient_data standard inpatient data
+#' @param all_episodes all episodes tables (this is an output from make_spell_table)
+#' @param ward_mapping_config_path path to the ward mapping config file
 #'
 #' @return moves table
 #' @export
@@ -29,7 +31,8 @@ make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1,
 #' @examples
 make_moves_table <- function(ed_data = test_ed_data_sample,
                              inpatient_data = test_ip_data_sample,
-                             all_episodes){
+                             all_episodes,
+                             ward_mapping_config_path){
 
   moves_table <- all_episodes %>%
     dplyr::select(pseudo_id, start_datetime, end_datetime, ward_category,episode_id, episode_type, spell_number) %>%
@@ -45,9 +48,13 @@ make_moves_table <- function(ed_data = test_ed_data_sample,
     dplyr::select(spell_number, pseudo_id, move_from, move_to, move_datetime) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(move_from_category = dplyr::if_else(move_from == "ED", "ED",
-                                                      dplyr::if_else(move_from == "External Incoming", move_from, get_ward_mapping(move_from)))) %>%
+                                                      dplyr::if_else(move_from == "External Incoming",
+                                                                     move_from,
+                                                                     get_ward_mapping(move_from, ward_mapping_config_path)))) %>%
     dplyr::mutate(move_to_category = dplyr::if_else(move_to == "ED", "ED",
-                                                    dplyr::if_else(move_to == "External Outgoing", move_to, get_ward_mapping(move_to)))) %>%
+                                                    dplyr::if_else(move_to == "External Outgoing",
+                                                                   move_to,
+                                                                   get_ward_mapping(move_to, ward_mapping_config_path)))) %>%
 
     dplyr::mutate(move_number = 1:dplyr::n())
 

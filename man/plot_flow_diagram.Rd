@@ -7,9 +7,10 @@
 plot_flow_diagram(
   moves_table,
   ward_level = F,
-  start = min(moves_table$move_datetime),
-  end = max(moves_table$move_datetime),
-  selected_levels = NULL
+  start = NULL,
+  end = NULL,
+  selected_levels = NULL,
+  remove_static_moves = F
 )
 }
 \arguments{
