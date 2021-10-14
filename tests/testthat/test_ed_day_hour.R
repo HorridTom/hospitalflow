@@ -12,7 +12,7 @@ ED_day_hour_test_data <- tibble::tibble(pseudo_id, start_datetime, end_datetime)
 
 testthat::test_that("Occupancy is calculated correctly for constructed data",{
 
-  occupancy_day1 <- occupancy(time_instance = as.POSIXct("2013-01-01 12:00:00"), df = ED_day_hour_test_data, )
+  occupancy_day1 <- occupancy(time_instance = as.POSIXct("2013-01-01 12:00:00"), df = ED_day_hour_test_data, df_type = "ED table")
   occupancy_day6 <- occupancy(time_instance = as.POSIXct("2013-01-06 12:00:00"), df = ED_day_hour_test_data, df_type = "ED table")
   occupancy_day13 <- occupancy(time_instance = as.POSIXct("2013-01-13 12:00:00"), df = ED_day_hour_test_data, df_type = "ED table")
   occupancies <- c(occupancy_day1, occupancy_day6, occupancy_day13)
