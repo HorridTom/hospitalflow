@@ -73,8 +73,16 @@ test_that("spell table is created correctly",{
                                            age_band_start, admission_method, discharge_method) #, admission_method
 
 
-  result <- make_spell_table(ed_data_age_sex, inpatient_data_age_sex, same_type_episode_lag = 1, different_type_episode_lag = 6) %>%
-    dplyr::select(spell_number, spell_start, spell_end, number_of_episodes, admission_method_type)
+  result <- make_spell_table(ed_data_age_sex,
+                             inpatient_data_age_sex,
+                             same_type_episode_lag = 1,
+                             different_type_episode_lag = 6)
+
+  result <- result$spell_table
+
+  result <- result %>%
+    dplyr::select(spell_number, spell_start, spell_end, number_of_episodes,
+                  admission_method_type)
 
   result$spell_number <- as.character(result$spell_number)
   result$number_of_episodes <- as.character(result$number_of_episodes)
