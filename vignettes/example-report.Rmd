@@ -1,6 +1,6 @@
 ---
 title: "Example Hospital Flow Report"
-author: "CLAHRC NWL Information Intelligence Team"
+author: "ARC/CLAHRC NWL Information Intelligence Team"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 params:
@@ -26,6 +26,9 @@ library(magrittr)
 sample_duration <- lubridate::duration(params$sample_weeks, "weeks")
 sample_no_of_patients <- params$sample_no_of_patients
 ```
+
+This report was created using the _hospitalflow_ package, created by the
+ARC/CLAHRC NWL Information Intelligence Team.
 
 Package version: `r stringr::str_sub(system("git rev-parse HEAD", intern=TRUE), 1, 8)`
 
@@ -121,6 +124,26 @@ example_moves_table <- hospitalflow::make_moves_table(ed_data = example_ed_data,
 ## Example dataset
 This example report is based on `r nrow(example_ed_data)` emergency department attendances and `r nrow(example_inpatient_data)` inpatient episodes of care, linked into `r nrow(example_spell_table)` hospital spells. All attendances and admissions occurred prior to `r end_date` and all discharges after `r start_date`.
 
+## Hospital Flow Diagram
+```{r sankey-high-level, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
+hospitalflow::plot_flow_diagram(moves_table = example_moves_table, 
+                                ward_level = F,
+                                start = NULL, 
+                                end = NULL,
+                                selected_levels = NULL,
+                                remove_static_moves = T)
+```
+
+```{r sankey-ward-level, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE, include = FALSE}
+hospitalflow::plot_flow_diagram(moves_table = example_moves_table, 
+                                ward_level = T,
+                                start = NULL, 
+                                end = NULL,
+                                selected_levels = NULL,
+                                remove_static_moves = F)
+```
+
+
 ## Age and Gender
 
 ```{r age-gender-ed, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
@@ -202,7 +225,7 @@ hospitalflow::los_distrib_method_admission(start_date = start_date, end_date = e
                                            hospital_name = "Anytown General Hospital")
 ```
 
-## Alternative ED occupancy by hour of week
+## ED occupancy by hour of week
 ```{r ed-occ-1, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
 hospitalflow::occupancy_weekday_hour(start_date = as.POSIXct(start_date, tz = "Europe/London"),
                                    end_date = as.POSIXct(end_date, tz = "Europe/London"),
@@ -239,24 +262,4 @@ hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/L
                               plot_chart = TRUE,
                               hospital_name = "Anytown General Hospital",
                               readmission_by = 90)
-```
-
-## Sankey Flow Diagram High Level
-```{r sankey-high-level, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
-hospitalflow::plot_flow_diagram(moves_table = example_moves_table, 
-                                ward_level = F,
-                                start = NULL, 
-                                end = NULL,
-                                selected_levels = NULL,
-                                remove_static_moves = F)
-```
-
-## Sankey Flow Diagram Ward Level
-```{r sankey-ward-level, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
-hospitalflow::plot_flow_diagram(moves_table = example_moves_table, 
-                                ward_level = T,
-                                start = NULL, 
-                                end = NULL,
-                                selected_levels = NULL,
-                                remove_static_moves = F)
 ```
