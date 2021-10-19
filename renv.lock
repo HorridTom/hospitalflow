@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.0.3",
+    "Version": "4.0.4",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -625,6 +625,13 @@
       "Repository": "CRAN",
       "Hash": "a525aba14184fec243f9eaec62fbed43"
     },
+    "igraph": {
+      "Package": "igraph",
+      "Version": "1.2.7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f1e720796423d6c08bf430fc3be0bf10"
+    },
     "ini": {
       "Package": "ini",
       "Version": "0.3.1",
@@ -799,6 +806,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "7aa61e5aa2c4c09905885a10a14534c9"
+    },
+    "networkD3": {
+      "Package": "networkD3",
+      "Version": "0.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "38310ec4ddb1398359abdd603c151067"
     },
     "nlme": {
       "Package": "nlme",
