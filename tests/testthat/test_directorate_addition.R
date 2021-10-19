@@ -77,9 +77,14 @@ test_that("directorate is calculated correctly",{
                                            main_specialty, discharge_method)
 
 
-  # run the function make_spell_table
+  # get the spell table for this data
 
-  result <- make_spell_table(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 6)
+  result <- make_spell_table(ed_data,
+                             inpatient_data,
+                             same_type_episode_lag = 1,
+                             different_type_episode_lag = 6)
+
+  result <- result$spell_table
 
   # in order to be able to add directorate, first we need to add spell variables
   # which will output an object with main specialty start, prev_disch, days_since_prev_discharges

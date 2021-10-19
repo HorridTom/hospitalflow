@@ -28,7 +28,7 @@ occupancy_weekday_hour <- function(start_date, end_date, data, plot_chart, hospi
 
   time_hr <- seq(from = start_date, to = end_date, by = "hour")
 
-  occupancy_vct <- sapply(time_hr, occupancy, df = df_select, start_time = "spell_start", end_time = "initial_ed_end_datetime")
+  occupancy_vct <- sapply(time_hr, occupancy, df = df_select, df_type = "spell table modified")
 
   occupancy_df <- tibble::tibble(time_hr, occupancy_vct)
 

@@ -12,9 +12,9 @@ occupancy_on_arrival <- function(df){
 
   df <- df %>%
     dplyr::rowwise() %>%
-    dplyr::mutate(occupancy_on_arrival = hospitalflow::occupancy(start_datetime, df,
-                                                                 start_time = "start_datetime",
-                                                                 end_time = "end_datetime"))
+    dplyr::mutate(occupancy_on_arrival = hospitalflow::occupancy(time_instance = start_datetime, df,
+                                                                 df_type = "ED table"
+                                                                 ))
 
   df
 

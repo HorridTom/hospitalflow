@@ -29,9 +29,9 @@ test_that("Occupancy at specified time correct for improvised data",{
                                             spell_start,
                                             spell_end)
 
-  result0 <- occupancy(t0, df = test_arrivals_occupancy)
-  result1 <- occupancy(t1, df = test_arrivals_occupancy)
-  result2 <- occupancy(t2, df = test_arrivals_occupancy)
+  result0 <- occupancy(time_instance = t0, df = test_arrivals_occupancy, df_type = "spell table")
+  result1 <- occupancy(time_instance = t1, df = test_arrivals_occupancy, df_type = "spell table")
+  result2 <- occupancy(time_instance = t2, df = test_arrivals_occupancy, df_type = "spell table")
 
   #Test resultsare correct
   expect_equal(result0,  correct_answer0)
@@ -58,8 +58,8 @@ test_that("Occupancy by hour of a date is generated correctly, for real data",{
   correct_answer1 <- 2
 
   #Specify correct results
-  result0 <- occupancy(t0, df = occupancy_test)
-  result1 <- occupancy(t1, df = occupancy_test)
+  result0 <- occupancy(time_instance = t0, df = occupancy_test, df_type = "spell table")
+  result1 <- occupancy(time_instance = t1, df = occupancy_test, df_type = "spell table")
 
   #Test results are correct
   expect_equal(result0, correct_answer0)

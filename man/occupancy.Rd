@@ -4,12 +4,14 @@
 \alias{occupancy}
 \title{occupancy}
 \usage{
-occupancy(date_time, df, start_time = "spell_start", end_time = "spell_end")
+occupancy(time_instance, df, df_type = "spell table")
 }
 \arguments{
-\item{date_time}{datetime at which we want to know the occupancy}
+\item{time_instance}{datetime at which we want to know the occupancy}
 
-\item{df}{dataframe representing stays, with start_datetime and end_datetime specifying stay start and end}
+\item{df}{dataframe on which to perform the occupancy function}
+
+\item{df_type}{whether the df specified is a "spell table" or an "inpatient table" or "ED table"}
 }
 \value{
 the occupancy at date_time

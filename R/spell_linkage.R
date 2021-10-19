@@ -7,14 +7,59 @@
 #' @param different_type_episode_lag the maximum amount of time two episodes of different type
 #' can be separated by and still be classified as part of the same spell.
 #'
-#' @return spell table
+#' @return named list containing the spell table and the all_episodes table
 #' @export
 #'
 #' @examples
 make_spell_table <- function(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 6) {
   all_episodes <- make_spell_number(ed_data, inpatient_data, same_type_episode_lag, different_type_episode_lag)
-  spell_variables(all_episodes)
+  spell_table <- spell_variables(all_episodes)
+  spells_episodes_tables <- list(spell_table = spell_table, all_episodes = all_episodes)
 }
+
+
+#' make_moves_table
+#'
+#' @param ed_data standard ED data
+#' @param inpatient_data standard inpatient data
+#' @param all_episodes all episodes tables (this is an output from make_spell_table)
+#' @param ward_mapping_config_path path to the ward mapping config file
+#'
+#' @return moves table
+#' @export
+#'
+#' @examples
+make_moves_table <- function(ed_data = test_ed_data_sample,
+                             inpatient_data = test_ip_data_sample,
+                             all_episodes,
+                             ward_mapping_config_path){
+
+  moves_table <- all_episodes %>%
+    dplyr::select(pseudo_id, start_datetime, end_datetime, ward_category,episode_id, episode_type, spell_number) %>%
+    dplyr::mutate(ward_category = dplyr::if_else(episode_type == "ED", "ED", ward_category)) %>%
+    dplyr::group_by(spell_number) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::group_modify(~ dplyr::add_row(.x, ward_category = "External Outgoing")) %>%
+    dplyr::mutate(pseudo_id = dplyr::if_else(is.na(pseudo_id), dplyr::lag(pseudo_id), pseudo_id)) %>% #gives the added rows the same pseudo ID as the row above
+    dplyr::mutate(start_datetime = dplyr::if_else(is.na(start_datetime), dplyr::lag(end_datetime), start_datetime)) %>% #gives the added rows the same start and end datetimes as the row above
+    dplyr::rename(move_datetime = start_datetime, move_to = ward_category) %>%
+    dplyr::mutate(move_from = dplyr::lag(move_to)) %>%
+    dplyr::mutate(move_from = dplyr::if_else(is.na(move_from), "External Incoming", move_from)) %>%
+    dplyr::select(spell_number, pseudo_id, move_from, move_to, move_datetime) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(move_from_category = dplyr::if_else(move_from == "ED", "ED",
+                                                      dplyr::if_else(move_from == "External Incoming",
+                                                                     move_from,
+                                                                     get_ward_mapping(move_from, ward_mapping_config_path)))) %>%
+    dplyr::mutate(move_to_category = dplyr::if_else(move_to == "ED", "ED",
+                                                    dplyr::if_else(move_to == "External Outgoing",
+                                                                   move_to,
+                                                                   get_ward_mapping(move_to, ward_mapping_config_path)))) %>%
+
+    dplyr::mutate(move_number = 1:dplyr::n())
+
+}
+
 
 
 #' make_spell_number

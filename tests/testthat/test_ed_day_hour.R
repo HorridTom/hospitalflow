@@ -12,9 +12,10 @@ ED_day_hour_test_data <- tibble::tibble(pseudo_id, start_datetime, end_datetime)
 
 test_that("Occupancy is calculated correctly for constructed data",{
 
-  occupancy_day1 <- hospitalflow::occupancy(as.POSIXct("2013-01-01 12:00:00"), df = ED_day_hour_test_data, start_time = "start_datetime", end_time = "end_datetime")
-  occupancy_day6 <- hospitalflow::occupancy(as.POSIXct("2013-01-06 12:00:00"), df = ED_day_hour_test_data, start_time = "start_datetime", end_time = "end_datetime")
-  occupancy_day13 <- hospitalflow::occupancy(as.POSIXct("2013-01-13 12:00:00"), df = ED_day_hour_test_data, start_time = "start_datetime", end_time = "end_datetime")
+  occupancy_day1 <- occupancy(time_instance = as.POSIXct("2013-01-01 12:00:00"), df = ED_day_hour_test_data, df_type = "ED table")
+  occupancy_day6 <- occupancy(time_instance = as.POSIXct("2013-01-06 12:00:00"), df = ED_day_hour_test_data, df_type = "ED table")
+  occupancy_day13 <- occupancy(time_instance = as.POSIXct("2013-01-13 12:00:00"), df = ED_day_hour_test_data, df_type = "ED table")
+
   occupancies <- c(occupancy_day1, occupancy_day6, occupancy_day13)
 
   testthat::expect_equal(occupancies, c(2,5,3))
@@ -101,5 +102,106 @@ test_that("Min is calculated correctly for constructed data",{
 })
 
 
+# real data sample
+test_data_uhl_ed_sample <- readRDS("testdata/test_data_uhl_ed_sample.rds")
 
+testthat::test_that("Occupancy is calculated correctly for real data",{
+
+  occupancy_day1 <- hospitalflow::occupancy(time_instance = as.POSIXct("2016-10-01 12:00:00"), df = test_data_uhl_ed_sample, df_type = "ED table")
+  occupancy_day7 <- hospitalflow::occupancy(time_instance = as.POSIXct("2016-10-07 12:00:00"), df = test_data_uhl_ed_sample, df_type = "ED table")
+  occupancy_day13 <- hospitalflow::occupancy(time_instance = as.POSIXct("2016-10-13 12:00:00"), df = test_data_uhl_ed_sample, df_type = "ED table")
+  occupancies <- c(occupancy_day1, occupancy_day7, occupancy_day13)
+
+  testthat::expect_equal(occupancies, c(1,2,0))
+
+})
+
+occupancy_df_test_real <- ED_day_hour("2016-10-01","2016-10-15", df = test_data_uhl_ed_sample)
+
+testthat::test_that("Average is calculated correctly for real data",{
+
+  average_mon <- occupancy_df_test_real[[13,"average"]]
+  average_tues <- occupancy_df_test_real[[37,"average"]]
+  average_wed <- occupancy_df_test_real[[61,"average"]]
+  average_thurs <- occupancy_df_test_real[[85,"average"]]
+  average_fri <- occupancy_df_test_real[[109,"average"]]
+  average_sat <- occupancy_df_test_real[[133,"average"]]
+  average_sun <- occupancy_df_test_real[[157,"average"]]
+  averages <- c(average_mon, average_tues, average_wed, average_thurs, average_fri, average_sat, average_sun)
+
+  testthat::expect_equal(averages, c(0,1,1,0.5,2,0.5,0))
+
+})
+
+
+testthat::test_that("Q1 is calculated correctly for real data",{
+
+  q1_mon <- occupancy_df_test_real[[13,"Q1"]]
+  q1_tues <- occupancy_df_test_real[[37,"Q1"]]
+  q1_wed <- occupancy_df_test_real[[61,"Q1"]]
+  q1_thurs <- occupancy_df_test_real[[85,"Q1"]]
+  q1_fri <- occupancy_df_test_real[[109,"Q1"]]
+  q1_sat <- occupancy_df_test_real[[133,"Q1"]]
+  q1_sun <- occupancy_df_test_real[[157,"Q1"]]
+  q1s <- c(q1_mon, q1_tues, q1_wed, q1_thurs, q1_fri, q1_sat, q1_sun)
+
+  testthat::expect_equal(q1s, c(0,0.5,0.5,0.25,2,0.25,0))
+
+})
+
+testthat::test_that("Q3 is calculated correctly for real data",{
+
+  q3_mon <- occupancy_df_test_real[[13,"Q3"]]
+  q3_tues <- occupancy_df_test_real[[37,"Q3"]]
+  q3_wed <- occupancy_df_test_real[[61,"Q3"]]
+  q3_thurs <- occupancy_df_test_real[[85,"Q3"]]
+  q3_fri <- occupancy_df_test_real[[109,"Q3"]]
+  q3_sat <- occupancy_df_test_real[[133,"Q3"]]
+  q3_sun <- occupancy_df_test_real[[157,"Q3"]]
+  q3s <- c(q3_mon, q3_tues, q3_wed, q3_thurs, q3_fri, q3_sat, q3_sun)
+
+  testthat::expect_equal(q3s, c(0,1.5,1.5,0.75,2,0.75,0))
+
+})
+
+testthat::test_that("Max is calculated correctly for real data",{
+
+  max_mon <- occupancy_df_test_real[[13,"Max"]]
+  max_tues <- occupancy_df_test_real[[37,"Max"]]
+  max_wed <- occupancy_df_test_real[[61,"Max"]]
+  max_thurs <- occupancy_df_test_real[[85,"Max"]]
+  max_fri <- occupancy_df_test_real[[109,"Max"]]
+  max_sat <- occupancy_df_test_real[[133,"Max"]]
+  max_sun <- occupancy_df_test_real[[157,"Max"]]
+  maxes <- c(max_mon, max_tues, max_wed, max_thurs, max_fri, max_sat, max_sun)
+
+  testthat::expect_equal(maxes, c(0,2,2,1,2,1,0))
+
+})
+
+testthat::test_that("Min is calculated correctly for real data",{
+
+  min_mon <- occupancy_df_test_real[[13,"Min"]]
+  min_tues <- occupancy_df_test_real[[37,"Min"]]
+  min_wed <- occupancy_df_test_real[[61,"Min"]]
+  min_thurs <- occupancy_df_test_real[[85,"Min"]]
+  min_fri <- occupancy_df_test_real[[109,"Min"]]
+  min_sat <- occupancy_df_test_real[[133,"Min"]]
+  min_sun <- occupancy_df_test_real[[157,"Min"]]
+  mins <- c(min_mon, min_tues, min_wed, min_thurs, min_fri, min_sat, min_sun)
+
+  testthat::expect_equal(mins, c(0,0,0,0,2,0,0))
+
+})
+
+
+#tests for graphics
+test_that("Plots have known output", {
+
+  ed_occupancy_day_hour_ggplot <- ED_day_hour_plot("2016-10-01", "2016-10-15", df = test_data_uhl_ed_sample, hospital_name = "Hospital Name")
+
+  vdiffr::expect_doppelganger("ed_occupancy_day_hour_plot", ed_occupancy_day_hour_ggplot)
+
+
+})
 
