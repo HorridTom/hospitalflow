@@ -41,7 +41,7 @@ average_ed_los_flows <- function(start_date, end_date, data, plot_chart,
     dplyr::select(spell_number, time_hr, flow_groups, Los) %>%
     dplyr::arrange(time_hr) %>%
     tidyr::drop_na() %>%
-    tidyr::spread(flow_groups, Los) %>%
+    tidyr::pivot_wider(flow_groups, Los) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(Hour = lubridate::hour(time_hr)) %>%
     dplyr::group_by(Hour) %>%
