@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.0.3",
+    "Version": "4.0.4",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -697,10 +697,10 @@
     },
     "lme4": {
       "Package": "lme4",
-      "Version": "1.1-26",
+      "Version": "1.1-27.1",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "5f2466f5127e0ce67e44bb381387eeca"
+      "Hash": "c995b0405ce0894d6fe52b3e08ea9085"
     },
     "lmom": {
       "Package": "lmom",
@@ -809,10 +809,10 @@
     },
     "nloptr": {
       "Package": "nloptr",
-      "Version": "1.2.2.2",
+      "Version": "1.2.2.3",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "2737faeee353704efec5afa1e943dd64"
+      "Hash": "22eeb1eb7129a2ca17b8eb70b56a02fe"
     },
     "nnet": {
       "Package": "nnet",
@@ -858,10 +858,10 @@
     },
     "pbkrtest": {
       "Package": "pbkrtest",
-      "Version": "0.5-0.1",
+      "Version": "0.5.1",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "e4c9df9e478e08a32c27a406ce8fba90"
+      "Hash": "b304ff5955f37b48bd30518faf582929"
     },
     "pillar": {
       "Package": "pillar",
@@ -1163,13 +1163,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "dfd843ee98246cf932823acf613b05dd"
-    },
-    "statmod": {
-      "Package": "statmod",
-      "Version": "1.4.35",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "53c27113461e8abbe2dc7125e22b2a39"
     },
     "stringi": {
       "Package": "stringi",
