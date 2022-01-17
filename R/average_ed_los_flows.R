@@ -36,20 +36,43 @@ average_ed_los_flows <- function(start_date, end_date, data, plot_chart,
 
 
   # using gather function to create a new column with date
-  arrivals <-  dt_calc %>%
+  arrivals <- dt_calc %>%
     dplyr::group_by(time_hr = lubridate::floor_date(spell_start, "1 hour")) %>%
     dplyr::select(spell_number, time_hr, flow_groups, Los) %>%
     dplyr::arrange(time_hr) %>%
     tidyr::drop_na() %>%
-    tidyr::pivot_wider(flow_groups, Los) %>%
+    tidyr::pivot_wider(names_from = flow_groups, values_from = Los) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(Hour = lubridate::hour(time_hr)) %>%
-    dplyr::group_by(Hour) %>%
-    dplyr::summarise('Flow 1' = mean(`Flow 1`, na.rm =  TRUE),
-                     'Flow 2' = mean(`Flow 2`, na.rm = TRUE),
-                     'Flow 3' = mean(`Flow 3`, na.rm = TRUE),
-                     'Flow 4' = mean(`Flow 4`, na.rm = TRUE)) %>%
-    naniar::replace_with_na(replace = list('Flow 1' = NaN, 'Flow 2' = NaN, 'Flow 3' = NaN, 'Flow 4' = NaN))
+    dplyr::group_by(Hour)  #%>%
+    # dplyr::rename(Flow1 = 'Flow 1',
+    #               Flow2 = 'Flow 2',
+    #               Flow3 = 'Flow 3',
+    #               Flow4 = 'Flow 4')
+
+  #splitting pipe to check colnames
+  arrivals <- arrivals %>%
+    dplyr::mutate(`Flow 1` = ifelse("Flow 1" %in% colnames(arrivals),
+                                 `Flow 1`,
+                                 rep(0, nrow(arrivals))),
+                  `Flow 2` = ifelse("Flow 2" %in% colnames(arrivals),
+                                 `Flow 2`,
+                                 rep(0, nrow(arrivals))),
+                  `Flow 3` = ifelse("Flow 3" %in% colnames(arrivals),
+                                 `Flow 3`,
+                                 rep(0, nrow(arrivals))),
+                  `Flow 4` = ifelse("Flow 4" %in% colnames(arrivals),
+                                 `Flow 4`,
+                                 rep(0, nrow(arrivals))),
+                  ) %>%
+    dplyr::summarise(`Flow 1` = mean(`Flow 1`, na.rm = TRUE),
+                     `Flow 2` = mean(`Flow 2`, na.rm = TRUE),
+                     `Flow 3` = mean(`Flow 3`, na.rm = TRUE),
+                     `Flow 4` = mean(`Flow 4`, na.rm = TRUE)) %>%
+    naniar::replace_with_na(replace = list(`Flow 1` = NaN,
+                                           `Flow 2` = NaN,
+                                           `Flow 3` = NaN,
+                                           `Flow 4` = NaN))
 
 
 
@@ -57,7 +80,8 @@ average_ed_los_flows <- function(start_date, end_date, data, plot_chart,
 
   df_padded <- df_time_hr %>%
     dplyr::left_join(arrivals) %>%
-    tidyr::gather(key = flow_groups, value = average_arrivals, 'Flow 1', 'Flow 2', 'Flow 3', 'Flow 4') %>%
+    tidyr::gather(key = flow_groups, value = average_arrivals,
+                  `Flow 1`, `Flow 2`, `Flow 3`, `Flow 4`) %>%
     tidyr::replace_na(list(average_arrivals = 0)) %>%
     dplyr::ungroup() %>%
     tidyr::drop_na()
