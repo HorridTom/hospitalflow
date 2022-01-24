@@ -83,50 +83,68 @@ four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day",
           qic.clshade   = TRUE)
   ## ***
 
-  pct_flow_1 <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_1, chart = 'pp', ylab = "percent",
-                        show.grid = TRUE, multiply= 100)
+  #initialise ylimlow_list
+  ylimlow_vect <- c()
 
-  pct_flow_2 <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_2, chart = 'pp', ylab = "percent",
-                               show.grid = TRUE, multiply= 100)
+  if(nrow(sum_4hrs_perf_flow_1) != 0){
+    pct_flow_1 <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_1, chart = 'pp', ylab = "percent",
+                                 show.grid = TRUE, multiply= 100)
 
-  pct_flow_3 <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_3, chart = 'pp', ylab = "percent",
-                        show.grid = TRUE, multiply= 100)
+    pct_flow_1$data$x <- as.Date(pct_flow_1$data$x, tz = time_zone)
+    cht_data_flow_1 <- add_rule_breaks(pct_flow_1$data)
+    pct_flow_1 <- ggplot2::ggplot(cht_data_flow_1, ggplot2::aes(x, y, label = x))
+    cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
-  pct_flow_4 <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_4, chart = 'pp', ylab = "percent",
-                               show.grid = TRUE, multiply= 100)
+    ylimlow_flow_1 <- min(min(pct_flow_1$data$y, na.rm = TRUE),min(pct_flow_1$data$lcl, na.rm = TRUE))
+    ylimlow_vect <- c(ylimlow_vect, ylimlow_flow_1)
+  }
 
-  pct_flow_1$data$x <- as.Date(pct_flow_1$data$x, tz = time_zone)
-  cht_data_flow_1 <- add_rule_breaks(pct_flow_1$data)
-  pct_flow_1 <- ggplot2::ggplot(cht_data_flow_1, ggplot2::aes(x, y, label = x))
-  cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
+  if(nrow(sum_4hrs_perf_flow_2) != 0){
+    pct_flow_2 <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_2, chart = 'pp', ylab = "percent",
+                                 show.grid = TRUE, multiply= 100)
 
-  pct_flow_2$data$x <- as.Date(pct_flow_2$data$x, tz = time_zone)
-  cht_data_flow_2 <- add_rule_breaks(pct_flow_2$data)
-  pct_flow_2 <- ggplot2::ggplot(cht_data_flow_2, ggplot2::aes(x, y, label = x))
-  cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
+    pct_flow_2$data$x <- as.Date(pct_flow_2$data$x, tz = time_zone)
+    cht_data_flow_2 <- add_rule_breaks(pct_flow_2$data)
+    pct_flow_2 <- ggplot2::ggplot(cht_data_flow_2, ggplot2::aes(x, y, label = x))
+    cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
-  pct_flow_3$data$x <- as.Date(pct_flow_3$data$x, tz = time_zone)
-  cht_data_flow_3 <- add_rule_breaks(pct_flow_3$data)
-  pct_flow_3 <- ggplot2::ggplot(cht_data_flow_3, ggplot2::aes(x, y, label = x))
-  cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
+    ylimlow_flow_2 <- min(min(pct_flow_2$data$y, na.rm = TRUE),min(pct_flow_2$data$lcl, na.rm = TRUE))
+    ylimlow_vect <- c(ylimlow_vect, ylimlow_flow_2)
+  }
 
-  pct_flow_4$data$x <- as.Date(pct_flow_4$data$x, tz = time_zone)
-  cht_data_flow_4 <- add_rule_breaks(pct_flow_4$data)
-  pct_flow_4 <- ggplot2::ggplot(cht_data_flow_4, ggplot2::aes(x, y, label = x))
-  cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
+  if(nrow(sum_4hrs_perf_flow_3) != 0){
+    pct_flow_3 <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_3, chart = 'pp', ylab = "percent",
+                                 show.grid = TRUE, multiply= 100)
+
+    pct_flow_3$data$x <- as.Date(pct_flow_3$data$x, tz = time_zone)
+    cht_data_flow_3 <- add_rule_breaks(pct_flow_3$data)
+    pct_flow_3 <- ggplot2::ggplot(cht_data_flow_3, ggplot2::aes(x, y, label = x))
+    cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
+
+    ylimlow_flow_3 <- min(min(pct_flow_3$data$y, na.rm = TRUE),min(pct_flow_3$data$lcl, na.rm = TRUE))
+    ylimlow_vect <- c(ylimlow_vect, ylimlow_flow_3)
+  }
+
+  if(nrow(sum_4hrs_perf_flow_4) != 0){
+    pct_flow_4 <- qicharts2::qic(Time, under_4hrs, n = N, data = sum_4hrs_perf_flow_4, chart = 'pp', ylab = "percent",
+                                 show.grid = TRUE, multiply= 100)
+
+    pct_flow_4$data$x <- as.Date(pct_flow_4$data$x, tz = time_zone)
+    cht_data_flow_4 <- add_rule_breaks(pct_flow_4$data)
+    pct_flow_4 <- ggplot2::ggplot(cht_data_flow_4, ggplot2::aes(x, y, label = x))
+    cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
+
+    ylimlow_flow_4 <- min(min(pct_flow_4$data$y, na.rm = TRUE),min(pct_flow_3$data$lcl, na.rm = TRUE))
+    ylimlow_vect <- c(ylimlow_vect, ylimlow_flow_4)
+  }
 
   #ensure passed arguments are dates
   st.dt <- as.Date(start_dt, format = "%Y-%m-%d", tz = time_zone)
   ed.dt <- as.Date(end_dt, format = "%Y-%m-%d", tz = time_zone)
-  #q.st.dt <- as.Date(zoo::as.yearqtr(st.dt, format = "%Y-%m-%d"))
-  #q.ed.dt <- as.Date(zoo::as.yearqtr(ed.dt, format = "%Y-%m-%d"), frac = 1) + 1
 
   cht_axis_breaks <- seq(st.dt, ed.dt, by = "quarters")
-  ylimlow_flow_1 <- min(min(pct_flow_1$data$y, na.rm = TRUE),min(pct_flow_1$data$lcl, na.rm = TRUE))
-  ylimlow_flow_2 <- min(min(pct_flow_2$data$y, na.rm = TRUE),min(pct_flow_2$data$lcl, na.rm = TRUE))
-  ylimlow_flow_3 <- min(min(pct_flow_3$data$y, na.rm = TRUE),min(pct_flow_3$data$lcl, na.rm = TRUE))
-  ylimlow_flow_4 <- min(min(pct_flow_4$data$y, na.rm = TRUE),min(pct_flow_3$data$lcl, na.rm = TRUE))
-  ylimlow <- min(ylimlow_flow_1, ylimlow_flow_2, ylimlow_flow_3, ylimlow_flow_4)
+
+  ylimlow <- min(ylimlow_vect)
 
   plot_theme <- list(
     ggplot2::geom_hline(ggplot2::aes(yintercept = yintercept, linetype = cutoff),
@@ -142,24 +160,37 @@ four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day",
     ggplot2::ylim(ylimlow, 100)
   )
 
-    #+
-  #ggplot2::geom_text(ggplot2::aes(label = ifelse(x==max(x), format(x, '%b-%y'),'')), hjust = -0.05, vjust = 2)
+  if(exists("pct_flow_1")){
+    four_hr_plot_flow_1 <- format_control_chart(pct_flow_1, r1_col = "orange", r2_col = "steelblue", main_col = "blue") +
+      ggplot2::ggtitle("Flow 1") +
+      plot_theme
+  }else{
+    four_hr_plot_flow_1 <- ggplot2::ggplot()
+  }
 
-  four_hr_plot_flow_1 <- format_control_chart(pct_flow_1, r1_col = "orange", r2_col = "steelblue", main_col = "blue") +
-    ggplot2::ggtitle("Flow 1") +
-    plot_theme
+  if(exists("pct_flow_2")){
+    four_hr_plot_flow_2 <- format_control_chart(pct_flow_2, r1_col = "orange", r2_col = "steelblue", main_col = "red") +
+      ggplot2::ggtitle("Flow 2") +
+      plot_theme
+  }else{
+    four_hr_plot_flow_2 <- ggplot2::ggplot()
+  }
 
-  four_hr_plot_flow_2 <- format_control_chart(pct_flow_2, r1_col = "orange", r2_col = "steelblue", main_col = "red") +
-    ggplot2::ggtitle("Flow 2") +
-    plot_theme
+  if(exists("pct_flow_3")){
+    four_hr_plot_flow_3 <- format_control_chart(pct_flow_3, r1_col = "orange", r2_col = "steelblue", main_col = "green") +
+      ggplot2::ggtitle("Flow 3") +
+      plot_theme
+  }else{
+    four_hr_plot_flow_3 <- ggplot2::ggplot()
+  }
 
-  four_hr_plot_flow_3 <- format_control_chart(pct_flow_3, r1_col = "orange", r2_col = "steelblue", main_col = "green") +
-    ggplot2::ggtitle("Flow 3") +
-    plot_theme
-
-  four_hr_plot_flow_4 <- format_control_chart(pct_flow_4, r1_col = "orange", r2_col = "steelblue", main_col = "purple") +
-    ggplot2::ggtitle("Flow 4") +
-    plot_theme
+  if(exists("pct_flow_4")){
+    four_hr_plot_flow_4 <- format_control_chart(pct_flow_4, r1_col = "orange", r2_col = "steelblue", main_col = "purple") +
+      ggplot2::ggtitle("Flow 4") +
+      plot_theme
+  }else{
+    four_hr_plot_flow_4 <- ggplot2::ggplot()
+  }
 
   #caption = paste("*Shewart chart rules apply: \nRule 1: Any month outside the control limits\nRule 2: Eight or more consecutive months all above, or all below, the centre line", sep = "")
 
