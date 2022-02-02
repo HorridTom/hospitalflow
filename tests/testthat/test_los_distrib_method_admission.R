@@ -61,38 +61,21 @@ test_that("Length of stay for admitted patients, for improvised data",{
 })
 
 
-test_that("Length of stay for admitted patients, for real data",{
+test_that("Length of stay for admitted patients, for realistic synthetic data",{
 
-  #Specify correct results
+  los_distrib_synthetic_spelltable_sample <- readRDS("testdata/los_distrib_method_admission/los_distrib_synthetic_spelltable_sample.rds")
 
-  load("testdata/los_distrib_queh_sample_tests/queh_ip_sample.rda")
-
-
-
-  queh_ip_sample$spell_number <- as.character(queh_ip_sample$spell_number)
-
-
-  correct_answers <- readr::read_csv("testdata/los_distrib_queh_sample_tests/correct_answers.csv")
-
-  correct_answers <- correct_answers %>%
-    dplyr::select(losbinned, admission_method_type, Count) %>%
-    tibble::as_tibble()
-
+  correct_answers <- readRDS("testdata/los_distrib_method_admission/correct_answers.rds")
 
   #Run Admission Discharges graph - with min and max dates chosen based on spell_Start and spell_end
-  result <- hospitalflow::los_distrib_method_admission(start_date = as.Date("2015-04-01", tz = "Europe/London"), end_date = as.Date("2018-12-30", tz= "Europe/London"),
-                                                       data = queh_ip_sample,
-                                                       plot_chart = FALSE, hospital_name = "Queh")
-
-  # result$admission_method_type <- as.character(result$admission_method_type)
-  result$Count <- as.numeric(result$Count)
-  result$losbinned <- as.character(result$losbinned)
-
-  result <- result %>% tibble::as_tibble()
-
+  result <- hospitalflow::los_distrib_method_admission(start_date = as.Date("2015-04-01",
+                                                                            tz = "Europe/London"),
+                                                       end_date = as.Date("2018-12-30",
+                                                                          tz= "Europe/London"),
+                                                       data = los_distrib_synthetic_spelltable_sample,
+                                                       plot_chart = FALSE, hospital_name = "Hospital X")
 
   #Test results are correct
   expect_equal(result, correct_answers, tolerance = 0.1)
-
 
 })

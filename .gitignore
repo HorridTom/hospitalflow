@@ -37,7 +37,7 @@ rsconnect/
 /tests/testthat/testdata/four_hr_performance
 /tests/testthat/testdata/generic_standardise
 #/tests/testthat/testdata/los_att_adm_tests
-/tests/testthat/testdata/los_distrib_queh_sample_tests
+#/tests/testthat/testdata/los_distrib_queh_sample_tests
 /tests/testthat/testdata/occupancy
 /tests/testthat/testdata/occupancy_hr_day
 /tests/testthat/testdata/readmission_test
