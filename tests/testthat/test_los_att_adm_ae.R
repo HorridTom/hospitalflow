@@ -4,7 +4,7 @@ library(hospitalflow)
 
 test_that("length of stay is correctly analysed for attendances and admissions",{
 
-  test_los_att_adm_ae <- readRDS("testdata/los_att_adm_tests/test_los_att_adm_ae_spells.rds")
+  test_los_att_adm_ae <- readRDS("testdata/los_att_adm_tests/constructed_spells_los_att_adm.rds")
 
   correct_answers <- tibble::tibble(
 
@@ -26,10 +26,11 @@ test_that("length of stay is correctly analysed for attendances and admissions",
 })
 
 
-test_that("length of stay is correctly analysed for attendances and admissions for real data",{
+test_that("length of stay is correctly analysed for attendances and admissions
+          for realistic synthetic data",{
 
-  spell_table <- readr::read_rds("testdata/los_att_adm_tests/spelltable_sample.rds")
-  correct_answers <- readr::read_rds("testdata/los_att_adm_tests/correct_answers_real_data_los_att_adm.rds")
+  spell_table <- readr::read_rds("testdata/los_att_adm_tests/synthetic_spelltable_sample.rds")
+  correct_answers <- readr::read_rds("testdata/los_att_adm_tests/correct_answers_spelltable_data_los_att_adm.rds")
   correct_answers <- tibble::as_tibble(correct_answers)
 
   result <- hospitalflow::los_att_adm_ae(start_date = as.Date("2016-01-01", tz = "Europe/London"),
