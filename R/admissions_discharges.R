@@ -189,15 +189,4 @@ admissions_discharges <- function(start_date, end_date, data, plot_chart, hospit
 
 
 
-#' adm_disch_day_of_week
-#'
-#' @return
-#' @export
-#'
-adm_disch_day_of_week <- function() {
-  admissions_discharges(start_date, end_date, data, plot_chart = TRUE, hospital_name)
-}
-
-
-
 
