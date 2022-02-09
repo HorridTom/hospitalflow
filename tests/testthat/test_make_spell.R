@@ -7,8 +7,8 @@ test_that("spell table is created correctly",{
   correct_answers <- tibble::tibble(
 
     spell_number = as.character(c("1", "2", "3", "4", "5", "6", "7", "8", "9")),
-    spell_start = as.POSIXct(c("2019-01-02 17:00", "2019-01-03 08:00", "2019-01-03 19:00", "2019-01-01 17:00", "2019-01-02 08:00", "2019-01-03 08:00", "2019-01-04 14:00", "2019-01-05 06:00", "2019-01-04 14:00")),
-    spell_end = as.POSIXct(c("2019-01-02 21:30", "2019-01-03 10:00", "2019-01-03 21:00", "2019-01-02 00:00", "2019-01-02 10:00", "2019-01-03 11:00", "2019-01-05 03:00", "2019-01-05 13:00", "2019-01-04 17:00")),
+    spell_start = as.POSIXct(c("2019-01-02 17:00", "2019-01-03 08:00", "2019-01-03 19:00", "2019-01-01 17:00", "2019-01-02 08:00", "2019-01-03 08:00", "2019-01-04 14:00", "2019-01-05 06:00", "2019-01-04 14:00"), tz = "Europe/London"),
+    spell_end = as.POSIXct(c("2019-01-02 21:30", "2019-01-03 10:00", "2019-01-03 21:00", "2019-01-02 00:00", "2019-01-02 10:00", "2019-01-03 11:00", "2019-01-05 03:00", "2019-01-05 13:00", "2019-01-04 17:00"), tz = "Europe/London"),
     number_of_episodes = as.character(c("2", "1", "1", "1", "1", "1", "2", "1", "1")),
     admission_method_type = as.character(c("Emergency Admissions", "Emergency Admissions",  "Elective Admissions", NA,"Elective Admissions", "Elective Admissions", "Other Admissions", "Other Admissions", NA))
   )
