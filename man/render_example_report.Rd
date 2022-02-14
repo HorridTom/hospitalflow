@@ -4,10 +4,30 @@
 \alias{render_example_report}
 \title{render_example_report}
 \usage{
-render_example_report(sample_weeks = 4)
+render_example_report(
+  title = "Example Hospital Flow Report",
+  author = "CLAHRC NWL Information Intelligence Team",
+  hospital_name = "Anytown General Hospital",
+  sample_weeks = 1,
+  sample_no_of_patients = 50,
+  import_list_path = "../example-config/example_import_list.rds",
+  output_dir = "reports"
+)
 }
 \arguments{
+\item{title}{The title to use for the report.}
+
+\item{author}{The author to be named on the report.}
+
+\item{hospital_name}{The hospital name to use for the report and all graphs.}
+
 \item{sample_weeks}{The number of weeks of sample data to use for the report.}
+
+\item{import_list_path}{The directory containing the import list as an RDS file.}
+
+\item{output_dir}{The directory where the report will be saved.}
+
+\item{sample_no_patients}{The number of patients in the sample data to use for the report.}
 }
 \value{
 The system.time output for the time taken to render the report.
