@@ -8,8 +8,11 @@ params:
   author: "CLAHRC NWL Information Intelligence Team"
   hospital_name: "Anytown General Hospital"
   import_list_path: "../example-config/example_import_list.rds"
-  sample_weeks: 1
-  sample_no_of_patients: 100
+  sample_weeks: 8
+  sample_no_of_patients: NULL
+  use_existing_spell_table: TRUE
+  existing_spell_table_path: "../data/spell_table.rda"
+  existing_moves_table_path: "../data/moves_table.rda"
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -38,7 +41,8 @@ Number of weeks used as sample: `r params$sample_weeks`
 Number of patients sampled: `r params$sample_no_of_patients`
 
 ```{r import-data, cache=TRUE, echo=FALSE}
-# Import and Standardise Data
+if(params$use_existing_spell_table == FALSE){
+  # Import and Standardise Data
 
 import_list <- readRDS(params$import_list_path)
 
@@ -56,10 +60,12 @@ import_list <- lapply(import_list, function(x) {
 })
 
 data_list <- hospitalflow::import_standardise_bind(import_list)
+}
 ```
 
 ```{r spell-table, cache=TRUE, echo=FALSE}
-ed_data <- data_list[["ED"]] 
+if(params$use_existing_spell_table == FALSE){
+  ed_data <- data_list[["ED"]] 
 inpatient_data <- data_list[["IP"]] 
 
 data_start_date <- as.Date(max(min(ed_data$start_datetime, na.rm = TRUE),
@@ -96,7 +102,7 @@ if(!is.na(sample_duration)) {
 }
 
 #samples down by number of patients 
-if(!is.na(sample_no_of_patients)) {
+if(!is.null(sample_no_of_patients)) {
   
   inpatients <- levels(factor(example_inpatient_data$pseudo_id))
   sample_inpatients <- sample(inpatients, sample_no_of_patients)
@@ -121,6 +127,18 @@ example_moves_table <- hospitalflow::make_moves_table(ed_data = example_ed_data,
                                                       inpatient_data = example_inpatient_data,
                                                       all_episodes = example_all_episodes,
                                                       ward_mapping_config_path = import_list$ip_import$config_path)
+}else{
+  load(params$existing_spell_table_path)
+  load(params$existing_moves_table_path)
+  
+  example_spell_table <- spell_table
+  example_moves_table <- moves_table
+  
+  start_date <- min(example_spell_table$spell_start, na.rm = TRUE)
+  end_date <- max(example_spell_table$spell_start, na.rm = TRUE)
+}
+
+
 ```
 ## Example dataset
 This example report is based on `r nrow(example_ed_data)` emergency department attendances and `r nrow(example_inpatient_data)` inpatient episodes of care, linked into `r nrow(example_spell_table)` hospital spells. All attendances and admissions occurred prior to `r end_date` and all discharges after `r start_date`.
@@ -206,7 +224,7 @@ hospitalflow::los_distrib_method_admission(start_date = start_date, end_date = e
                                            hospital_name = "Anytown General Hospital")
 ```
 
-## Alternative ED occupancy by hour of week
+## ED occupancy by hour of week
 ```{r ed-occ-1, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
 hospitalflow::occupancy_weekday_hour(start_date = as.POSIXct(start_date, tz = "Europe/London"),
                                    end_date = as.POSIXct(end_date, tz = "Europe/London"),
