@@ -29,8 +29,7 @@ ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_c
     dplyr::filter(spell_start <= end_date & spell_end >= start_date) %>%
     dplyr::select(spell_number, spell_start, spell_end, gender, age_band_start, spell_class_col)
 
-  dt$age_band_start <- factor(dt$age_band_start, levels = c("0 yrs", "1-4 yrs","5-9 yrs","10-14 yrs","15-19 yrs","20-24 yrs","25-29 yrs","30-34 yrs","35-39 yrs","40-44 yrs",
-                                            "45-49 yrs","50-54 yrs","55-59 yrs","60-64 yrs","65-69 yrs","70-74 yrs","75-79 yrs","80-84 yrs", "85-89 yrs", "90-94 yrs", "95+"))
+  dt$age_band_start <- factor(dt$age_band_start, levels = gtools::mixedsort(unique(dt$age_band_start)))
 
   # finding the number of ae attendances
   df_ae_attendances <- dt %>%
