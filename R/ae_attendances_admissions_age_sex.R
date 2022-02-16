@@ -29,7 +29,8 @@ ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_c
     dplyr::filter(spell_start <= end_date & spell_end >= start_date) %>%
     dplyr::select(spell_number, spell_start, spell_end, gender, age_band_start, spell_class_col)
 
-  dt$age_band_start <- factor(dt$age_band_start, levels = gtools::mixedsort(unique(dt$age_band_start)))
+  dt <- dt %>%
+    dplyr::mutate(age_band_start = factor(age_band_start, levels = gtools::mixedsort(unique(dt$age_band_start)))) # necessary for correct age band ordering on x axis
 
   # finding the number of ae attendances
   df_ae_attendances <- dt %>%
