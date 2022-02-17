@@ -65,7 +65,7 @@ test_that("Admission and Attendances by age-Sex, for improvised data",{
 
 test_that("5-9 yrs age group is in the correct place",{
   test_data <- readRDS("testdata/attend_adm_age_sex/attend_adm_age_sex_test.rds")
-  plot <- hospitalflow::ae_attendances_admissions_age_sex(
+  result <- hospitalflow::ae_attendances_admissions_age_sex(
     start_date = "2019-01-01",
     end_date = "2019-01-02",
     data = test_data,
@@ -73,6 +73,6 @@ test_that("5-9 yrs age group is in the correct place",{
     hospital_name = "some_hospital_name"
   )
   #extracting x-tick labels from the plot
-  labels <- ggplot2::ggplot_build(plot)$layout$panel_params[[1]]$x$breaks
+  labels <- ggplot2::ggplot_build(result)$layout$panel_params[[1]]$x$breaks
   expect_equal(which("5-9 yrs" == labels), 3)
 })

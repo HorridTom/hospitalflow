@@ -30,7 +30,7 @@ ae_attendances_admissions_age_sex <- function(start_date, end_date, data, plot_c
     dplyr::select(spell_number, spell_start, spell_end, gender, age_band_start, spell_class_col)
 
   if(is.factor(dt$age_band_start)){
-    age_band_levels <- gtools::mixedsort(unique(levels(dt$age_band_start)))
+    age_band_levels <- gtools::mixedsort(levels(dt$age_band_start))
   } else {
     age_band_levels <- gtools::mixedsort(unique(dt$age_band_start))
   }
