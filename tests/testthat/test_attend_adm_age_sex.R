@@ -73,6 +73,6 @@ test_that("5-9 yrs age group is in the correct place",{
     hospital_name = "some_hospital_name"
   )
   #extracting x-tick labels from the plot
-  labels <- ggplot2::ggplot_build(result)$layout$panel_params[[1]]$x$breaks
-  expect_equal(which("5-9 yrs" == labels), 3)
+  lbls <- ggplot2::ggplot_build(result)$layout$panel_params[[1]]$x$breaks
+  expect_equal(which("5-9 yrs" == lbls), 3)
 })
