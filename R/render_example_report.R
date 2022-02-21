@@ -17,7 +17,10 @@ render_example_report <- function(title = "Example Hospital Flow Report",
                                   sample_weeks = 20,
                                   sample_no_of_patients = NULL,
                                   import_list_path = "../example-config/example_import_list.rds",
-                                  output_dir = "../reports") {
+                                  output_dir = "../reports",
+                                  use_existing_spell_table = TRUE,
+                                  existing_spell_table_path = "../data/spell_table.rda",
+                                  existing_moves_table_path = "../data/moves_table.rda") {
 
   system.time(rmarkdown::render(input = "vignettes/example-report.Rmd",
                                 output_file = paste0("/example-report_",
@@ -30,6 +33,9 @@ render_example_report <- function(title = "Example Hospital Flow Report",
                                               hospital_name = hospital_name,
                                               sample_weeks = sample_weeks,
                                               sample_no_of_patients = sample_no_of_patients,
-                                              import_list_path = import_list_path)
+                                              import_list_path = import_list_path,
+                                              use_existing_spell_table = use_existing_spell_table,
+                                              existing_spell_table_path = existing_spell_table_path,
+                                              existing_moves_table_path = existing_moves_table_path)
   ))
 }
