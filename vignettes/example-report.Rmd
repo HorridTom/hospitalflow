@@ -9,7 +9,7 @@ params:
   hospital_name: "Anytown General Hospital"
   import_list_path: "../example-config/example_import_list.rds"
   sample_weeks: 8
-  sample_no_of_patients: NULL
+  sample_no_of_patients: 3000
   use_existing_spell_table: TRUE
   existing_spell_table_path: "../data/spell_table.rda"
   existing_moves_table_path: "../data/moves_table.rda"
@@ -66,76 +66,126 @@ data_list <- hospitalflow::import_standardise_bind(import_list)
 ```{r spell-table, cache=TRUE, echo=FALSE}
 if(params$use_existing_spell_table == FALSE){
   ed_data <- data_list[["ED"]] 
-inpatient_data <- data_list[["IP"]] 
-
-data_start_date <- as.Date(max(min(ed_data$start_datetime, na.rm = TRUE),
-                       min(ed_data$end_datetime, na.rm = TRUE),
-                       min(inpatient_data$start_datetime, na.rm = TRUE),
-                       min(inpatient_data$end_datetime, na.rm = TRUE)))
-data_end_date <- as.Date(min(max(ed_data$start_datetime, na.rm = TRUE),
-                     max(ed_data$end_datetime, na.rm = TRUE),
-                     max(inpatient_data$start_datetime, na.rm = TRUE),
-                     max(inpatient_data$end_datetime, na.rm = TRUE)))
-start_date <- data_start_date
-end_date <- data_end_date
-
-#samples down by time frame
-if(!is.na(sample_duration)) {
+  inpatient_data <- data_list[["IP"]] 
   
-  data_start_date <- lubridate::ceiling_date(data_start_date, "month")
-  data_end_date <- lubridate::floor_date(data_end_date, "month")
-  
-  if(data_end_date - data_start_date > sample_duration) {
-    start_date <- data_end_date - sample_duration
-    end_date <- data_end_date
-    example_ed_data <- ed_data %>% dplyr::filter(start_datetime <= end_date,
-                                                 end_datetime >= start_date)
-    example_inpatient_data <- inpatient_data %>% dplyr::filter(start_datetime <= end_date,
-                                                               end_datetime >= start_date)
+  data_start_date <- as.Date(max(min(ed_data$start_datetime, na.rm = TRUE),
+                         min(ed_data$end_datetime, na.rm = TRUE),
+                         min(inpatient_data$start_datetime, na.rm = TRUE),
+                         min(inpatient_data$end_datetime, na.rm = TRUE)))
+  data_end_date <- as.Date(min(max(ed_data$start_datetime, na.rm = TRUE),
+                       max(ed_data$end_datetime, na.rm = TRUE),
+                       max(inpatient_data$start_datetime, na.rm = TRUE),
+                       max(inpatient_data$end_datetime, na.rm = TRUE)))
+  start_date <- data_start_date
+  end_date <- data_end_date
+
+  #samples down by time frame
+  if(!is.na(sample_duration)) {
+    
+    data_start_date <- lubridate::ceiling_date(data_start_date, "month")
+    data_end_date <- lubridate::floor_date(data_end_date, "month")
+    
+    if(data_end_date - data_start_date > sample_duration) {
+      start_date <- data_end_date - sample_duration
+      end_date <- data_end_date
+      example_ed_data <- ed_data %>% dplyr::filter(start_datetime <= end_date,
+                                                   end_datetime >= start_date)
+      example_inpatient_data <- inpatient_data %>% dplyr::filter(start_datetime <= end_date,
+                                                                 end_datetime >= start_date)
+    } else {
+      example_ed_data <- ed_data
+      example_inpatient_data <- inpatient_data
+    }
   } else {
     example_ed_data <- ed_data
     example_inpatient_data <- inpatient_data
   }
-} else {
-  example_ed_data <- ed_data
-  example_inpatient_data <- inpatient_data
-}
 
-#samples down by number of patients 
-if(!is.null(sample_no_of_patients)) {
+  #samples down by number of patients 
+  if(!is.null(sample_no_of_patients)) {
+    
+    inpatients <- levels(factor(example_inpatient_data$pseudo_id))
+    sample_inpatients <- sample(inpatients, sample_no_of_patients)
+    
+    example_ed_data <- example_ed_data %>% 
+      dplyr::filter(pseudo_id %in% sample_inpatients)
+    
+    example_inpatient_data <- example_inpatient_data %>%
+      dplyr::filter(pseudo_id %in% sample_inpatients)
   
-  inpatients <- levels(factor(example_inpatient_data$pseudo_id))
-  sample_inpatients <- sample(inpatients, sample_no_of_patients)
+  } 
+
+  example_spell_list <- hospitalflow::make_spell_table(ed_data = example_ed_data,
+                                                        inpatient_data = example_inpatient_data)
+  example_spell_table <- example_spell_list$spell_table
+  example_all_episodes <- example_spell_list$all_episodes
   
-  example_ed_data <- example_ed_data %>% 
-    dplyr::filter(pseudo_id %in% sample_inpatients)
-  
-  example_inpatient_data <- example_inpatient_data %>%
-    dplyr::filter(pseudo_id %in% sample_inpatients)
-
-} 
-
-example_spell_list <- hospitalflow::make_spell_table(ed_data = example_ed_data,
-                                                      inpatient_data = example_inpatient_data)
-example_spell_table <- example_spell_list$spell_table
-example_all_episodes <- example_spell_list$all_episodes
-
-example_spell_table <- hospitalflow::add_spell_variables(ed_data = example_ed_data,
-                                                         inpatient_data = example_inpatient_data,
-                                                         spell_table = example_spell_table)
-example_moves_table <- hospitalflow::make_moves_table(ed_data = example_ed_data,
-                                                      inpatient_data = example_inpatient_data,
-                                                      all_episodes = example_all_episodes,
-                                                      ward_mapping_config_path = import_list$ip_import$config_path)
+  example_spell_table <- hospitalflow::add_spell_variables(ed_data = example_ed_data,
+                                                           inpatient_data = example_inpatient_data,
+                                                           spell_table = example_spell_table)
+  example_moves_table <- hospitalflow::make_moves_table(ed_data = example_ed_data,
+                                                        inpatient_data = example_inpatient_data,
+                                                        all_episodes = example_all_episodes,
+                                                        ward_mapping_config_path = import_list$ip_import$config_path)
 }else{
+  #pointing to existing spell table 
+  
   load(params$existing_spell_table_path)
   load(params$existing_moves_table_path)
   
   example_spell_table <- spell_table
   example_moves_table <- moves_table
   
+  data_start_date <- as.Date(max(
+    min(example_spell_table$spell_start, na.rm = TRUE),
+    min(example_spell_table$spell_end, na.rm = TRUE),
+    min(example_moves_table$move_datetime, na.rm = TRUE)
+    ))
+  
+  data_end_date <- as.Date(min(
+    max(example_spell_table$spell_start, na.rm = TRUE),
+    max(example_spell_table$spell_end, na.rm = TRUE),
+    max(example_moves_table$move_datetime, na.rm = TRUE)
+    ))
+  
+  start_date <- data_start_date
+  end_date <- data_end_date
+  
+  #samples down by time frame
+  if(!is.na(sample_duration)) {
+    
+    data_start_date <- lubridate::ceiling_date(data_start_date, "month")
+    data_end_date <- lubridate::floor_date(data_end_date, "month")
+    
+    if(data_end_date - data_start_date > sample_duration) {
+      start_date <- data_end_date - sample_duration
+      end_date <- data_end_date
+      example_spell_table <- example_spell_table %>% 
+        dplyr::filter(spell_start <= end_date,
+                      spell_end >= start_date)
+      example_moves_table <- example_moves_table %>% 
+        dplyr::filter(move_datetime <= end_date,
+                      move_datetime >= start_date)
+    }
+  }
+  
   start_date <- min(example_spell_table$spell_start, na.rm = TRUE)
   end_date <- max(example_spell_table$spell_start, na.rm = TRUE)
+  
+  #samples down by number of patients 
+  if(!is.null(sample_no_of_patients)) {
+    
+    patients <- levels(factor(example_spell_table$pseudo_id))
+    sample_patients <- sample(patients, sample_no_of_patients)
+    
+    example_spell_table <- example_spell_table %>% 
+      dplyr::filter(pseudo_id %in% sample_patients)
+    
+    example_moves_table <- example_moves_table %>%
+      dplyr::filter(pseudo_id %in% sample_patients)
+  
+  } 
+
 }
 
 
