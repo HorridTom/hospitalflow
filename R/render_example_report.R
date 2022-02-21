@@ -14,13 +14,12 @@
 render_example_report <- function(title = "Example Hospital Flow Report",
                                   author = "CLAHRC NWL Information Intelligence Team",
                                   hospital_name = "Anytown General Hospital",
-                                  sample_weeks = 4,
-                                  sample_no_of_patients = 500,
+                                  sample_weeks = 20,
+                                  sample_no_of_patients = NULL,
                                   import_list_path = "../example-config/example_import_list.rds",
                                   output_dir = "../reports") {
 
   system.time(rmarkdown::render(input = "vignettes/example-report.Rmd",
-                                output_format = "rmarkdown::html_vignette",
                                 output_file = paste0("/example-report_",
                                                      gsub(":","-",paste(strsplit(x = toString(Sys.time()),split = " ")[[1]], collapse="-")),
                                                      "_", stringr::str_sub(system("git rev-parse HEAD", intern=TRUE), 1, 8),
