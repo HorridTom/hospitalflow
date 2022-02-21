@@ -8,8 +8,8 @@ params:
   author: "CLAHRC NWL Information Intelligence Team"
   hospital_name: "Anytown General Hospital"
   import_list_path: "../example-config/example_import_list.rds"
-  sample_weeks: 8
-  sample_no_of_patients: 3000
+  sample_weeks: 20
+  sample_no_of_patients: NULL
   use_existing_spell_table: TRUE
   existing_spell_table_path: "../data/spell_table.rda"
   existing_moves_table_path: "../data/moves_table.rda"
@@ -80,7 +80,7 @@ if(params$use_existing_spell_table == FALSE){
   end_date <- data_end_date
 
   #samples down by time frame
-  if(!is.na(sample_duration)) {
+  if(!is.null(params$sample_weeks)) {
     
     data_start_date <- lubridate::ceiling_date(data_start_date, "month")
     data_end_date <- lubridate::floor_date(data_end_date, "month")
@@ -152,7 +152,7 @@ if(params$use_existing_spell_table == FALSE){
   end_date <- data_end_date
   
   #samples down by time frame
-  if(!is.na(sample_duration)) {
+  if(!is.null(params$sample_weeks)) {
     
     data_start_date <- lubridate::ceiling_date(data_start_date, "month")
     data_end_date <- lubridate::floor_date(data_end_date, "month")
@@ -168,10 +168,7 @@ if(params$use_existing_spell_table == FALSE){
                       move_datetime >= start_date)
     }
   }
-  
-  start_date <- min(example_spell_table$spell_start, na.rm = TRUE)
-  end_date <- max(example_spell_table$spell_start, na.rm = TRUE)
-  
+
   #samples down by number of patients 
   if(!is.null(sample_no_of_patients)) {
     
