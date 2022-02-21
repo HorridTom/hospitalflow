@@ -2,7 +2,7 @@
 title: "`r params$title`"
 author: "`r params$author`"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: html_document
 params:
   title: "Example Hospital Flow Report"
   author: "CLAHRC NWL Information Intelligence Team"
