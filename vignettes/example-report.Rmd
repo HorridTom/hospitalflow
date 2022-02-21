@@ -311,9 +311,9 @@ hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/L
 
 ## Sankey Flow Diagram High Level
 ```{r sankey-high-level, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
-hospitalflow::plot_flow_diagram(moves_table = example_moves_table, 
+hospitalflow::plot_flow_diagram(moves_table = example_moves_table,
                                 ward_level = F,
-                                start = NULL, 
+                                start = NULL,
                                 end = NULL,
                                 selected_levels = NULL,
                                 remove_static_moves = F)
@@ -321,9 +321,9 @@ hospitalflow::plot_flow_diagram(moves_table = example_moves_table,
 
 ## Sankey Flow Diagram Ward Level
 ```{r sankey-ward-level, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
-hospitalflow::plot_flow_diagram(moves_table = example_moves_table, 
+hospitalflow::plot_flow_diagram(moves_table = example_moves_table,
                                 ward_level = T,
-                                start = NULL, 
+                                start = NULL,
                                 end = NULL,
                                 selected_levels = NULL,
                                 remove_static_moves = F)
