@@ -187,8 +187,7 @@ if(params$use_existing_spell_table == FALSE){
 
 
 ```
-## Example dataset
-This example report is based on `r nrow(example_ed_data)` emergency department attendances and `r nrow(example_inpatient_data)` inpatient episodes of care, linked into `r nrow(example_spell_table)` hospital spells. All attendances and admissions occurred prior to `r end_date` and all discharges after `r start_date`.
+
 
 ## Age and Gender
 
