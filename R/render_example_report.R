@@ -3,10 +3,20 @@
 #' @param title The title to use for the report.
 #' @param author The author to be named on the report.
 #' @param hospital_name The hospital name to use for the report and all graphs.
+#' @param use_example_data If TRUE, use the package example data.
 #' @param sample_weeks The number of weeks of sample data to use for the report.
-#' @param sample_no_patients The number of patients in the sample data to use for the report.
-#' @param import_list_path The directory containing the import list as an RDS file.
+#' @param sample_no_patients The number of patients in the sample data to use
+#' for the report.
+#' @param import_list_path The directory containing the import list as an RDS
+#' file. Ignored if use_example_data is TRUE.
 #' @param output_dir The directory where the report will be saved.
+#' @param use_existing_spell_table If TRUE, skip import_standardise_bind and
+#' just load a spell table and a moves table directly. If use_example_data is also
+#' TRUE, uses the example spell table provided in the package.
+#' @param existing_spell_table_path path to existing spell table. Ignored if
+#' use_existing_spell_table is FALSE or use_example_data is TRUE.
+#' @param existing_moves_table_path path to existing moves table. Ignored if
+#' use_existing_spell_table is FALSE or use_example_data is TRUE.
 #' @return The system.time output for the time taken to render the report.
 #' @export
 #'
