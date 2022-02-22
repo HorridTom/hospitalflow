@@ -54,3 +54,9 @@ The system.time output for the time taken to render the report.
 \description{
 render_example_report
 }
+\examples{
+\dontrun{
+render_example_report(output_dir = "../reports", use_existing_spell_table = FALSE)
+render_example_report(output_dir = "../reports", use_existing_spell_table = TRUE)
+}
+}
