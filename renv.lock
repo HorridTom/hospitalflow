@@ -865,10 +865,10 @@
     },
     "padr": {
       "Package": "padr",
-      "Version": "0.5.3",
+      "Version": "0.6.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "98f6a7837d3d6207e2bd9fa70fdf09e0"
+      "Hash": "36099d0a3dea2691e26ba6d5f6c5e09d"
     },
     "pander": {
       "Package": "pander",
