@@ -7,12 +7,13 @@ params:
   title: "Example Hospital Flow Report"
   author: "CLAHRC NWL Information Intelligence Team"
   hospital_name: "Anytown General Hospital"
-  import_list_path: "../example-config/example_import_list.rds"
+  use_example_data: TRUE
+  import_list_path: system.file("extdata", "example-config", "example_import_list.rds", package = "hospitalflow")
   sample_weeks: 20
   sample_no_of_patients: NULL
-  use_existing_spell_table: TRUE
-  existing_spell_table_path: "../data/spell_table.rda"
-  existing_moves_table_path: "../data/moves_table.rda"
+  use_existing_spell_table: FALSE
+  existing_spell_table_path: NULL
+  existing_moves_table_path: NULL
 ---
 
 ```{r setup, include = FALSE}
@@ -37,44 +38,61 @@ Number of weeks used as sample: `r params$sample_weeks`
 Number of patients sampled: `r params$sample_no_of_patients`
 
 ```{r import-data, cache=TRUE, echo=FALSE}
-if(params$use_existing_spell_table == FALSE){
+if(!params$use_existing_spell_table){
   # Import and Standardise Data
-
-import_list <- readRDS(params$import_list_path)
-
-# This import list uses relative paths (good for us during development)
-# which means the paths need prepending with "../" to work from the
-# working directory used in running this file.
-# In production use, users will be best specifying their import paths
-# as absolute paths.
-import_list <- lapply(import_list, function(x) {
-  list(data_path = paste0("../", x$data_path),
-  config_path = paste0("../", x$config_path),
-  site = x$site,
-  facility = x$facility,
-  time_zone = x$time_zone)
-})
-
-data_list <- hospitalflow::import_standardise_bind(import_list)
+  
+  if(!params$use_example_data) {
+    import_list <- readRDS(params$import_list_path)
+    
+    # This import list uses relative paths (good for us during development)
+    # which means the paths need prepending with "../" to work from the
+    # working directory used in running this file.
+    # In production use, users will be best specifying their import paths
+    # as absolute paths.
+    import_list <- lapply(import_list, function(x) {
+      list(data_path = paste0("../", x$data_path),
+           config_path = paste0("../", x$config_path),
+           site = x$site,
+           facility = x$facility,
+           time_zone = x$time_zone)
+    })
+  } else {
+    import_list <- list(
+      ed_import = list(
+        data_path = system.file("extdata", "example_hospital_ed_data.csv", package = "hospitalflow"),
+        config_path = system.file("extdata", "example-config", "ed", package = "hospitalflow"),
+        site = "Site 1",
+        facility = "ED",
+        time_zone = "Europe/London"),
+      ip_import = list(
+        data_path = system.file("extdata", "example_hospital_inpatient_data.csv", package = "hospitalflow"),
+        config_path = system.file("extdata", "example-config", "inpatient", package = "hospitalflow"),
+        site = "Site 1",
+        facility = "IP",
+        time_zone = "Europe/London")
+    )
+  }
+  
+  data_list <- hospitalflow::import_standardise_bind(import_list)
 }
 ```
 
 ```{r spell-table, cache=TRUE, echo=FALSE}
-if(params$use_existing_spell_table == FALSE){
+if(!params$use_existing_spell_table){
   ed_data <- data_list[["ED"]] 
   inpatient_data <- data_list[["IP"]] 
   
   data_start_date <- as.Date(max(min(ed_data$start_datetime, na.rm = TRUE),
-                         min(ed_data$end_datetime, na.rm = TRUE),
-                         min(inpatient_data$start_datetime, na.rm = TRUE),
-                         min(inpatient_data$end_datetime, na.rm = TRUE)))
+                                 min(ed_data$end_datetime, na.rm = TRUE),
+                                 min(inpatient_data$start_datetime, na.rm = TRUE),
+                                 min(inpatient_data$end_datetime, na.rm = TRUE)))
   data_end_date <- as.Date(min(max(ed_data$start_datetime, na.rm = TRUE),
-                       max(ed_data$end_datetime, na.rm = TRUE),
-                       max(inpatient_data$start_datetime, na.rm = TRUE),
-                       max(inpatient_data$end_datetime, na.rm = TRUE)))
+                               max(ed_data$end_datetime, na.rm = TRUE),
+                               max(inpatient_data$start_datetime, na.rm = TRUE),
+                               max(inpatient_data$end_datetime, na.rm = TRUE)))
   start_date <- data_start_date
   end_date <- data_end_date
-
+  
   #samples down by time frame
   if(!is.null(params$sample_weeks)) {
     
@@ -96,7 +114,7 @@ if(params$use_existing_spell_table == FALSE){
     example_ed_data <- ed_data
     example_inpatient_data <- inpatient_data
   }
-
+  
   #samples down by number of patients 
   if(!is.null(sample_no_of_patients)) {
     
@@ -108,11 +126,11 @@ if(params$use_existing_spell_table == FALSE){
     
     example_inpatient_data <- example_inpatient_data %>%
       dplyr::filter(pseudo_id %in% sample_inpatients)
-  
+    
   } 
-
+  
   example_spell_list <- hospitalflow::make_spell_table(ed_data = example_ed_data,
-                                                        inpatient_data = example_inpatient_data)
+                                                       inpatient_data = example_inpatient_data)
   example_spell_table <- example_spell_list$spell_table
   example_all_episodes <- example_spell_list$all_episodes
   
@@ -123,26 +141,29 @@ if(params$use_existing_spell_table == FALSE){
                                                         inpatient_data = example_inpatient_data,
                                                         all_episodes = example_all_episodes,
                                                         ward_mapping_config_path = import_list$ip_import$config_path)
-}else{
+  
+} else {
   #pointing to existing spell table 
   
-  load(params$existing_spell_table_path)
-  load(params$existing_moves_table_path)
-  
-  example_spell_table <- spell_table
-  example_moves_table <- moves_table
+  if(params$use_example_data) {
+    example_spell_table <- hospitalflow::spell_table
+    example_moves_table <- hospitalflow::moves_table
+  } else {
+    example_spell_table <- readRDS(params$existing_spell_table_path)
+    example_moves_table <- readRDS(params$existing_moves_table_path)
+  }
   
   data_start_date <- as.Date(max(
     min(example_spell_table$spell_start, na.rm = TRUE),
     min(example_spell_table$spell_end, na.rm = TRUE),
     min(example_moves_table$move_datetime, na.rm = TRUE)
-    ))
+  ))
   
   data_end_date <- as.Date(min(
     max(example_spell_table$spell_start, na.rm = TRUE),
     max(example_spell_table$spell_end, na.rm = TRUE),
     max(example_moves_table$move_datetime, na.rm = TRUE)
-    ))
+  ))
   
   start_date <- data_start_date
   end_date <- data_end_date
@@ -164,7 +185,7 @@ if(params$use_existing_spell_table == FALSE){
                       move_datetime >= start_date)
     }
   }
-
+  
   #samples down by number of patients 
   if(!is.null(sample_no_of_patients)) {
     
@@ -176,12 +197,10 @@ if(params$use_existing_spell_table == FALSE){
     
     example_moves_table <- example_moves_table %>%
       dplyr::filter(pseudo_id %in% sample_patients)
-  
+    
   } 
-
+  
 }
-
-
 ```
 
 

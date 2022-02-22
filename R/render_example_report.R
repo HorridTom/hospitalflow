@@ -14,13 +14,22 @@
 render_example_report <- function(title = "Example Hospital Flow Report",
                                   author = "CLAHRC NWL Information Intelligence Team",
                                   hospital_name = "Anytown General Hospital",
+                                  use_example_data = TRUE,
                                   sample_weeks = 20,
                                   sample_no_of_patients = NULL,
-                                  import_list_path = "../example-config/example_import_list.rds",
+                                  import_list_path = system.file("extdata",
+                                                                 "example-config",
+                                                                 "example_import_list.rds",
+                                                                 package = "hospitalflow"),
                                   output_dir,
                                   use_existing_spell_table = TRUE,
-                                  existing_spell_table_path = "../data/spell_table.rda",
-                                  existing_moves_table_path = "../data/moves_table.rda") {
+                                  existing_spell_table_path = NULL,
+                                  existing_moves_table_path = NULL) {
+
+  if(missing(output_dir)) {
+    stop("output_dir argument missing, you must specify where to save the output",
+         call. = FALSE)
+  }
 
   system.time(rmarkdown::render(input = "vignettes/example-report.Rmd",
                                 output_file = paste0("/example-report_",
@@ -31,6 +40,7 @@ render_example_report <- function(title = "Example Hospital Flow Report",
                                 params = list(title = title,
                                               author = author,
                                               hospital_name = hospital_name,
+                                              use_example_data = use_example_data,
                                               sample_weeks = sample_weeks,
                                               sample_no_of_patients = sample_no_of_patients,
                                               import_list_path = import_list_path,
