@@ -17,7 +17,7 @@ render_example_report <- function(title = "Example Hospital Flow Report",
                                   sample_weeks = 20,
                                   sample_no_of_patients = NULL,
                                   import_list_path = "../example-config/example_import_list.rds",
-                                  output_dir = "../reports",
+                                  output_dir,
                                   use_existing_spell_table = TRUE,
                                   existing_spell_table_path = "../data/spell_table.rda",
                                   existing_moves_table_path = "../data/moves_table.rda") {
