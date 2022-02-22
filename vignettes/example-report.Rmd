@@ -13,10 +13,6 @@ params:
   use_existing_spell_table: TRUE
   existing_spell_table_path: "../data/spell_table.rda"
   existing_moves_table_path: "../data/moves_table.rda"
-vignette: >
-  %\VignetteIndexEntry{Vignette Title}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
