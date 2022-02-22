@@ -26,7 +26,7 @@
 #' render_example_report(output_dir = "../reports", use_existing_spell_table = TRUE)
 #' }
 render_example_report <- function(title = "Example Hospital Flow Report",
-                                  author = "CLAHRC NWL Information Intelligence Team",
+                                  author = "ARC NWL Information Intelligence Team",
                                   hospital_name = "Anytown General Hospital",
                                   use_example_data = TRUE,
                                   sample_weeks = 20,

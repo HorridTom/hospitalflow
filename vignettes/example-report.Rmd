@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: html_document
 params:
   title: "Example Hospital Flow Report"
-  author: "CLAHRC NWL Information Intelligence Team"
+  author: "ARC NWL Information Intelligence Team"
   hospital_name: "Anytown General Hospital"
   use_example_data: TRUE
   import_list_path: system.file("extdata", "example-config", "example_import_list.rds", package = "hospitalflow")
