@@ -57,7 +57,7 @@ readmissions_ip <- function(start_date, end_date, data, readmission_by , plot_ch
 
 
   dt_reamd_disch <- dplyr::left_join(dt_calc_disch, dt_calc_readm) %>%
-    na.omit()
+    tidyr::replace_na(list(Readm = 0))
 
   # function to plot the 4 hrs emergency performance
   # Plot all days - see Tom's AE APP

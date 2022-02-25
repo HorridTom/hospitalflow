@@ -4,14 +4,59 @@
 \alias{render_example_report}
 \title{render_example_report}
 \usage{
-render_example_report(sample_weeks = 4)
+render_example_report(
+  title = "Example Hospital Flow Report",
+  author = "ARC NWL Information Intelligence Team",
+  hospital_name = "Anytown General Hospital",
+  use_example_data = TRUE,
+  sample_weeks = 20,
+  sample_no_of_patients = NULL,
+  import_list_path = system.file("extdata", "example-config",
+    "example_import_list.rds", package = "hospitalflow"),
+  output_dir,
+  use_existing_spell_table = TRUE,
+  existing_spell_table_path = NULL,
+  existing_moves_table_path = NULL
+)
 }
 \arguments{
+\item{title}{The title to use for the report.}
+
+\item{author}{The author to be named on the report.}
+
+\item{hospital_name}{The hospital name to use for the report and all graphs.}
+
+\item{use_example_data}{If TRUE, use the package example data.}
+
 \item{sample_weeks}{The number of weeks of sample data to use for the report.}
+
+\item{import_list_path}{The directory containing the import list as an RDS
+file. Ignored if use_example_data is TRUE.}
+
+\item{output_dir}{The directory where the report will be saved.}
+
+\item{use_existing_spell_table}{If TRUE, skip import_standardise_bind and
+just load a spell table and a moves table directly. If use_example_data is also
+TRUE, uses the example spell table provided in the package.}
+
+\item{existing_spell_table_path}{path to existing spell table. Ignored if
+use_existing_spell_table is FALSE or use_example_data is TRUE.}
+
+\item{existing_moves_table_path}{path to existing moves table. Ignored if
+use_existing_spell_table is FALSE or use_example_data is TRUE.}
+
+\item{sample_no_patients}{The number of patients in the sample data to use
+for the report.}
 }
 \value{
 The system.time output for the time taken to render the report.
 }
 \description{
 render_example_report
+}
+\examples{
+\dontrun{
+render_example_report(output_dir = "../reports", use_existing_spell_table = FALSE)
+render_example_report(output_dir = "../reports", use_existing_spell_table = TRUE)
+}
 }

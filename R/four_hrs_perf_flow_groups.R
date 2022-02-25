@@ -93,7 +93,6 @@ four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day",
     pct_flow_1$data$x <- as.Date(pct_flow_1$data$x, tz = time_zone)
     cht_data_flow_1 <- add_rule_breaks(pct_flow_1$data)
     pct_flow_1 <- ggplot2::ggplot(cht_data_flow_1, ggplot2::aes(x, y, label = x))
-    cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
     ylimlow_flow_1 <- min(min(pct_flow_1$data$y, na.rm = TRUE),min(pct_flow_1$data$lcl, na.rm = TRUE))
     ylimlow_vect <- c(ylimlow_vect, ylimlow_flow_1)
@@ -106,7 +105,6 @@ four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day",
     pct_flow_2$data$x <- as.Date(pct_flow_2$data$x, tz = time_zone)
     cht_data_flow_2 <- add_rule_breaks(pct_flow_2$data)
     pct_flow_2 <- ggplot2::ggplot(cht_data_flow_2, ggplot2::aes(x, y, label = x))
-    cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
     ylimlow_flow_2 <- min(min(pct_flow_2$data$y, na.rm = TRUE),min(pct_flow_2$data$lcl, na.rm = TRUE))
     ylimlow_vect <- c(ylimlow_vect, ylimlow_flow_2)
@@ -119,7 +117,6 @@ four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day",
     pct_flow_3$data$x <- as.Date(pct_flow_3$data$x, tz = time_zone)
     cht_data_flow_3 <- add_rule_breaks(pct_flow_3$data)
     pct_flow_3 <- ggplot2::ggplot(cht_data_flow_3, ggplot2::aes(x, y, label = x))
-    cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
     ylimlow_flow_3 <- min(min(pct_flow_3$data$y, na.rm = TRUE),min(pct_flow_3$data$lcl, na.rm = TRUE))
     ylimlow_vect <- c(ylimlow_vect, ylimlow_flow_3)
@@ -132,11 +129,12 @@ four_hrs_perf_flow_groups <- function(start_dt, end_dt, data, time_unit = "day",
     pct_flow_4$data$x <- as.Date(pct_flow_4$data$x, tz = time_zone)
     cht_data_flow_4 <- add_rule_breaks(pct_flow_4$data)
     pct_flow_4 <- ggplot2::ggplot(cht_data_flow_4, ggplot2::aes(x, y, label = x))
-    cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
     ylimlow_flow_4 <- min(min(pct_flow_4$data$y, na.rm = TRUE),min(pct_flow_3$data$lcl, na.rm = TRUE))
     ylimlow_vect <- c(ylimlow_vect, ylimlow_flow_4)
   }
+
+  cutoff <- data.frame(yintercept= 95, cutoff=factor(95))
 
   #ensure passed arguments are dates
   st.dt <- as.Date(start_dt, format = "%Y-%m-%d", tz = time_zone)
