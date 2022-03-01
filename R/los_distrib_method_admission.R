@@ -10,7 +10,8 @@
 #' @export
 #'
 #' @examples
-los_distrib_method_admission <- function(start_date, end_date, data, plot_chart, hospital_name = "Hospital Name"){
+los_distrib_method_admission <- function(start_date, end_date, data, plot_chart,
+                                         hospital_name){
 
   #get time zone of data
   time_zone <- attr(data$spell_start, "tzone")
@@ -82,7 +83,7 @@ los_distrib_method_admission <- function(start_date, end_date, data, plot_chart,
     na.omit()
 
   # Set the title
-  title_stub <- " Hospital LoS distribution for admitted patients, "
+  title_stub <- " LoS distribution for admitted patients, "
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
