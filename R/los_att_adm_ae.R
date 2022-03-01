@@ -88,7 +88,7 @@ los_att_adm_ae <- function(start_date, end_date, data, plot_chart,
 
 
   # Set the title
-  title_stub <- " Hospital LoS distribution for admitted patients, "
+  title_stub <- " LoS distribution for admitted patients, "
   #hospital_name <- "Chelsea & Westminster"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
