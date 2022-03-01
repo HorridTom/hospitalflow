@@ -10,7 +10,7 @@
 #' @export
 #'
 #' @examples
-ed_los_flow_grps <- function(start_date, end_date, data, plot_chart, hospital_name = "Name"){
+ed_los_flow_grps <- function(start_date, end_date, data, plot_chart, hospital_name){
 
   dt_select <- data %>%
     dplyr::filter(spell_start < end_date | initial_ed_end_datetime > start_date)
@@ -76,7 +76,6 @@ ed_los_flow_grps <- function(start_date, end_date, data, plot_chart, hospital_na
 
   # # Set the title
   title_stub <- " ED LoS distribution, "
-  hospital_name <- "Hospital"
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)

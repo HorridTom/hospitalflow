@@ -61,7 +61,7 @@ ae_arrival_occupancy <- function(start_date, end_date, data, plot_chart,
                      Average_occupancy = mean(occupancy_vct))
 
   # Set the title
-  title_stub <- " hospital: Hourly A&E arrival & occupancy profile, "
+  title_stub <- ": Hourly A&E arrival & occupancy profile, "
   start_date_title <- format(as.Date(start_date), format = "%d %B %Y")
   end_date_title <- format(as.Date(end_date), format = "%d %B %Y")
   chart_title <- paste0(hospital_name, title_stub, start_date_title, " to ", end_date_title)
