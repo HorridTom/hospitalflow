@@ -11,7 +11,8 @@ test_that("ed length of stay for flow groups is calculated correctly",{
 
   result <- ed_los_flow_grps(start_date = as.Date("2016-06-01",tz = "Europe/London"),
                              end_date = as.Date("2016-06-30",tz = "Europe/London"),
-                             data = ed_los_flow_groups, plot_chart = FALSE, hospital_name = hospital_name)
+                             data = ed_los_flow_groups, plot_chart = FALSE,
+                             hospital_name = "Anytown General Hospital")
 
   #Test results are correct up to row order
   expect_equal(correct_answers %>% dplyr::arrange(Time_binned, flow_groups),
