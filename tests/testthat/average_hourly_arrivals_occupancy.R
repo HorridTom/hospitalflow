@@ -11,10 +11,7 @@ test_that("ED Arrivals and occupancy by hour of the day", {
     Average_occupancy = as.numeric(c(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.0, 0.5, 0.5, 1, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5))
   )
 
-  str(correct_answers_arriv_occ)
-
   # Run Admission Discharges graph
-
   result_arriv_occ_jan_march <- hospitalflow::arrival_occupancy_hr(
     start_date = as.POSIXct("2018-12-10 00:00", tz = "Europe/London"), end_date = as.POSIXct("2018-12-11 23:00", tz = "Europe/London"),
     data = test_arrivals_occupancy, plot_chart = FALSE, hospital_name = "Chelsea & Westminster"
