@@ -73,7 +73,7 @@ if(!params$use_existing_spell_table){
     )
   }
   
-  data_list <- hospitalflow::import_standardise_bind(import_list)
+  data_list <- import_standardise_bind(import_list)
 }
 ```
 
@@ -129,15 +129,15 @@ if(!params$use_existing_spell_table){
     
   } 
   
-  example_spell_list <- hospitalflow::make_spell_table(ed_data = example_ed_data,
+  example_spell_list <- make_spell_table(ed_data = example_ed_data,
                                                        inpatient_data = example_inpatient_data)
   example_spell_table <- example_spell_list$spell_table
   example_all_episodes <- example_spell_list$all_episodes
   
-  example_spell_table <- hospitalflow::add_spell_variables(ed_data = example_ed_data,
+  example_spell_table <- add_spell_variables(ed_data = example_ed_data,
                                                            inpatient_data = example_inpatient_data,
                                                            spell_table = example_spell_table)
-  example_moves_table <- hospitalflow::make_moves_table(ed_data = example_ed_data,
+  example_moves_table <- make_moves_table(ed_data = example_ed_data,
                                                         inpatient_data = example_inpatient_data,
                                                         all_episodes = example_all_episodes,
                                                         ward_mapping_config_path = import_list$ip_import$config_path)
@@ -146,8 +146,8 @@ if(!params$use_existing_spell_table){
   #pointing to existing spell table 
   
   if(params$use_example_data) {
-    example_spell_table <- hospitalflow::spell_table
-    example_moves_table <- hospitalflow::moves_table
+    example_spell_table <- spell_table
+    example_moves_table <- moves_table
   } else {
     example_spell_table <- readRDS(params$existing_spell_table_path)
     example_moves_table <- readRDS(params$existing_moves_table_path)
@@ -207,7 +207,7 @@ if(!params$use_existing_spell_table){
 ## Age and Gender
 
 ```{r age-gender-ed, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-hospitalflow::ae_attendances_admissions_age_sex(start_date = start_date, end_date = end_date,
+ae_attendances_admissions_age_sex(start_date = start_date, end_date = end_date,
                                                 data = example_spell_table,
                                                 plot_chart = TRUE,
                                                 hospital_name = "Anytown General Hospital")
@@ -216,7 +216,7 @@ hospitalflow::ae_attendances_admissions_age_sex(start_date = start_date, end_dat
 ## Arrival Occupancy
 
 ```{r arr-occ, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-hospitalflow::ae_arrival_occupancy(start_date = as.POSIXct(start_date, tz = "Europe/London"),
+ae_arrival_occupancy(start_date = as.POSIXct(start_date, tz = "Europe/London"),
                                    end_date = as.POSIXct(end_date, tz = "Europe/London"),
                                    data = example_spell_table,
                                    plot_chart = TRUE,
@@ -226,7 +226,7 @@ hospitalflow::ae_arrival_occupancy(start_date = as.POSIXct(start_date, tz = "Eur
 ## Four hour performance by flow group
 
 ```{r four-hour-flow-group, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-hospitalflow::four_hrs_perf_flow_groups(start_dt = as.Date(start_date),
+four_hrs_perf_flow_groups(start_dt = as.Date(start_date),
                                    end_dt = as.Date(end_date),
                                    data = example_spell_table,
                                    time_unit = "day",
@@ -237,7 +237,7 @@ hospitalflow::four_hrs_perf_flow_groups(start_dt = as.Date(start_date),
 ## Duration in ED by flow group
 
 ```{r crisis-spike, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE }
-hospitalflow::ed_los_flow_grps(start_date = start_date, end_date = end_date,
+ed_los_flow_grps(start_date = start_date, end_date = end_date,
                              data = example_spell_table,
                              plot_chart = TRUE,
                              hospital_name = "Anytown General Hospital")
@@ -248,7 +248,7 @@ hospitalflow::ed_los_flow_grps(start_date = start_date, end_date = end_date,
 ## Duration in ED by admitted/non-admitted
 
 ```{r los-ed, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-hospitalflow::los_att_adm_ae(start_date = start_date, end_date = end_date,
+los_att_adm_ae(start_date = start_date, end_date = end_date,
                              data = example_spell_table,
                              plot_chart = TRUE,
                              hospital_name = "Anytown General Hospital")
@@ -257,7 +257,7 @@ hospitalflow::los_att_adm_ae(start_date = start_date, end_date = end_date,
 ## Duration in ED by flow group
 
 ```{r los-ed-flow,  echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-hospitalflow::average_ed_los_flows(start_date = start_date, end_date = end_date,
+average_ed_los_flows(start_date = start_date, end_date = end_date,
                              data = example_spell_table,
                              plot_chart = TRUE,
                              hospital_name = "Anytown General Hospital")
@@ -269,7 +269,7 @@ hospitalflow::average_ed_los_flows(start_date = start_date, end_date = end_date,
 
 
 ```{r adm-disch-dow, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-hospitalflow::admissions_discharges(start_date = start_date, end_date = end_date,
+admissions_discharges(start_date = start_date, end_date = end_date,
                                     data = example_spell_table,
                                     plot_chart = TRUE,
                                     hospital_name = "Anytown General Hospital")
@@ -279,7 +279,7 @@ hospitalflow::admissions_discharges(start_date = start_date, end_date = end_date
 ## Length of Stay
 
 ```{r los-dist, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-hospitalflow::los_distrib_method_admission(start_date = start_date, end_date = end_date,
+los_distrib_method_admission(start_date = start_date, end_date = end_date,
                                            data = example_spell_table,
                                            plot_chart = TRUE,
                                            hospital_name = "Anytown General Hospital")
@@ -287,7 +287,7 @@ hospitalflow::los_distrib_method_admission(start_date = start_date, end_date = e
 
 ## ED occupancy by hour of week
 ```{r ed-occ-1, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
-hospitalflow::occupancy_weekday_hour(start_date = as.POSIXct(start_date, tz = "Europe/London"),
+occupancy_weekday_hour(start_date = as.POSIXct(start_date, tz = "Europe/London"),
                                    end_date = as.POSIXct(end_date, tz = "Europe/London"),
                                    data = example_spell_table,
                                    plot_chart = TRUE,
@@ -296,7 +296,7 @@ hospitalflow::occupancy_weekday_hour(start_date = as.POSIXct(start_date, tz = "E
 
 ## Monthly 7-day Readmission Rate
 ```{r readm-7, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
-hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/London"),
+readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/London"),
                               end_date = as.POSIXct(end_date, tz = "Europe/London"),
                               data = example_spell_table,
                               plot_chart = TRUE,
@@ -306,7 +306,7 @@ hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/L
 
 ## Monthly 30-day Readmission Rate
 ```{r readm-30, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
-hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/London"),
+readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/London"),
                               end_date = as.POSIXct(end_date, tz = "Europe/London"),
                               data = example_spell_table,
                               plot_chart = TRUE,
@@ -316,7 +316,7 @@ hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/L
 
 ## Monthly 90-day Readmission Rate
 ```{r readm-90, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
-hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/London"),
+readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/London"),
                               end_date = as.POSIXct(end_date, tz = "Europe/London"),
                               data = example_spell_table,
                               plot_chart = TRUE,
@@ -326,7 +326,7 @@ hospitalflow::readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/L
 
 ## Sankey Flow Diagram High Level
 ```{r sankey-high-level, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
-hospitalflow::plot_flow_diagram(moves_table = example_moves_table,
+plot_flow_diagram(moves_table = example_moves_table,
                                 ward_level = F,
                                 start = NULL,
                                 end = NULL,
@@ -336,7 +336,7 @@ hospitalflow::plot_flow_diagram(moves_table = example_moves_table,
 
 ## Sankey Flow Diagram Ward Level
 ```{r sankey-ward-level, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
-hospitalflow::plot_flow_diagram(moves_table = example_moves_table,
+plot_flow_diagram(moves_table = example_moves_table,
                                 ward_level = T,
                                 start = NULL,
                                 end = NULL,

@@ -31,7 +31,7 @@ ae_attendances_admissions_age_sex
 }
 \examples{
 \dontrun{
-hospitalflow::ae_attendances_admissions_age_sex(start_date = "2012-01-01 00:00:00",
+ae_attendances_admissions_age_sex(start_date = "2012-01-01 00:00:00",
 end_date = "2015-01-01 00:00:00",
 data = test_data_age_sex_att_adm, plot_chart = TRUE)
 }

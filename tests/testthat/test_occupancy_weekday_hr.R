@@ -18,7 +18,7 @@ test_that("Average occupancy, interquartile range, range correctly calculated", 
   correct_answers <- correct_answers %>%
     dplyr::mutate(Weekday = factor(Weekday, levels = c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"), ordered = FALSE))
 
-  result <- hospitalflow::occupancy_weekday_hour(
+  result <- occupancy_weekday_hour(
     start_date = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
     end_date = as.POSIXct("2019-01-16 00:00:00", tz = "Europe/London"),
     data = test_occupancy_hr_day, plot_chart = FALSE,

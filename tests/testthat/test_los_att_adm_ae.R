@@ -11,7 +11,7 @@ test_that("length of stay is correctly analysed for attendances and admissions",
     Value = as.integer(c(1, 1, 1, 1))
   )
 
-  result <- hospitalflow::los_att_adm_ae(
+  result <- los_att_adm_ae(
     start_date = as.Date("2019-01-01", tz = "Europe/London"),
     end_date = as.Date("2019-01-06", tz = "Europe/London"),
     data = test_los_att_adm_ae, plot_chart = FALSE, hospital_name = "Hospital_name"
@@ -27,7 +27,7 @@ test_that("length of stay is correctly analysed for attendances and admissions f
   correct_answers <- readr::read_rds("testdata/los_att_adm_tests/correct_answers_spelltable_data_los_att_adm.rds")
   correct_answers <- tibble::as_tibble(correct_answers)
 
-  result <- hospitalflow::los_att_adm_ae(
+  result <- los_att_adm_ae(
     start_date = as.Date("2016-01-01", tz = "Europe/London"),
     end_date = as.Date("2016-01-08", tz = "Europe/London"),
     data = spell_table, plot_chart = FALSE, hospital_name = "Hospital_name"

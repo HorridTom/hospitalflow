@@ -74,7 +74,7 @@ autoplot(KM1) + ggtitle(expression(paste("Kaplan-Meier estimate ", hat(S)(t), " 
 ```
 
 ```{r}
-S_function <- hospitalflow::make_survival_function(KM0)
+S_function <- make_survival_function(KM0)
 
 cond_S_function <- function(t0, t1, S_function) {
   pmin(S_function(t1)/S_function(t0),1)
@@ -114,17 +114,17 @@ times_in_hospital_2
 ```
 Now use the survival function from above to estimate the probability each patient will still be in after a further 48 hours.
 ```{r}
-probabilities_still_in_48h_1 <- hospitalflow::get_discharge_probability(times_in_hospital_1, S_function, 48)
+probabilities_still_in_48h_1 <- get_discharge_probability(times_in_hospital_1, S_function, 48)
 probabilities_still_in_48h_1
-probabilities_still_in_48h_2 <- hospitalflow::get_discharge_probability(times_in_hospital_2, S_function, 48)
+probabilities_still_in_48h_2 <- get_discharge_probability(times_in_hospital_2, S_function, 48)
 probabilities_still_in_48h_2
 ```
 These are the parameters of individual bernoulli trials, the sum of which yields a Poisson Binomial distribution. It is possible to calculate this distribution via the discrete Fourier transform of the following vector:
 ```{r}
 p1 <- probabilities_still_in_48h_1
-x1 <- (1/(length(p1)+1)) * hospitalflow::get_poisson_binomial_characteristic_values(p1)
+x1 <- (1/(length(p1)+1)) * get_poisson_binomial_characteristic_values(p1)
 p2 <- probabilities_still_in_48h_2
-x2 <- (1/(length(p2)+1)) * hospitalflow::get_poisson_binomial_characteristic_values(p2)
+x2 <- (1/(length(p2)+1)) * get_poisson_binomial_characteristic_values(p2)
 ```
 The Poisson Binomial distribution mass function is now given by (for the sample of 30):
 ```{r}
@@ -151,11 +151,11 @@ Next step is to write a function to run this on patients actually in hospital/wa
 
 ```{r}
 T1 <- strptime("2017-07-01 12:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe/London")
-ipss1 <- hospitalflow::get_inpatient_snapshot(df = surv_data, t = T1) %>% filter(!is.na(stay_duration))
+ipss1 <- get_inpatient_snapshot(df = surv_data, t = T1) %>% filter(!is.na(stay_duration))
 
-ipss1 <- ipss1 %>% mutate(prob_here_48h = hospitalflow::get_discharge_probability(stay_duration, S_function, 48))
+ipss1 <- ipss1 %>% mutate(prob_here_48h = get_discharge_probability(stay_duration, S_function, 48))
 
-x_vect1 <- (1/(nrow(ipss1)+1)) * hospitalflow::get_poisson_binomial_characteristic_values(ipss1 %>% pull(prob_here_48h))
+x_vect1 <- (1/(nrow(ipss1)+1)) * get_poisson_binomial_characteristic_values(ipss1 %>% pull(prob_here_48h))
 
 pb_dist_T1 <- fft(x_vect1)
 pb_dist_T1 <- tibble::tibble(prob = Re(pb_dist_T1)) %>% tibble::rowid_to_column("k") %>% mutate(k = k-1)
@@ -168,7 +168,7 @@ expected_k_T1
 Now let's see how accurate that prediction is
 
 ```{r}
-ipss1_48h <- hospitalflow::get_inpatient_snapshot(df = surv_data, t = T1 + 48*60*60) %>% mutate(residual = spell_number %in% ipss1$spell_number)
+ipss1_48h <- get_inpatient_snapshot(df = surv_data, t = T1 + 48*60*60) %>% mutate(residual = spell_number %in% ipss1$spell_number)
 residual_T1 <- ipss1_48h %>% filter(residual == TRUE) %>% nrow()
 paste("Predicted residual occupancy: ", expected_k_T1, ". Actual residual occupancy: ", residual_T1)
 paste("Error: ", expected_k_T1 - residual_T1, ". Relative error: ", (expected_k_T1 - residual_T1)/residual_T1)
@@ -182,12 +182,12 @@ For now let's carry on and hack together a means of getting the prediction for a
 
 ```{r}
 
-hospitalflow::predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
-hospitalflow::get_residual_occupancy(df = surv_data, t = T1, delta_t = 48)
+predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
+get_residual_occupancy(df = surv_data, t = T1, delta_t = 48)
 
 dates <- seq(lubridate::ymd_hm('2017-01-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2017-07-31 12:00', tz = "Europe/London"), by = '1 day')
 
-model_output <- hospitalflow::run_S_func_model(df = surv_data, S_func = S_function, date_seq = dates)
+model_output <- run_S_func_model(df = surv_data, S_func = S_function, date_seq = dates)
 
 summary(model_output$predictions)
 ```
@@ -215,12 +215,12 @@ Next steps will be to generalise the model to include this weekly effect.
 CM1 <- coxph(Surv(obsT, status) ~ adm_wd, data = dfSurv2)
 KM1S <- survfit(CM1, newdata = data.frame(adm_wd = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")))
 
-step_funs <- lapply(c(1:7), function(x) {hospitalflow::make_survival_function(KM1S[,x])})
+step_funs <- lapply(c(1:7), function(x) {make_survival_function(KM1S[,x])})
 names(step_funs) <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 ```
 
 ```{r coxph-predict1}
-ipss <- hospitalflow::get_inpatient_snapshot(df = dfSurv2, t = T1) %>% filter(!is.na(stay_duration))
+ipss <- get_inpatient_snapshot(df = dfSurv2, t = T1) %>% filter(!is.na(stay_duration))
 newdata1 <- ipss %>% select(obsT = stay_duration, adm_wd) %>% mutate(status = TRUE)
 newdata1d <- newdata1 %>% mutate(obsT = obsT + 48)
 CM1_prediction_1 <- predict(CM1, newdata = newdata1, type = "expected")
@@ -234,13 +234,13 @@ predictions_CM1 <- cbind(ipss, CM1_pred_prob = prob_here_48h_CM1)
 sum(predictions_CM1$CM1_pred_prob)
 # Now lets embed that into predict_residual_occupancy
 
-hospitalflow::predict_residual_occupancy(df = dfSurv2, t = T1, delta_t = 48,
+predict_residual_occupancy(df = dfSurv2, t = T1, delta_t = 48,
                                          coxmodel = "Surv(obsT, status) ~ adm_wd")
-hospitalflow::get_residual_occupancy(df = dfSurv2, t = T1, delta_t = 48)
+get_residual_occupancy(df = dfSurv2, t = T1, delta_t = 48)
 ```
 
 ```{r eval-coxph1}
-model_output_CM <- hospitalflow::run_S_func_model(df = dfSurv2, coxmodel = "Surv(obsT, status) ~ adm_wd",
+model_output_CM <- run_S_func_model(df = dfSurv2, coxmodel = "Surv(obsT, status) ~ adm_wd",
                                                   date_seq = dates)
 
 summary(model_output_CM$predictions)
@@ -266,7 +266,7 @@ CM2_prediction_1 <- predict(CM2, newdata = newdata2, type = "expected")
 CM2_prediction_2 <- predict(CM2, newdata = newdata2d, type = "expected")
 prob_here_48h_CM2 <- exp(-CM2_prediction_2)/exp(-CM2_prediction_1)
 
-model_output_CM2 <- hospitalflow::run_S_func_model(df = dfSurv2,
+model_output_CM2 <- run_S_func_model(df = dfSurv2,
                                                    coxmodel = "Surv(obsT, status) ~ adm_wd + adm_daytime + adm_calmonth + gender + age_band_start",
                                                   date_seq = dates)
 

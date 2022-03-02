@@ -12,7 +12,7 @@ library(ggfortify)
 ```{r}
 surv_data <- readRDS(file = "../../cw-data/spell_table_cw_20190902_b7fae6f7.rds")
 
-surv_data <- hospitalflow::add_directorate_variable(surv_data)
+surv_data <- add_directorate_variable(surv_data)
 
 surv_data <- surv_data %>% filter(admission_method_type == "Emergency Admissions",
                                   !(age_band_start %in% c("1-4 yrs", "5-9 yrs", "10-14 yrs")),
@@ -63,7 +63,7 @@ T1 <- strptime("2018-09-01 12:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe
 # Predicting Residual Occupancy
 
 ```{r eval-coxph2}
-ipss <- hospitalflow::get_inpatient_snapshot(df = dfSurv2, t = T1) %>% filter(!is.na(stay_duration))
+ipss <- get_inpatient_snapshot(df = dfSurv2, t = T1) %>% filter(!is.na(stay_duration))
 
 dates <- seq(lubridate::ymd_hm('2018-08-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2019-01-31 12:00', tz = "Europe/London"), by = '1 day')
 
@@ -74,9 +74,9 @@ CM2 <- coxph(Surv(obsT, status) ~ adm_wd + adm_daytime + adm_calmonth + gender +
 #CM2_prediction_2 <- predict(CM2, newdata = newdata2d, type = "expected")
 #prob_here_48h_CM2 <- exp(-CM2_prediction_2)/exp(-CM2_prediction_1)
 
-#ipsss <- lapply(dates, hospitalflow::get_inpatient_snapshot, )
+#ipsss <- lapply(dates, get_inpatient_snapshot, )
 predictions_data_2 <- tibble(t0 = dates) %>%
-  dplyr::mutate(newdata = purrr::map(t0, hospitalflow::get_inpatient_snapshot,
+  dplyr::mutate(newdata = purrr::map(t0, get_inpatient_snapshot,
                                      df = dfSurv2),
                 newdata_d = purrr::map(newdata, dplyr::mutate, obsT = obsT + 48),
                 pred1 = purrr::map(newdata, predict, object = CM2, type = "expected"),
@@ -85,14 +85,14 @@ predictions_data_2 <- tibble(t0 = dates) %>%
 
 predictions_data_2 <- predictions_data_2 %>%
   dplyr::mutate(predicted = purrr::map(prob_here_48h, sum),
-                actual = purrr::map(t0, hospitalflow::get_residual_occupancy,
+                actual = purrr::map(t0, get_residual_occupancy,
                                     df = dfSurv2, delta_t = 48))
 
-# model_output_CM2 <- hospitalflow::run_S_func_model(df = dfSurv2,
+# model_output_CM2 <- run_S_func_model(df = dfSurv2,
 #                                                    coxmodel = "Surv(obsT, status) ~ adm_wd + adm_daytime + adm_calmonth + gender + age_band_start",
 #                                                   date_seq = dates)
 
-model_output_CM2 <- hospitalflow::evaluate_predictions(predictions_data_2 %>% rename(dates = t0))
+model_output_CM2 <- evaluate_predictions(predictions_data_2 %>% rename(dates = t0))
 
 summary(model_output_CM2$predictions)
 ```
@@ -120,7 +120,7 @@ CM3_prediction_1 <- predict(CM3, newdata = newdata3, type = "expected")
 CM3_prediction_2 <- predict(CM3, newdata = newdata3d, type = "expected")
 prob_here_48h_CM3 <- exp(-CM3_prediction_2)/exp(-CM3_prediction_1)
 
-model_output_CM3 <- hospitalflow::run_S_func_model(df = dfSurv2,
+model_output_CM3 <- run_S_func_model(df = dfSurv2,
                                                    coxmodel = "Surv(obsT, status) ~ adm_wd + adm_daytime + adm_calmonth + gender + age_band_start + disch_in_last_week + disch_in_last_month + admitted_before",
                                                   date_seq = dates)
 

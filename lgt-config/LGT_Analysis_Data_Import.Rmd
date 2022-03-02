@@ -167,17 +167,17 @@ adm_method_mapping <- readr::read_csv('AdmMethod.csv',
                                         )
                                       )
 
-qeh_ip_st_cc <- qeh_ip_st %>% hospitalflow::make_adm_type_col(adm_method_mapping) %>%
-  hospitalflow::make_adm_disch_cols() %>% mutate(Admission.Type = as.factor(Admission.Type),
+qeh_ip_st_cc <- qeh_ip_st %>% make_adm_type_col(adm_method_mapping) %>%
+  make_adm_disch_cols() %>% mutate(Admission.Type = as.factor(Admission.Type),
                                                  PatientType = as.factor(PatientType))
-qeh_aw_st_cc <- qeh_aw_st %>% hospitalflow::make_adm_type_col(adm_method_mapping) %>%
-  hospitalflow::make_adm_disch_cols()
-qeh_ncf_st_cc <- qeh_ncf_st %>% hospitalflow::make_adm_type_col(adm_method_mapping) %>%
-  hospitalflow::make_adm_disch_cols()
-uhl_ip_st_cc <- uhl_ip_st %>% hospitalflow::make_adm_type_col(adm_method_mapping) %>%
-  hospitalflow::make_adm_disch_cols()
-uhl_aw_st_cc <- uhl_aw_st %>% hospitalflow::make_adm_type_col(adm_method_mapping) %>%
-  hospitalflow::make_adm_disch_cols()
+qeh_aw_st_cc <- qeh_aw_st %>% make_adm_type_col(adm_method_mapping) %>%
+  make_adm_disch_cols()
+qeh_ncf_st_cc <- qeh_ncf_st %>% make_adm_type_col(adm_method_mapping) %>%
+  make_adm_disch_cols()
+uhl_ip_st_cc <- uhl_ip_st %>% make_adm_type_col(adm_method_mapping) %>%
+  make_adm_disch_cols()
+uhl_aw_st_cc <- uhl_aw_st %>% make_adm_type_col(adm_method_mapping) %>%
+  make_adm_disch_cols()
 ```
 
 ## Consistency of patient ID and spellnumber across extracts

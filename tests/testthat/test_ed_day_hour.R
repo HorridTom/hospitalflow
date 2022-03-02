@@ -25,7 +25,7 @@ test_that("Occupancy is calculated correctly for constructed data", {
 })
 
 
-occupancy_df_test <- hospitalflow::ED_day_hour("2013-01-01", "2013-01-15", df = ED_day_hour_test_data)
+occupancy_df_test <- ED_day_hour("2013-01-01", "2013-01-15", df = ED_day_hour_test_data)
 
 
 test_that("Average is calculated correctly for constructed data", {

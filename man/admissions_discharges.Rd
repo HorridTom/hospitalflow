@@ -39,7 +39,7 @@ admission_discharges
 }
 \examples{
 \dontrun{
-hospitalflow::admissions_discharges(start_date = "2015-01-01 00:00:00", end_date = "2015-02-01 00:00:00",
+admissions_discharges(start_date = "2015-01-01 00:00:00", end_date = "2015-02-01 00:00:00",
                                    data = example_data, plot_chart = TRUE)
 }
 }
