@@ -28,6 +28,4 @@ test_that("Example data are correctly imported, standardised, and bound", {
 
   expect_equal(ed_result, ed_correct_result)
   expect_equal(ip_result, ip_correct_result)
-
-
 })
