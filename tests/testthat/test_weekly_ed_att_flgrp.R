@@ -1,5 +1,4 @@
 context("Weekly ed attendances by flow groups for real random data")
-library(hospitalflow)
 
 test_that("Weekly ed attandances by flow groups", {
   weekly_ed_att_flgrp <- readRDS("testdata/weekly_ed_att_flgrps/weekly_ed_flgrp.rds")

@@ -1,5 +1,4 @@
 context("Average ED los for flow groups, for real random data")
-library(hospitalflow)
 
 test_that("averaged ed los for flow groups are calculated correctly", {
   correct_answers <- readRDS("testdata/average_ed_los_flows/correct_answers.rds")

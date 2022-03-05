@@ -1,5 +1,4 @@
 context("Four hours performance")
-library(hospitalflow)
 
 test_that("four hour performance is giving the right expected answer", {
   four_hr_performance <- readRDS("testdata/four_hr_performance/four_hr_performance.rds")

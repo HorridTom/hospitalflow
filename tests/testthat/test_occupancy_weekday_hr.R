@@ -1,5 +1,4 @@
 context("Arrivals and Occupancy by hour of the day")
-library(hospitalflow)
 
 test_that("Average occupancy, interquartile range, range correctly calculated", {
   test_occupancy_hr_day <- readRDS("testdata/occupancy_hr_day/test_occupancy_hr_day.rds")

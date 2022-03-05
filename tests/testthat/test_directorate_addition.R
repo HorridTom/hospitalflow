@@ -1,6 +1,4 @@
 context("Calculating the directorate")
-library(hospitalflow)
-
 
 test_that("directorate is calculated correctly", {
   correct_answers <- tibble::tibble(

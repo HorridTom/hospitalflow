@@ -1,5 +1,4 @@
 context("Admissions and Discharges by Weekday plot")
-library(hospitalflow)
 
 test_that("Admission numbers by day of the Week for improvised data", {
 

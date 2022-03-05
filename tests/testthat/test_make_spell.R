@@ -1,6 +1,4 @@
 context("Make a spell table function and test los_att_adm_ae")
-library(hospitalflow)
-
 
 test_that("spell table is created correctly", {
   correct_answers <- tibble::tibble(

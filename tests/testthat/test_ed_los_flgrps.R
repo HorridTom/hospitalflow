@@ -1,5 +1,4 @@
 context("ED length of stay for flow groups for real random data")
-library(hospitalflow)
 
 test_that("ed length of stay for flow groups is calculated correctly", {
   correct_answers <- readRDS("testdata/ed_los_flows/correct_answers.rds") %>%

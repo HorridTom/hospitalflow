@@ -1,5 +1,4 @@
 context("Occupancy at specified time")
-library(hospitalflow)
 
 test_that("Occupancy at specified time correct for improvised data", {
 

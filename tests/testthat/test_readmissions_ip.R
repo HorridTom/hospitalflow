@@ -1,5 +1,4 @@
 context("Readmissions for 90 days")
-library(hospitalflow)
 
 test_that("readmissions within 90 days is giving the right expected answer", {
   readmissions_dt <- readRDS("testdata/readmission_test/dt_readmission_test.rds")

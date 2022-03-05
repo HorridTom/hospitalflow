@@ -1,5 +1,4 @@
 context("Los distribution method for admitted patients, for improvised data")
-library(hospitalflow)
 
 test_that("Length of stay for admitted patients, for improvised data", {
 

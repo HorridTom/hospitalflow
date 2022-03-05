@@ -1,6 +1,4 @@
 context("Length of stay for attendances and admissions")
-library(hospitalflow)
-
 
 test_that("length of stay is correctly analysed for attendances and admissions", {
   test_los_att_adm_ae <- readRDS("testdata/los_att_adm_tests/constructed_spells_los_att_adm.rds")

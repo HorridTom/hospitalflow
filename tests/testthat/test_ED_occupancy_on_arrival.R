@@ -1,5 +1,4 @@
 context("Occupancy on arrival analysis")
-library(hospitalflow)
 
 # tests with constructed data
 

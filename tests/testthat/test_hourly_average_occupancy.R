@@ -1,5 +1,4 @@
 context("Arrivals and Occupancy by hour of the day")
-library(hospitalflow)
 
 test_that("arrivals and occupancy by hour of the day is correctly calculated", {
 
