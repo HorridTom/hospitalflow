@@ -33,7 +33,8 @@ Imports:
     DescTools,
     naniar,
     ggpubr,
-    gtools (>= 3.9.2)
+    gtools (>= 3.9.2),
+    magrittr
 VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)
