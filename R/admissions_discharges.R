@@ -17,7 +17,6 @@
 #' @return Chart or dataframe showing average Admissions and Discharges by the day of the week
 #' @export
 #' @importFrom magrittr %>%
-#' @importFrom lubridate %m+%
 #'
 #' @examples
 #' \dontrun{
