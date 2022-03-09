@@ -10,7 +10,7 @@ License: What license is it under?
 Depends: 
     R (>= 2.10)
 Imports: 
-    DescTools,
+    DescTools (>= 0.99.40),
     dplyr (>= 1.0.4),
     forcats (>= 0.5.1),
     ggplot2 (>= 3.3.3),
