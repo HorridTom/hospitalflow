@@ -12,30 +12,29 @@ Depends:
 Imports: 
     DescTools,
     dplyr (>= 1.0.4),
-    forcats,
-    ggplot2,
-    ggpubr,
-    grid,
+    forcats (>= 0.5.1),
+    ggplot2 (>= 3.3.3),
+    ggpubr (>= 0.4.0),
     gtools (>= 3.9.2),
-    lazyeval,
-    lubridate,
-    magrittr,
-    naniar,
-    padr,
-    purrr,
-    qicharts2,
-    readr,
-    reshape2,
-    rlang,
-    scales,
+    lazyeval (>= 0.2.2),
+    lubridate (>= 1.7.9.2),
+    magrittr (>= 2.0.1),
+    naniar (>= 0.6.0),
+    padr (>= 0.6.0),
+    purrr (>= 0.3.4),
+    qicharts2 (>= 0.7.1),
+    readr (>= 1.4.0),
+    reshape2 (>= 1.4.4),
+    rlang (>= 0.4.10),
+    scales (>= 1.1.1),
     stringr (>= 1.4.0),
     tibble (>= 3.0.6),
-    tidyr
+    tidyr (>= 1.1.2)
 Suggests: 
-    knitr,
-    rmarkdown,
-    testthat,
-    vdiffr
+    knitr (>= 1.31),
+    rmarkdown (>= 2.12),
+    testthat (>= 3.0.2),
+    vdiffr (>= 0.3.3)
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
