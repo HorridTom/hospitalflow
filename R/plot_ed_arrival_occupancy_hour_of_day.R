@@ -1,10 +1,11 @@
-#' Average emergency department arrival occupancy during the day
+#' Average emergency department arrival occupancy by time of the day
 #'
 #' @description
 #' \code{plot_ed_arrival_occupancy_hour_of_day} returns average daily occupancy
 #' of the emergency department by hours of the day either as a plot (default) or
 #' a dataframe.
 #'
+#' @param data Hospital episode data.
 #' @inheritParams plot_admissions_discharges_day_of_week
 #'
 #' @return A plot (default) or a dataframe showing average occupancy of emergency

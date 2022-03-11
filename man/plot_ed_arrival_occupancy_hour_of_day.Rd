@@ -13,15 +13,7 @@ plot_ed_arrival_occupancy_hour_of_day(
 )
 }
 \arguments{
-\item{data}{\itemize{Hospital episode data with at least the following fields:
-  \item Admissions - date of admission;
-  \item Discharges - date of discharge;
-  \item IDcol - patient pseudo ID;
-  \item PatientType - the admission type, distinguishing emergency from other
-  admissions
-  \item EpisodeNumber - episode ID;
-  \item WardCode - ward where the episode took place.
-}}
+\item{data}{Hospital episode data.}
 
 \item{startDate}{Date of earliest discharge to be included in the analysis.}
 

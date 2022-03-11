@@ -1,4 +1,3 @@
-context("AE Attendances and Admissions, Age-Sex, Jan, 2019")
 
 test_that("Admission and Attendances by age-Sex, for improvised data", {
 
@@ -48,7 +47,13 @@ test_that("Admission and Attendances by age-Sex, for improvised data", {
     )))
 
   # Run Admission Discharges graph
-  result <- ae_attendances_admissions_age_sex(start_date = "2019-01-01 00:00:00", end_date = "2019-01-05 00:00:00", data = test_att_adm_age_sex, plot_chart = FALSE, hospital_name = "Chelsea & Westminster")
+  result <- plot_ed_attendance_demographics(
+    data = test_att_adm_age_sex,
+    startDate = "2019-01-01 00:00:00",
+    endDate = "2019-01-05 00:00:00",
+    returnPlot = FALSE,
+    hospitalName = "{hospital_name}"
+  )
 
   result$value <- as.numeric(result$value)
   result$group <- as.factor(result$group)
@@ -60,12 +65,12 @@ test_that("Admission and Attendances by age-Sex, for improvised data", {
 
 test_that("5-9 yrs age group is in the correct place", {
   test_data <- readRDS("testdata/attend_adm_age_sex/attend_adm_age_sex_test.rds")
-  result <- ae_attendances_admissions_age_sex(
-    start_date = "2019-01-01",
-    end_date = "2019-01-02",
+  result <- plot_ed_attendance_demographics(
     data = test_data,
-    plot_chart = TRUE,
-    hospital_name = "some_hospital_name"
+    startDate = "2019-01-01",
+    endDate = "2019-01-02",
+    returnPlot = TRUE,
+    hospitalName = "{hospital_name}"
   )
   # extracting x-tick labels from the plot
   lbls <- ggplot2::ggplot_build(result)$layout$panel_params[[1]]$x$breaks
