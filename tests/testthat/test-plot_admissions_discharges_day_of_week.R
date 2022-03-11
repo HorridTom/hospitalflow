@@ -1,4 +1,3 @@
-context("Admissions and Discharges by Weekday plot")
 
 test_that("Admission numbers by day of the Week for improvised data", {
 
@@ -36,12 +35,13 @@ test_that("Admission numbers by day of the Week for improvised data", {
     spell_end, spell_class_col
   )
 
-  # Run Admission Discharges graph
-  result <- admissions_discharges(
-    start_date = as.Date("2018-12-10", tz = "Europe/London"),
-    end_date = as.Date("2018-12-23", tz = "Europe/London"),
-    data = test_avg_adm_disch, plot_chart = FALSE,
-    hospital_name = "Hospital Two"
+  # Run admissions&discharges graph
+  result <- plot_admissions_discharges_day_of_week(
+    data = test_avg_adm_disch,
+    startDate = as.Date("2018-12-10", tz = "Europe/London"),
+    endDate = as.Date("2018-12-23", tz = "Europe/London"),
+    returnPlot = FALSE,
+    hospitalName = "Hospital Two"
   )
 
   result$Weekday <- as.character(result$Weekday)

@@ -269,7 +269,7 @@ average_ed_los_flows(start_date = start_date, end_date = end_date,
 
 
 ```{r adm-disch-dow, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-admissions_discharges(start_date = start_date, end_date = end_date,
+plot_admissions_discharges_day_of_week(start_date = start_date, end_date = end_date,
                                     data = example_spell_table,
                                     plot_chart = TRUE,
                                     hospital_name = "Anytown General Hospital")
