@@ -34,9 +34,10 @@ and hospitalizations by age (divided into bands) and gender (male and female).
 \examples{
 \dontrun{
 plot_ed_attendance_demographics(
+  data = test_data_age_sex_att_adm,
   startDate = "2012-01-01 00:00:00",
   endDate = "2015-01-01 00:00:00",
-  data = test_data_age_sex_att_adm, returnPlot = TRUE
+  returnPlot = TRUE
 )
 }
 }

@@ -12,7 +12,9 @@
 #' department over a day.
 #'
 #' @examples
+#' \dontrun{
 #' TBD
+#' }
 #' @export
 plot_ed_arrival_occupancy_hour_of_day <- function(data,
                                                   startDate,

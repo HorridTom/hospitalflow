@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_ed_arrival_occupancy_hour_of_day.R
 \name{plot_ed_arrival_occupancy_hour_of_day}
 \alias{plot_ed_arrival_occupancy_hour_of_day}
-\title{Average emergency department arrival occupancy during the day}
+\title{Average emergency department arrival occupancy by time of the day}
 \usage{
 plot_ed_arrival_occupancy_hour_of_day(
   data,
@@ -33,5 +33,7 @@ of the emergency department by hours of the day either as a plot (default) or
 a dataframe.
 }
 \examples{
+\dontrun{
 TBD
+}
 }
