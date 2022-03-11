@@ -239,10 +239,12 @@ four_hrs_perf_flow_groups(start_dt = as.Date(start_date),
 ## Duration in ED by flow group
 
 ```{r crisis-spike, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE }
-ed_los_flow_grps(start_date = start_date, end_date = end_date,
-                             data = example_spell_table,
-                             plot_chart = TRUE,
-                             hospital_name = "Anytown General Hospital")
+plot_ed_los_distribution_flow(
+  data = example_spell_table,
+  startDate = start_date,
+  endDate = end_date,
+  returnPlot = TRUE,
+  hospitalName = "Anytown General Hospital")
 ```
 
 
