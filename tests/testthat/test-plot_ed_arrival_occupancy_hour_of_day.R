@@ -1,4 +1,3 @@
-context("Arrivals and Occupancy by hour of the day")
 
 test_that("arrivals and occupancy by hour of the day is correctly calculated", {
 
@@ -31,13 +30,12 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated", {
   )
 
   # Run Admission Discharges graph
-
-  result_arriv_occ <- ae_arrival_occupancy(
-    start_date = as.POSIXct("2018-12-10 01:00:00", tz = "Europe/London"),
-    end_date = as.POSIXct("2018-12-12 00:00:00", tz = "Europe/London"),
+  result_arriv_occ <- plot_ed_arrival_occupancy_hour_of_day(
     data = test_arrivals_occupancy,
-    plot_chart = FALSE,
-    hospital_name = "Hospital name"
+    startDate = as.POSIXct("2018-12-10 01:00:00", tz = "Europe/London"),
+    endDate = as.POSIXct("2018-12-12 00:00:00", tz = "Europe/London"),
+    returnPlot = FALSE,
+    hospitalName = "{hospital_name}"
   )
 
   # result_ariv_occ_data_jm <- result_arriv_occ_jan_march$data
@@ -46,8 +44,6 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated", {
   # Test results are correct
   expect_equal(as.data.frame(correct_answers_arriv_occ), as.data.frame(result_arriv_occ), tolerance = 0.01)
 })
-
-context("Arrivals and Occupancy by hour of the day, for real data")
 
 test_that("arrivals and occupancy by hour of the day is correctly calculated", {
   occupancy_arrival_test <- readRDS("testdata/arrival_occupancy/occupancy_arrival_test.rds")
@@ -62,10 +58,12 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated", {
     Average_occupancy = as.numeric(c(2, 2, 2, 2, 2, 2, 0))
   )
 
-  result_occ <- ae_arrival_occupancy(
-    start_date = as.POSIXct("2016-05-31 23:00:00", tz = "Europe/London"),
-    end_date = as.POSIXct("2016-06-01 05:00:00", tz = "Europe/London"),
-    data = occupancy_arrival_test, plot_chart = FALSE, hospital_name = "Hospital Name"
+  result_occ <- plot_ed_arrival_occupancy_hour_of_day(
+    data = occupancy_arrival_test,
+    startDate = as.POSIXct("2016-05-31 23:00:00", tz = "Europe/London"),
+    endDate = as.POSIXct("2016-06-01 05:00:00", tz = "Europe/London"),
+    returnPlot = FALSE,
+    hospitalName = "{hospital_name}"
   )
 
   # Test results are correct

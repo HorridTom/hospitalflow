@@ -216,11 +216,11 @@ ae_attendances_admissions_age_sex(start_date = start_date, end_date = end_date,
 ## Arrival Occupancy
 
 ```{r arr-occ, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-ae_arrival_occupancy(start_date = as.POSIXct(start_date, tz = "Europe/London"),
-                                   end_date = as.POSIXct(end_date, tz = "Europe/London"),
+plot_ed_arrival_occupancy_hour_of_day(startDate = as.POSIXct(start_date, tz = "Europe/London"),
+                                   endDate = as.POSIXct(end_date, tz = "Europe/London"),
                                    data = example_spell_table,
-                                   plot_chart = TRUE,
-                                   hospital_name = "Anytown General Hospital")
+                                   returnPlot = TRUE,
+                                   hospitalName = "Anytown General Hospital")
 ```
 
 ## Four hour performance by flow group
@@ -269,10 +269,10 @@ average_ed_los_flows(start_date = start_date, end_date = end_date,
 
 
 ```{r adm-disch-dow, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-plot_admissions_discharges_day_of_week(start_date = start_date, end_date = end_date,
+plot_admissions_discharges_day_of_week(startDate = start_date, endDate = end_date,
                                     data = example_spell_table,
-                                    plot_chart = TRUE,
-                                    hospital_name = "Anytown General Hospital")
+                                    returnPlot = TRUE,
+                                    hospitalName = "Anytown General Hospital")
 ```
 
 

@@ -41,7 +41,7 @@ test_that("Admission numbers by day of the Week for improvised data", {
     startDate = as.Date("2018-12-10", tz = "Europe/London"),
     endDate = as.Date("2018-12-23", tz = "Europe/London"),
     returnPlot = FALSE,
-    hospitalName = "Hospital Two"
+    hospitalName = "{hospital_name}"
   )
 
   result$Weekday <- as.character(result$Weekday)

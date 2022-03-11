@@ -1,12 +1,12 @@
 #' Average daily hospital arrivals and discharges
 #'
 #' @description
-#' \code{plot_admissions_discharges_day_of_week} returns daily hospital arrivals
-#' and discharges averaged across days of the week either as a plot or a
+#' \code{plot_admissions_discharges_day_of_week} returns average daily hospital
+#' arrivals and discharges by days of the week either as a plot (default) or a
 #' dataframe.
 #'
-#' @param data Hospital episode data with at least the following fields:
-#' \itemize{
+#' @param data
+#' \itemize{Hospital episode data with at least the following fields:
 #'   \item Admissions - date of admission;
 #'   \item Discharges - date of discharge;
 #'   \item IDcol - patient pseudo ID;
@@ -20,8 +20,8 @@
 #' @param returnPlot If TRUE returns a plot, otherwise returns a dataframe.
 #' @param hospitalName Name of the hospital.
 #'
-#' @return A plot or a dataframe showing average admissions and discharges on
-#' every day of the week.
+#' @return A plot (default) or a dataframe showing average admissions and
+#' discharges on each day of the week.
 #'
 #' @examples
 #' \dontrun{
