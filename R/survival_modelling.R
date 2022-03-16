@@ -75,14 +75,14 @@ get_inpatient_snapshot <- function(df, t) {
 #' @examples
 predict_residual_occupancy <- function(df, t, S_function, delta_t, coxmodel = NULL) {
   if(is.null(coxmodel)) {
-    ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
-    ipss1 <- ipss1 %>% mutate(prob_here_after_dt = hospitalflow::get_discharge_probability(stay_duration, S_function, delta_t))
+    ipss1 <- get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
+    ipss1 <- ipss1 %>% mutate(prob_here_after_dt = get_discharge_probability(stay_duration, S_function, delta_t))
     ipss1 %>% pull(prob_here_after_dt) %>% sum()
   } else {
     # filter to only available data
     df <- df %>% dplyr::filter(start_datetime <= t)
     CM <- coxph(as.formula(coxmodel), data = df, na.action = na.exclude)
-    ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% dplyr::filter(!is.na(stay_duration))
+    ipss1 <- get_inpatient_snapshot(df = df, t = t) %>% dplyr::filter(!is.na(stay_duration))
     newdata <- ipss1 %>% dplyr::select(-obsT) %>%
       dplyr::rename(obsT = stay_duration) %>%
       #               adm_wd, adm_daytime, adm_calmonth, gender, age_band_start,
@@ -107,8 +107,8 @@ predict_residual_occupancy <- function(df, t, S_function, delta_t, coxmodel = NU
 #'
 #' @examples
 get_residual_occupancy <- function(df, t, delta_t) {
-  ipss1 <- hospitalflow::get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
-  ipss1_dt <- hospitalflow::get_inpatient_snapshot(df = df, t = t + delta_t*60*60) %>% mutate(residual = spell_number %in% ipss1$spell_number)
+  ipss1 <- get_inpatient_snapshot(df = df, t = t) %>% filter(!is.na(stay_duration))
+  ipss1_dt <- get_inpatient_snapshot(df = df, t = t + delta_t*60*60) %>% mutate(residual = spell_number %in% ipss1$spell_number)
   ipss1_dt %>% filter(residual == TRUE) %>% nrow()
 }
 
@@ -144,8 +144,8 @@ make_survival_function <- function(KM) {
 #' @examples
 run_S_func_model <- function(df, S_func, coxmodel = NULL, date_seq, horizon = 48) {
 
-  pred_res_occ_v <- Vectorize(hospitalflow::predict_residual_occupancy, vectorize.args = "t")
-  get_res_occ_v <- Vectorize(hospitalflow::get_residual_occupancy, vectorize.args = "t")
+  pred_res_occ_v <- Vectorize(predict_residual_occupancy, vectorize.args = "t")
+  get_res_occ_v <- Vectorize(get_residual_occupancy, vectorize.args = "t")
 
   predictions <- tibble::tibble(dates = date_seq)
   predictions <- predictions %>% dplyr::mutate(predicted = pred_res_occ_v(df = df, dates,

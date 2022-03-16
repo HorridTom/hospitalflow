@@ -15,7 +15,7 @@ library(ggfortify)
 #surv_data <- readRDS(file = "../../lgt-data/data-out/spell_table_lgt_20190816_b704e260_ms.rds")
 surv_data <- readRDS(file = "../../cw-data/spell_table_cw_20190902_b7fae6f7.rds")
 
-surv_data <- hospitalflow::add_directorate_variable(surv_data)
+surv_data <- add_directorate_variable(surv_data)
 
 surv_data <- surv_data %>% filter(admission_method_type == "Emergency Admissions",
                                   !(age_band_start %in% c("1-4 yrs", "5-9 yrs", "10-14 yrs")),
@@ -74,7 +74,7 @@ autoplot(KM1) + ggtitle(expression(paste("Kaplan-Meier estimate ", hat(S)(t), " 
 ```
 
 ```{r}
-S_function <- hospitalflow::make_survival_function(KM0)
+S_function <- make_survival_function(KM0)
 
 cond_S_function <- function(t0, t1, S_function) {
   pmin(S_function(t1)/S_function(t0),1)
@@ -109,12 +109,12 @@ T1 <- strptime("2018-09-01 12:00:00", format = "%Y-%m-%d %H:%M:%S", tz = "Europe
 
 ```{r}
 
-hospitalflow::predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
-hospitalflow::get_residual_occupancy(df = surv_data, t = T1, delta_t = 48)
+predict_residual_occupancy(df = surv_data, t = T1, S_function = S_function, delta_t = 48)
+get_residual_occupancy(df = surv_data, t = T1, delta_t = 48)
 
 dates <- seq(lubridate::ymd_hm('2018-08-01 12:00', tz = "Europe/London"), lubridate::ymd_hm('2019-01-31 12:00', tz = "Europe/London"), by = '1 day')
 
-model_output <- hospitalflow::run_S_func_model(df = surv_data, S_func = S_function, date_seq = dates)
+model_output <- run_S_func_model(df = surv_data, S_func = S_function, date_seq = dates)
 
 summary(model_output$predictions)
 ```
@@ -142,12 +142,12 @@ Next steps will be to generalise the model to include this weekly effect.
 CM1 <- coxph(Surv(obsT, status) ~ adm_wd, data = dfSurv2)
 KM1S <- survfit(CM1, newdata = data.frame(adm_wd = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")))
 
-step_funs <- lapply(c(1:7), function(x) {hospitalflow::make_survival_function(KM1S[,x])})
+step_funs <- lapply(c(1:7), function(x) {make_survival_function(KM1S[,x])})
 names(step_funs) <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 ```
 
 ```{r coxph-predict1}
-ipss <- hospitalflow::get_inpatient_snapshot(df = dfSurv2, t = T1) %>% filter(!is.na(stay_duration))
+ipss <- get_inpatient_snapshot(df = dfSurv2, t = T1) %>% filter(!is.na(stay_duration))
 newdata1 <- ipss %>% select(obsT = stay_duration, adm_wd) %>% mutate(status = TRUE)
 newdata1d <- newdata1 %>% mutate(obsT = obsT + 48)
 CM1_prediction_1 <- predict(CM1, newdata = newdata1, type = "expected")
@@ -161,13 +161,13 @@ predictions_CM1 <- cbind(ipss, CM1_pred_prob = prob_here_48h_CM1)
 sum(predictions_CM1$CM1_pred_prob)
 # Now lets embed that into predict_residual_occupancy
 
-hospitalflow::predict_residual_occupancy(df = dfSurv2, t = T1, delta_t = 48,
+predict_residual_occupancy(df = dfSurv2, t = T1, delta_t = 48,
                                          coxmodel = "Surv(obsT, status) ~ adm_wd")
-hospitalflow::get_residual_occupancy(df = dfSurv2, t = T1, delta_t = 48)
+get_residual_occupancy(df = dfSurv2, t = T1, delta_t = 48)
 ```
 
 ```{r eval-coxph1}
-model_output_CM <- hospitalflow::run_S_func_model(df = dfSurv2, coxmodel = "Surv(obsT, status) ~ adm_wd",
+model_output_CM <- run_S_func_model(df = dfSurv2, coxmodel = "Surv(obsT, status) ~ adm_wd",
                                                   date_seq = dates)
 
 summary(model_output_CM$predictions)
@@ -193,7 +193,7 @@ CM2_prediction_1 <- predict(CM2, newdata = newdata2, type = "expected")
 CM2_prediction_2 <- predict(CM2, newdata = newdata2d, type = "expected")
 prob_here_48h_CM2 <- exp(-CM2_prediction_2)/exp(-CM2_prediction_1)
 
-model_output_CM2 <- hospitalflow::run_S_func_model(df = dfSurv2,
+model_output_CM2 <- run_S_func_model(df = dfSurv2,
                                                    coxmodel = "Surv(obsT, status) ~ adm_wd + adm_daytime + adm_calmonth + gender + age_band_start",
                                                   date_seq = dates)
 
@@ -223,7 +223,7 @@ CM3_prediction_1 <- predict(CM3, newdata = newdata3, type = "expected")
 CM3_prediction_2 <- predict(CM3, newdata = newdata3d, type = "expected")
 prob_here_48h_CM3 <- exp(-CM3_prediction_2)/exp(-CM3_prediction_1)
 
-model_output_CM3 <- hospitalflow::run_S_func_model(df = dfSurv2,
+model_output_CM3 <- run_S_func_model(df = dfSurv2,
                                                    coxmodel = "Surv(obsT, status) ~ adm_wd + adm_daytime + adm_calmonth + gender + age_band_start + disch_in_last_week + disch_in_last_month + admitted_before",
                                                   date_seq = dates)
 
