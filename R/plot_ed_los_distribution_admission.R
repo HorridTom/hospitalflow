@@ -1,4 +1,4 @@
-#' Length of stay inthe emergency department for attendances and admissions
+#' Length of stay in the emergency department for attendances and admissions
 #'
 #' @description
 #' \code{plot_ed_los_distribution_admission} shows the distribution of length of

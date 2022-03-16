@@ -1,4 +1,3 @@
-context("Los distribution method for admitted patients, for improvised data")
 
 test_that("Length of stay for admitted patients, for improvised data", {
 
@@ -40,7 +39,13 @@ test_that("Length of stay for admitted patients, for improvised data", {
   )
 
   # Run Admission Discharges graph
-  result <- los_distrib_method_admission(start_date = "2019-01-01 00:00:00", end_date = "2019-01-08 00:00:00", data = test_los_admission, plot_chart = FALSE, hospital_name = "Queh")
+  result <- plot_los_distribution_admission_method(
+    data = test_los_admission,
+    startDate = "2019-01-01 00:00:00",
+    endDate = "2019-01-08 00:00:00",
+    returnPlot = FALSE,
+    hospitalName = "Queh"
+  )
 
   # result$admission_method_type <- as.character(result$admission_method_type)
   result$Count <- as.numeric(result$Count)
@@ -55,16 +60,17 @@ test_that("Length of stay for admitted patients, for improvised data", {
 
 
 test_that("Length of stay for admitted patients, for realistic synthetic data", {
-  los_distrib_synthetic_spelltable_sample <- readRDS("testdata/los_distrib_method_admission/los_distrib_synthetic_spelltable_sample.rds")
+  los_distrib_synthetic_spelltable_sample <- readRDS("testdata/plot_los_distribution_admission_method/los_distrib_synthetic_spelltable_sample.rds")
 
-  correct_answers <- readRDS("testdata/los_distrib_method_admission/correct_answers.rds")
+  correct_answers <- readRDS("testdata/plot_los_distribution_admission_method/correct_answers.rds")
 
   # Run Admission Discharges graph - with min and max dates chosen based on spell_Start and spell_end
-  result <- los_distrib_method_admission(
-    start_date = as.Date("2015-04-01", tz = "Europe/London"),
-    end_date = as.Date("2018-12-30", tz = "Europe/London"),
+  result <- plot_los_distribution_admission_method(
     data = los_distrib_synthetic_spelltable_sample,
-    plot_chart = FALSE, hospital_name = "Hospital X"
+    startDate = as.Date("2015-04-01", tz = "Europe/London"),
+    endDate = as.Date("2018-12-30", tz = "Europe/London"),
+    returnPlot = FALSE,
+    hospitalName = "Hospital X"
   )
 
   # Test results are correct
