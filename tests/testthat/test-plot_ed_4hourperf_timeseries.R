@@ -1,6 +1,6 @@
 
 test_that("four hour performance is giving the right expected answer", {
-  four_hr_performance <- readRDS("testdata/four_hr_performance/four_hr_performance.rds")
+  four_hr_performance <- readRDS("testdata/plot_ed_4hourperf_timeseries/plot_ed_4hourperf_timeseries.rds")
   four_hr_performance <- four_hr_performance %>%
     dplyr::mutate(
       start_datetime = as.POSIXct(start_datetime, "%Y/%m/%d %H:%M", tz = "Europe/London"),
