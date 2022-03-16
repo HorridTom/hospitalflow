@@ -1,7 +1,6 @@
-context("Readmissions for 90 days")
 
 test_that("readmissions within 90 days is giving the right expected answer", {
-  readmissions_dt <- readRDS("testdata/readmission_test/dt_readmission_test.rds")
+  readmissions_dt <- readRDS("testdata/plot_readmissions_timeseries/dt_readmission_test.rds")
 
   # Specify correct results
   correct_answers <- tibble::tibble(
@@ -10,11 +9,13 @@ test_that("readmissions within 90 days is giving the right expected answer", {
   )
 
   # Run four_hr_performance
-  result <- readmissions_ip(
-    start_date = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
-    end_date = as.POSIXct("2019-12-31 00:00:00", tz = "Europe/London"),
-    data = readmissions_dt, plot_chart = FALSE, hospital_name = "Hospital_name",
-    readmission_by = 90
+  result <- plot_readmissions_timeseries(
+    data = readmissions_dt,
+    startDate = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
+    endDate = as.POSIXct("2019-12-31 00:00:00", tz = "Europe/London"),
+    readmissionBy = 90,
+    returnPlot = FALSE,
+    hospitalName = "Hospital_name"
   )
 
   result <- result %>%

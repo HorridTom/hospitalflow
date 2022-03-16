@@ -309,32 +309,35 @@ plot_ed_occupancy_hour_of_week(
 
 ## Monthly 7-day Readmission Rate
 ```{r readm-7, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
-readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/London"),
-                              end_date = as.POSIXct(end_date, tz = "Europe/London"),
-                              data = example_spell_table,
-                              plot_chart = TRUE,
-                              hospital_name = "Anytown General Hospital",
-                              readmission_by = 7)
+plot_readmissions_timeseries(
+  data = example_spell_table,  
+  startDate = as.POSIXct(start_date, tz = "Europe/London"),
+  endDate = as.POSIXct(end_date, tz = "Europe/London"),
+  returnPlot = TRUE,
+  hospitalName = "Anytown General Hospital",
+  readmissionBy = 7)
 ```
 
 ## Monthly 30-day Readmission Rate
 ```{r readm-30, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
-readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/London"),
-                              end_date = as.POSIXct(end_date, tz = "Europe/London"),
-                              data = example_spell_table,
-                              plot_chart = TRUE,
-                              hospital_name = "Anytown General Hospital",
-                              readmission_by = 30)
+plot_readmissions_timeseries(
+  data = example_spell_table,  
+  startDate = as.POSIXct(start_date, tz = "Europe/London"),
+  endDate = as.POSIXct(end_date, tz = "Europe/London"),
+  returnPlot = TRUE,
+  hospitalName = "Anytown General Hospital",
+  readmissionBy = 30)
 ```
 
 ## Monthly 90-day Readmission Rate
 ```{r readm-90, echo=F, results='asis', fig.height=5, fig.width=7, fig.align = 'left', cache=TRUE}
-readmissions_ip(start_date = as.POSIXct(start_date, tz = "Europe/London"),
-                              end_date = as.POSIXct(end_date, tz = "Europe/London"),
-                              data = example_spell_table,
-                              plot_chart = TRUE,
-                              hospital_name = "Anytown General Hospital",
-                              readmission_by = 90)
+plot_readmissions_timeseries(
+  data = example_spell_table,  
+  startDate = as.POSIXct(start_date, tz = "Europe/London"),
+  endDate = as.POSIXct(end_date, tz = "Europe/London"),
+  returnPlot = TRUE,
+  hospitalName = "Anytown General Hospital",
+  readmissionBy = 90)
 ```
 
 ## Sankey Flow Diagram High Level
