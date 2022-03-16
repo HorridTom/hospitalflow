@@ -1,4 +1,3 @@
-context("Occupancy on arrival analysis")
 
 # tests with constructed data
 
@@ -175,10 +174,10 @@ test_that("occupancies on arrival are correct for real data", {
   expect_equal(result, correct_answers)
 })
 
-real_data_plot_df <- ed_occupancy_on_arrival_plot(real_test_data,
+real_data_plot_df <- plot_ed_4hourperf_occupancy(real_test_data,
   "2019-03-01 00:00:00",
   "2019-03-02 00:00:00",
-  plotChart = F
+  returnPlot = F
 )
 
 test_that("n_all is correct for real data", {
