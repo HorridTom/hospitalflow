@@ -228,12 +228,13 @@ plot_ed_arrival_occupancy_hour_of_day(startDate = as.POSIXct(start_date, tz = "E
 ## Four hour performance by flow group
 
 ```{r four-hour-flow-group, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-four_hrs_perf_flow_groups(start_dt = as.Date(start_date),
-                                   end_dt = as.Date(end_date),
-                                   data = example_spell_table,
-                                   time_unit = "day",
-                                   plot_chart = TRUE,
-                                   hospital_name = "Anytown General Hospital")
+plot_ed_4hourperf_timeseries_flow(
+  data = example_spell_table,
+  startDate = as.Date(start_date),
+  endDate = as.Date(end_date),
+  timeUnit = "day",
+  returnPlot = TRUE,
+  hospitalName = "Anytown General Hospital")
 ```
 
 ## Duration in ED by flow group
