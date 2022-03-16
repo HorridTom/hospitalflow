@@ -1,7 +1,6 @@
-context("Arrivals and Occupancy by hour of the day")
 
 test_that("Average occupancy, interquartile range, range correctly calculated", {
-  test_occupancy_hr_day <- readRDS("testdata/occupancy_hr_day/test_occupancy_hr_day.rds")
+  test_occupancy_hr_day <- readRDS("testdata/plot_ed_occupancy_hour_of_week/test_occupancy_hr_day.rds")
 
   # Specify correct results
   correct_answers <- tibble::tibble(
@@ -17,11 +16,12 @@ test_that("Average occupancy, interquartile range, range correctly calculated", 
   correct_answers <- correct_answers %>%
     dplyr::mutate(Weekday = factor(Weekday, levels = c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"), ordered = FALSE))
 
-  result <- occupancy_weekday_hour(
-    start_date = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
-    end_date = as.POSIXct("2019-01-16 00:00:00", tz = "Europe/London"),
-    data = test_occupancy_hr_day, plot_chart = FALSE,
-    hospital_name = "Hospital Name"
+  result <- plot_ed_occupancy_hour_of_week(
+    data = test_occupancy_hr_day,
+    startDate = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
+    endDate = as.POSIXct("2019-01-16 00:00:00", tz = "Europe/London"),
+    returnPlot = FALSE,
+    hospitalName = "Hospital Name"
   )
 
   result <- result %>%
