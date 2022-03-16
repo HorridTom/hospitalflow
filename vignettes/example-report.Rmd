@@ -253,10 +253,12 @@ plot_ed_los_distribution_flow(
 ## Duration in ED by admitted/non-admitted
 
 ```{r los-ed, echo=F, results='asis', fig.height=5, fig.width=7, cache=TRUE}
-los_att_adm_ae(start_date = start_date, end_date = end_date,
-                             data = example_spell_table,
-                             plot_chart = TRUE,
-                             hospital_name = "Anytown General Hospital")
+plot_ed_los_distribution_admission(
+  data = example_spell_table,
+  startDate = start_date,
+  endDate = end_date,
+  returnPlot = TRUE,
+  hospitalName = "Anytown General Hospital")
 ```
 
 ## Duration in ED by flow group

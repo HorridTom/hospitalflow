@@ -1,4 +1,4 @@
-context("Make a spell table function and test los_att_adm_ae")
+context("Make a spell table function and test plot_ed_los_distribution_admission")
 
 test_that("spell table is created correctly", {
   correct_answers <- tibble::tibble(
