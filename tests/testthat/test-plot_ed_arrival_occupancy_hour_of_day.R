@@ -46,7 +46,7 @@ test_that("arrivals and occupancy by hour of the day is correctly calculated", {
 })
 
 test_that("arrivals and occupancy by hour of the day is correctly calculated", {
-  occupancy_arrival_test <- readRDS("testdata/arrival_occupancy/occupancy_arrival_test.rds")
+  occupancy_arrival_test <- readRDS("testdata/plot_ed_arrival_occupancy_hour_of_day/occupancy_arrival_test.rds")
 
   occupancy_arrival_test <- occupancy_arrival_test %>%
     dplyr::select(spell_number, spell_start, initial_ed_end_datetime, spell_class_col, starts_with_ed)

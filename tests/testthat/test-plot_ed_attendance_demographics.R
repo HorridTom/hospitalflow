@@ -64,7 +64,7 @@ test_that("Admission and Attendances by age-Sex, for improvised data", {
 })
 
 test_that("5-9 yrs age group is in the correct place", {
-  test_data <- readRDS("testdata/attend_adm_age_sex/attend_adm_age_sex_test.rds")
+  test_data <- readRDS("testdata/plot_ed_attendance_demographics/attend_adm_age_sex_test.rds")
   result <- plot_ed_attendance_demographics(
     data = test_data,
     startDate = "2019-01-01",
