@@ -11,7 +11,7 @@ occupancy_on_arrival(data)
 representing start and end of a patient's time in the emergency department.}
 }
 \value{
-the input \code{data} with an extra column \code{occupancy_on_arrival}.
+The input \code{data} with an extra column \code{occupancy_on_arrival}.
 }
 \description{
 Computes the emergency department occupancy on arrival for each patient.
