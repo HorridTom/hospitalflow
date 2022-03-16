@@ -32,7 +32,9 @@ ED attendances with ED LoS >4hrs and wait for treatment >4hrs against ED
 occupancy on arrival.
 }
 \description{
-Unscheduled emergency department occupancy by weekday and hour
+\code{plot_ed_4hourperf_occupancy} visualises the proportion of unscheduled
+emergency department (ED) attendances with ED length of stay (LoS) >4hrs and
+wait for treatment >4hrs against ED occupancy on arrival.
 }
 \examples{
 \dontrun{

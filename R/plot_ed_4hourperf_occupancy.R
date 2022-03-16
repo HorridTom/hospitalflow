@@ -29,6 +29,11 @@ occupancy_on_arrival <- function(data){
 
 #' Unscheduled emergency department occupancy by weekday and hour
 #'
+#' @description
+#' \code{plot_ed_4hourperf_occupancy} visualises the proportion of unscheduled
+#' emergency department (ED) attendances with ED length of stay (LoS) >4hrs and
+#' wait for treatment >4hrs against ED occupancy on arrival.
+#'
 #' @param data A dataframe of with \code{start_datetime} and \code{end_datetime}
 #' representing start and end of a patient's time in the emergency department.
 #' @param startDate The first date of the period for which the analysis will run.
