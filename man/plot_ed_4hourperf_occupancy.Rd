@@ -40,5 +40,4 @@ wait for treatment >4hrs against ED occupancy on arrival.
 \dontrun{
 TBD
 }
-
 }

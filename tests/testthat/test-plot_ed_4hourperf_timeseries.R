@@ -1,4 +1,3 @@
-context("Four hours performance")
 
 test_that("four hour performance is giving the right expected answer", {
   four_hr_performance <- readRDS("testdata/four_hr_performance/four_hr_performance.rds")
@@ -15,11 +14,13 @@ test_that("four hour performance is giving the right expected answer", {
   )
 
   # Run four_hr_performance
-  result <- four_hrs_perf(
-    start_dt = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
-    end_dt = as.POSIXct("2019-06-02 00:00:00", tz = "Europe/London"),
-    data = four_hr_performance, time_unit = "month",
-    plot_chart = FALSE, hospital_name = "Hospital_name"
+  result <- plot_ed_4hourperf_timeseries(
+    data = four_hr_performance,
+    startDate = as.POSIXct("2019-01-01 00:00:00", tz = "Europe/London"),
+    endDate = as.POSIXct("2019-06-02 00:00:00", tz = "Europe/London"),
+    timeUnit = "month",
+    returnPlot = FALSE,
+    hospitalName = "Hospital_name"
   )
 
   result <- result %>% dplyr::select(x, y)

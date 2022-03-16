@@ -46,13 +46,12 @@ occupancy_on_arrival <- function(data){
 #' @return A plot (default) or dataframe showing the proportion of unscheduled
 #' ED attendances with ED LoS >4hrs and wait for treatment >4hrs against ED
 #' occupancy on arrival.
-#' @export
 #'
 #' @examples
 #' \dontrun{
 #' TBD
 #' }
-#'
+#' @export
 plot_ed_4hourperf_occupancy <- function(data,
                                         startDate,
                                         endDate,
