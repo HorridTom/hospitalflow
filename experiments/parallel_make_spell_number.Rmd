@@ -1,0 +1,48 @@
+---
+title: "Parallelisation of `make_spell_number` function"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Establishing a benchmark
+
+```{r}
+t0 = Sys.time()
+hospitalflow::make_spell_number(
+  ed_data = hospitalflow::ed_data,
+  inpatient_data = hospitalflow::inpatient_data,
+)
+t1 = Sys.time()
+print(t1-t0)
+```
+
+## Defining a parallelized version of the function
+
+```{r}
+make_spell_number_parallel <- function(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 6) {
+
+  ed_episodes <- ed_data %>%
+    dplyr::mutate(episode_type = "ED")
+
+  ip_episodes <- inpatient_data %>%
+    dplyr::mutate(episode_type = "IP")
+
+  all_episodes <- dplyr::bind_rows(ed_episodes, ip_episodes) %>%
+    dplyr::filter(!is.na(end_datetime)) %>%
+    dplyr::arrange(pseudo_id, start_datetime) %>%
+    dplyr::group_by(pseudo_id) %>%
+    dplyr::mutate(episode_lag = difftime(start_datetime, dplyr::lag(end_datetime), units = "hours")) %>%
+    dplyr::mutate(prev_episode_type = dplyr::lag(episode_type)) %>%
+    dplyr::mutate(new_spell = dplyr::if_else(is.na(prev_episode_type) |
+                                        ((prev_episode_type == episode_type) & episode_lag > same_type_episode_lag) |
+                                        ((prev_episode_type != episode_type) & episode_lag > different_type_episode_lag), TRUE, FALSE)) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(spell_number = cumsum(new_spell))
+
+  all_episodes
+
+}
+```
