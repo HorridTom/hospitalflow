@@ -90,8 +90,8 @@ make_spell_number <- function(ed_data, inpatient_data, same_type_episode_lag = 1
     dplyr::mutate(episode_lag = difftime(start_datetime, dplyr::lag(end_datetime), units = "hours")) %>%
     dplyr::mutate(prev_episode_type = dplyr::lag(episode_type)) %>%
     dplyr::mutate(new_spell = dplyr::if_else(is.na(prev_episode_type) |
-                                        ((prev_episode_type == episode_type) & episode_lag > same_type_episode_lag) |
-                                        ((prev_episode_type != episode_type) & episode_lag > different_type_episode_lag), TRUE, FALSE)) %>%
+                                               ((prev_episode_type == episode_type) & episode_lag > same_type_episode_lag) |
+                                               ((prev_episode_type != episode_type) & episode_lag > different_type_episode_lag), TRUE, FALSE)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(spell_number = cumsum(new_spell))
 
@@ -158,7 +158,6 @@ spell_variables <- function(all_episodes) {
   spell_table
 
 }
-
 
 #' add_spell_variables
 #'
@@ -277,7 +276,8 @@ get_age_band_start <- function(age_band_df){
 
 
 get_episode_class_sequence <- function(episode_df) {
-  class_vector <- episode_df %>% dplyr::select(start_datetime, episode_type) %>%
+  class_vector <- episode_df %>%
+    dplyr::select(start_datetime, episode_type) %>%
     dplyr::arrange(start_datetime) %>%
     dplyr::mutate(episode_type = stringr::str_sub(episode_type, start = 1, end = 1)) %>%
     dplyr::pull(episode_type)
@@ -301,6 +301,7 @@ spell_class <- function(starts_with_ed, ed_non_adm, ed_comp_non_adm, ed_admissio
     "direct_comp_admission"
   }
 }
+
 
 admission_method_class <- function(admission_method_df) {
 
