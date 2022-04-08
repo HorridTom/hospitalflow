@@ -236,7 +236,7 @@ spell_variables_new <- function(all_episodes) {
   admission_type_df <- all_episodes %>%
     dplyr::select(spell_number, start_datetime, admission_method) %>%
     dplyr::group_by(spell_number) %>%
-    dplyr::filter(!is.na(admission_method))
+    dplyr::filter(!is.na(admission_method)) %>%
     dplyr::arrange(start_datetime) %>%
     dplyr::mutate(admission_method_type = dplyr::case_when(
       admission_method == "Waiting list" | admission_method == "Booked" | admission_method == "Planned" ~ "Elective Admissions",
