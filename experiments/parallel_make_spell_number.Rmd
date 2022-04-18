@@ -143,77 +143,22 @@ print(t1-t0)
 
 
 ```{r eval=FALSE, include=FALSE}
-only_spell_numbers <- data.frame(spell_number = unique(new_dtbl$spell_number))
-
 t0 = Sys.time()
 new_spell_vars_admission_type <- hospitalflow::spell_variables_new(
   all_episodes = new_dtbl
 )$admission_type_df
 t1 = Sys.time()
 print(t1-t0)
-
-good_admission_type <- dplyr::left_join(only_spell_numbers, new_spell_vars_admission_type, by = "spell_number")
-good_admission_type$admission_method_type <- ifelse(
-  good_admission_type$admission_method_type == "NULL",
-  as.character(NA),
-  good_admission_type$admission_method_type
-)
-setdiff(good_admission_type, from_spell_variables)
-
+```
+```{r eval=FALSE, include=FALSE}
+t0 = Sys.time()
+new_spell_vars_datetime <- hospitalflow::spell_variables_new(
+  all_episodes = new_dtbl
+)$datetime_df
+t1 = Sys.time()
+print(t1-t0)
 ```
 
-```{r}
-  only_spell_numbers <- data.frame(spell_number = unique(all_episodes$spell_number))
-  admission_type_df <- all_episodes %>%
-    dplyr::group_by(spell_number) %>%
-    dplyr::select(spell_number, start_datetime, admission_method) %>%
-    dplyr::filter(!is.na(admission_method)) %>%
-    dplyr::arrange(start_datetime) %>%
-    dplyr::summarise(admission_method_type = dplyr::case_when(
-      admission_method == "Waiting list" | admission_method == "Booked" | admission_method == "Planned" ~ "Elective Admissions",
-      admission_method == "Accident and emergency" | admission_method == "General Practitioner" | admission_method == "Bed bureau" ~ "Emergency Admissions",
-      admission_method == "Consultant Clinic" | admission_method == "Mental Health Crisis Resolution Team" | admission_method == "Accident and Emergency Department" ~ "Emergency Admissions",
-      admission_method == "Transfer from another Hospital Provider" | admission_method == "Intended home birth" | admission_method == "Other emergency admission" ~ "Emergency Admissions",
-      admission_method == "Other means" ~ "Emergency Admissions",
-      admission_method == "Admitted ante-partum" | admission_method == "Admitted post-partum"  ~ "Maternity Admissions",
-      admission_method == "Birth-this provider" | admission_method == "Birth-outside provider(not intended home)" | admission_method == "Transfer from other provider(non-emergency)" ~ "Other Admissions")) %>%
-    dplyr::slice_head(n=1) %>%
-    dplyr::ungroup() %>%
-    dplyr::select(spell_number, admission_method_type)
-  admission_type_df$admission_method_type <- as.list(admission_type_df$admission_method_type) #needed to make datatypes identical to original
-  admission_type_df <- dplyr::left_join(only_spell_numbers, admission_type_df, by = "spell_number")
-  admission_type_df$admission_method_type <- ifelse(
-    admission_type_df$admission_method_type == "NULL",
-    as.character(NA),
-    admission_type_df$admission_method_type
-  )
-
-test_that("optimized version of spell_variables returns identical admission method type", {
-  correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
-  ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-  inpatient_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-
-  all_episodes <- make_spell_number(
-    ed_data_age_sex,
-    inpatient_data_age_sex,
-    1,
-    6
-  )
-
-  # copy-pasted from spell_variables function
-  from_spell_variables <- all_episodes %>%
-    dplyr::group_by(spell_number) %>%
-    tidyr::nest() %>%
-    dplyr::mutate(admission_method_type = purrr::map(data, admission_method_class)) %>%
-    dplyr::select(-data) %>%
-    dplyr::ungroup()
-
-  from_spell_variables_new <- spell_variables_new(all_episodes)$admission_type_df
-
-  expect_identical(from_spell_variables, from_spell_variables_new)
-})
-
-```
 
 
 
@@ -221,7 +166,20 @@ test_that("optimized version of spell_variables returns identical admission meth
 # Getting the output of spell_variables
 ```{r eval=FALSE, include=FALSE}
 t0 = Sys.time()
-spell_variables_output_seq <- hospitalflow::spell_variables(
+spell_variables_ep_lists <- hospitalflow::spell_variables(
+  all_episodes = new_dtbl
+)
+t1 = Sys.time()
+print(t1-t0)
+
+saveRDS(spell_variables_ep_lists, "spell_variables_ep_lists.rds")
+```
+
+
+# Getting the output of spell_variables_new
+```{r eval=FALSE, include=FALSE}
+t0 = Sys.time()
+new_spell_vars_final <- hospitalflow::spell_variables_new(
   all_episodes = new_dtbl
 )
 t1 = Sys.time()

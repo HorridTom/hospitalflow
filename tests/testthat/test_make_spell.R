@@ -79,171 +79,296 @@ test_that("spell table is created correctly", {
   expect_equal(result, correct_answers)
 })
 
+## Below was used when optimizing make_spell_table function. Now
 
-test_that("make_spell_number_dtbl returns identical results to make_spell_number", {
-  correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
-  ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-  inpatient_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-
-  make_spell_number_result <- make_spell_number(
-    ed_data_age_sex,
-    inpatient_data_age_sex,
-    1,
-    6
-  )
-
-  make_spell_number_dtbl_result <- make_spell_number_dtbl(
-    ed_data_age_sex,
-    inpatient_data_age_sex,
-    1,
-    6
-  )
-
-  expect_identical(make_spell_number_result, make_spell_number_dtbl_result)
-})
-
-
-test_that("optimized version of spell_variables returns identical constituent ED and IP episodes", {
-  correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
-  ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-  inpatient_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-
-  all_episodes <- make_spell_number(
-    ed_data_age_sex,
-    inpatient_data_age_sex,
-    1,
-    6
-  )
-  print(colnames(all_episodes))
-  str(all_episodes)
-  # copy-pasted from spell_variables function
-  from_spell_variables <- all_episodes %>%
-    dplyr::group_by(spell_number) %>%
-    tidyr::nest() %>%
-    dplyr::mutate(
-      constituent_ed_episodes = purrr::map(
-        data,
-        get_episode_id_list,
-        episode_type_to_list = "ED"
-      ),
-      constituent_ip_episodes = purrr::map(
-        data,
-        get_episode_id_list,
-        episode_type_to_list = "IP")) %>%
-    dplyr::select(-data) %>%
-    dplyr::ungroup()
-
-  from_spell_variables_new <- spell_variables_new(all_episodes)$const_episodes_df
-
-  saveRDS(from_spell_variables, "from_spell_variables.rds")
-  saveRDS(from_spell_variables_new, "from_spell_variables_new.rds")
-
-  expect_identical(from_spell_variables, from_spell_variables_new)
-})
-
-
-test_that("optimized version of spell_variables returns identical gender", {
-  correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
-  ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-  inpatient_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-
-  all_episodes <- make_spell_number(
-    ed_data_age_sex,
-    inpatient_data_age_sex,
-    1,
-    6
-  )
-
-  # copy-pasted from spell_variables function
-  from_spell_variables <- all_episodes %>%
-    dplyr::group_by(spell_number) %>%
-    tidyr::nest() %>%
-    dplyr::mutate(gender = purrr::map(data, get_latest_gender)) %>%
-    dplyr::select(-data) %>%
-    dplyr::ungroup()
-
-  from_spell_variables_new <- spell_variables_new(all_episodes)$gender_df
-
-  expect_identical(from_spell_variables, from_spell_variables_new)
-})
-
-
-test_that("optimized version of spell_variables returns identical age bands", {
-  correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
-  ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-  inpatient_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-
-  all_episodes <- make_spell_number(
-    ed_data_age_sex,
-    inpatient_data_age_sex,
-    1,
-    6
-  )
-
-  # copy-pasted from spell_variables function
-  from_spell_variables <- all_episodes %>%
-    dplyr::group_by(spell_number) %>%
-    tidyr::nest() %>%
-    dplyr::mutate(age_band_start = purrr::map(data, get_age_band_start)) %>%
-    dplyr::select(-data) %>%
-    dplyr::ungroup()
-
-  from_spell_variables_new <- spell_variables_new(all_episodes)$age_band_df
-
-  expect_identical(from_spell_variables, from_spell_variables_new)
-})
-
-
-test_that("optimized version of spell_variables returns identical episode class sequence", {
-  correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
-  ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-  inpatient_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-
-  all_episodes <- make_spell_number_dtbl(
-    ed_data_age_sex,
-    inpatient_data_age_sex,
-    1,
-    6
-  )
-
-  # copy-pasted from spell_variables function
-  from_spell_variables <- all_episodes %>%
-    dplyr::group_by(spell_number) %>%
-    tidyr::nest() %>%
-    dplyr::mutate(episode_class_sequence = purrr::map(data, get_episode_class_sequence)) %>%
-    dplyr::select(-data) %>%
-    dplyr::ungroup()
-
-  from_spell_variables_new <- spell_variables_new(all_episodes)$ep_class_seq_df
-
-  expect_identical(from_spell_variables, from_spell_variables_new)
-})
-
-
-test_that("optimized version of spell_variables returns identical admission methods", {
-  correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
-  ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-  inpatient_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
-
-  all_episodes <- make_spell_number(
-    ed_data_age_sex,
-    inpatient_data_age_sex,
-    1,
-    6
-  )
-  print(colnames(all_episodes))
-  # copy-pasted from spell_variables function
-  from_spell_variables <- all_episodes %>%
-    dplyr::group_by(spell_number) %>%
-    tidyr::nest() %>%
-    dplyr::mutate(admission_method_type = purrr::map(data, admission_method_class)) %>%
-    dplyr::select(-data) %>%
-    dplyr::ungroup()
-
-  from_spell_variables_new <- spell_variables_new(all_episodes)$admission_type_df
-
-  expect_identical(from_spell_variables, from_spell_variables_new)
-})
-
-
+# test_that("make_spell_number_dtbl returns identical results to make_spell_number", {
+#   correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
+#   ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
+#   inpatient_data_age_sex <- readRDS("testdata/spell_linkage/inpatient_data_age_sex.rds")
+#
+#   make_spell_number_result <- make_spell_number(
+#     ed_data_age_sex,
+#     inpatient_data_age_sex,
+#     1,
+#     6
+#   )
+#
+#   make_spell_number_dtbl_result <- make_spell_number_dtbl(
+#     ed_data_age_sex,
+#     inpatient_data_age_sex,
+#     1,
+#     6
+#   )
+#
+#   expect_identical(make_spell_number_result, make_spell_number_dtbl_result)
+# })
+#
+#
+# test_that("optimized version of spell_variables returns identical constituent ED and IP episodes", {
+#   correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
+#   ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
+#   inpatient_data_age_sex <- readRDS("testdata/spell_linkage/inpatient_data_age_sex.rds")
+#
+#   all_episodes <- make_spell_number(
+#     ed_data_age_sex,
+#     inpatient_data_age_sex,
+#     1,
+#     6
+#   )
+#
+#   # copy-pasted from spell_variables function
+#   from_spell_variables <- all_episodes %>%
+#     dplyr::group_by(spell_number) %>%
+#     tidyr::nest() %>%
+#     dplyr::mutate(
+#       constituent_ed_episodes = purrr::map(
+#         data,
+#         get_episode_id_list,
+#         episode_type_to_list = "ED"
+#       ),
+#       constituent_ip_episodes = purrr::map(
+#         data,
+#         get_episode_id_list,
+#         episode_type_to_list = "IP")) %>%
+#     dplyr::select(-data) %>%
+#     dplyr::ungroup()
+#
+#   from_spell_variables_new <- spell_variables_new(all_episodes)$constituent_ed_episodes
+#
+#   expect_identical(from_spell_variables, from_spell_variables_new)
+# })
+#
+#
+# test_that("optimized version of spell_variables returns identical gender", {
+#   correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
+#   ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
+#   inpatient_data_age_sex <- readRDS("testdata/spell_linkage/inpatient_data_age_sex.rds")
+#
+#   all_episodes <- make_spell_number(
+#     ed_data_age_sex,
+#     inpatient_data_age_sex,
+#     1,
+#     6
+#   )
+#
+#   # copy-pasted from spell_variables function
+#   from_spell_variables <- all_episodes %>%
+#     dplyr::group_by(spell_number) %>%
+#     tidyr::nest() %>%
+#     dplyr::mutate(gender = purrr::map(data, get_latest_gender)) %>%
+#     dplyr::select(-data) %>%
+#     dplyr::ungroup()
+#
+#   from_spell_variables_new <- spell_variables_new(all_episodes)$gender_df
+#
+#   expect_identical(from_spell_variables, from_spell_variables_new)
+# })
+#
+#
+# test_that("optimized version of spell_variables returns identical age bands", {
+#   correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
+#   ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
+#   inpatient_data_age_sex <- readRDS("testdata/spell_linkage/inpatient_data_age_sex.rds")
+#
+#   all_episodes <- make_spell_number(
+#     ed_data_age_sex,
+#     inpatient_data_age_sex,
+#     1,
+#     6
+#   )
+#
+#   # copy-pasted from spell_variables function
+#   from_spell_variables <- all_episodes %>%
+#     dplyr::group_by(spell_number) %>%
+#     tidyr::nest() %>%
+#     dplyr::mutate(age_band_start = purrr::map(data, get_age_band_start)) %>%
+#     dplyr::select(-data) %>%
+#     dplyr::ungroup()
+#
+#   from_spell_variables_new <- spell_variables_new(all_episodes)$age_band_df
+#
+#   expect_identical(from_spell_variables, from_spell_variables_new)
+# })
+#
+#
+# test_that("optimized version of spell_variables returns identical episode class sequence", {
+#   correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
+#   ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
+#   inpatient_data_age_sex <- readRDS("testdata/spell_linkage/inpatient_data_age_sex.rds")
+#
+#   all_episodes <- make_spell_number_dtbl(
+#     ed_data_age_sex,
+#     inpatient_data_age_sex,
+#     1,
+#     6
+#   )
+#
+#   # copy-pasted from spell_variables function
+#   from_spell_variables <- all_episodes %>%
+#     dplyr::group_by(spell_number) %>%
+#     tidyr::nest() %>%
+#     dplyr::mutate(episode_class_sequence = purrr::map(data, get_episode_class_sequence)) %>%
+#     dplyr::select(-data) %>%
+#     dplyr::ungroup()
+#
+#   from_spell_variables_new <- spell_variables_new(all_episodes)$ep_class_seq_df
+#
+#   expect_identical(from_spell_variables, from_spell_variables_new)
+# })
+#
+#
+# test_that("optimized version of spell_variables returns identical admission methods", {
+#   correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
+#   ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
+#   inpatient_data_age_sex <- readRDS("testdata/spell_linkage/inpatient_data_age_sex.rds")
+#
+#   all_episodes <- make_spell_number(
+#     ed_data_age_sex,
+#     inpatient_data_age_sex,
+#     1,
+#     6
+#   )
+#
+#   # copy-pasted from spell_variables function
+#   from_spell_variables <- all_episodes %>%
+#     dplyr::group_by(spell_number) %>%
+#     tidyr::nest() %>%
+#     dplyr::mutate(admission_method_type = purrr::map(data, admission_method_class)) %>%
+#     dplyr::select(-data) %>%
+#     dplyr::ungroup()
+#
+#   from_spell_variables_new <- spell_variables_new(all_episodes)$admission_type_df
+#
+#   expect_identical(from_spell_variables, from_spell_variables_new)
+# })
+#
+#
+# test_that("optimized version of spell_variables returns identical initial ed episode end datetime", {
+#   correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
+#   ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
+#   inpatient_data_age_sex <- readRDS("testdata/spell_linkage/inpatient_data_age_sex.rds")
+#
+#   all_episodes <- make_spell_number(
+#     ed_data_age_sex,
+#     inpatient_data_age_sex,
+#     1,
+#     6
+#   )
+#
+#   # copy-pasted from spell_variables function
+#   from_spell_variables <- all_episodes %>%
+#     dplyr::group_by(spell_number) %>%
+#     tidyr::nest() %>%
+#     dplyr::mutate(initial_ed_end_datetime = purrr::map(data, get_initial_ed_episode_end_datetime)) %>%
+#     dplyr::select(-data) %>%
+#     dplyr::ungroup()
+#
+#   from_spell_variables_new <- spell_variables_new(all_episodes)$datetime_df
+#
+#   expect_identical(from_spell_variables, from_spell_variables_new)
+# })
+#
+#
+# test_that("optimized version of spell_variables returns identical disposal code", {
+#   correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
+#   ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
+#   inpatient_data_age_sex <- readRDS("testdata/spell_linkage/inpatient_data_age_sex.rds")
+#
+#   all_episodes <- make_spell_number(
+#     ed_data_age_sex,
+#     inpatient_data_age_sex,
+#     1,
+#     6
+#   )
+#
+#   # copy-pasted from spell_variables function
+#   from_spell_variables <- all_episodes %>%
+#     dplyr::group_by(spell_number) %>%
+#     tidyr::nest() %>%
+#     dplyr::mutate(disposal_code = purrr::map(data, get_disposal_code)) %>%
+#     dplyr::select(-data) %>%
+#     dplyr::ungroup()
+#
+#   from_spell_variables_new <- spell_variables_new(all_episodes)$disposal_df
+#
+#   expect_identical(from_spell_variables, from_spell_variables_new)
+# })
+#
+#
+# test_that("optimized version of spell_variables returns identical hrg ae code", {
+#   correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
+#   ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
+#   inpatient_data_age_sex <- readRDS("testdata/spell_linkage/inpatient_data_age_sex.rds")
+#
+#   all_episodes <- make_spell_number(
+#     ed_data_age_sex,
+#     inpatient_data_age_sex,
+#     1,
+#     6
+#   )
+#
+#   # copy-pasted from spell_variables function
+#   from_spell_variables <- all_episodes %>%
+#     dplyr::group_by(spell_number) %>%
+#     tidyr::nest() %>%
+#     dplyr::mutate(hrg_ae_code = purrr::map(data, get_hrg)) %>%
+#     dplyr::select(-data) %>%
+#     dplyr::ungroup()
+#
+#   from_spell_variables_new <- spell_variables_new(all_episodes)$hrg_df
+#
+#   expect_identical(from_spell_variables, from_spell_variables_new)
+# })
+#
+#
+# test_that("optimized version of spell_variables returns identical source referral", {
+#   correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
+#   ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
+#   inpatient_data_age_sex <- readRDS("testdata/spell_linkage/inpatient_data_age_sex.rds")
+#
+#   all_episodes <- make_spell_number(
+#     ed_data_age_sex,
+#     inpatient_data_age_sex,
+#     1,
+#     6
+#   )
+#
+#   # copy-pasted from spell_variables function
+#   from_spell_variables <- all_episodes %>%
+#     dplyr::group_by(spell_number) %>%
+#     tidyr::nest() %>%
+#     dplyr::mutate(source_referral_ae = purrr::map(data, get_source_of_referral)) %>%
+#     dplyr::select(-data) %>%
+#     dplyr::ungroup()
+#
+#   from_spell_variables_new <- spell_variables_new(all_episodes)$source_referral_df
+#
+#   expect_identical(from_spell_variables, from_spell_variables_new)
+# })
+#
+#
+# test_that("optimized version of spell_variables returns identical mortality ip", {
+#   correct_answers <- readRDS("testdata/spell_linkage/correct_answers.rds")
+#   ed_data_age_sex <- readRDS("testdata/spell_linkage/ed_data_age_sex.rds")
+#   inpatient_data_age_sex <- readRDS("testdata/spell_linkage/inpatient_data_age_sex.rds")
+#
+#   all_episodes <- make_spell_number(
+#     ed_data_age_sex,
+#     inpatient_data_age_sex,
+#     1,
+#     6
+#   )
+#
+#   # copy-pasted from spell_variables function
+#   from_spell_variables <- all_episodes %>%
+#     dplyr::group_by(spell_number) %>%
+#     tidyr::nest() %>%
+#     dplyr::mutate(died_ip = purrr::map(data, get_mortality_ip)) %>%
+#     dplyr::select(-data) %>%
+#     dplyr::ungroup()
+#
+#   from_spell_variables_new <- spell_variables_new(all_episodes)$mortality_df
+#
+#   expect_identical(from_spell_variables, from_spell_variables_new)
+# })
 
