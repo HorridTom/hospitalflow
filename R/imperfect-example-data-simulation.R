@@ -34,27 +34,27 @@ get_simulated_ed_data <- function(npat = 1000, start = as.POSIXct("2019-01-01 00
   )
 
   simulated_pat_data <- simulated_pat_data %>%
-    rowwise()%>%
-    mutate(age = get_age()) %>%
-    mutate(ethnicity = get_ethnic_cat()) %>%
-    ungroup()
+    dplyr::rowwise()%>%
+    dplyr::mutate(age = get_age()) %>%
+    dplyr::mutate(ethnicity = get_ethnic_cat()) %>%
+    dplyr::ungroup()
 
   simulated_data <- get_simulated_admission_data(simulated_pat_data, start = start, end = end)
   simulated_data <- simulated_data[[2]]
 
   simulated_data <- simulated_data %>%
-    select(-c(pseudo_id1)) %>%
-    rowwise() %>%
-    mutate(triage = get_traige_cat()) %>%
-    mutate(attendance_cat = get_attendance_cat()) %>%
-    mutate(arrival_mode = get_arrival_mode()) %>%
-    mutate(attendance_disposal = get_attendance_disp()) %>%
-    mutate(referral = get_referral()) %>%
-    mutate(initial_assess_datetime = as.POSIXct(generate_initial_assess(start_datetime = start_datetime,
+    dplyr::select(-c(pseudo_id1)) %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(triage = get_traige_cat()) %>%
+    dplyr::mutate(attendance_cat = get_attendance_cat()) %>%
+    dplyr::mutate(arrival_mode = get_arrival_mode()) %>%
+    dplyr::mutate(attendance_disposal = get_attendance_disp()) %>%
+    dplyr::mutate(referral = get_referral()) %>%
+    dplyr::mutate(initial_assess_datetime = as.POSIXct(generate_initial_assess(start_datetime = start_datetime,
                                                                         end_datetime = end_datetime))) %>%
-    mutate(treatment_datetime = as.POSIXct(generate_treatment_time(start_datetime = start_datetime,
+    dplyr::mutate(treatment_datetime = as.POSIXct(generate_treatment_time(start_datetime = start_datetime,
                                                                    end_datetime = end_datetime))) %>%
-    mutate(hrg_code = get_hrg_code())
+    dplyr::mutate(hrg_code = get_hrg_code())
 
   simulated_data$episode_id <- 1:nrow(simulated_data)
 
@@ -71,11 +71,11 @@ get_simulated_ip_data <- function(npat = 800,
 
   #get patients admistted from ED
   ed_admissions <- ed_data %>%
-    filter(attendance_disposal == "Admitted") %>%
-    mutate(start_datetime_ip = end_datetime, admission_method = "Accident and emergency") %>%
-    select(pseudo_id, sex, age, ethnicity, start_datetime_ip, admission_method) %>%
-    rename(start_datetime = start_datetime_ip) %>%
-    mutate(end_datetime = as.POSIXct(start_datetime +
+    dplyr::filter(attendance_disposal == "Admitted") %>%
+    dplyr::mutate(start_datetime_ip = end_datetime, admission_method = "Accident and emergency") %>%
+    dplyr::select(pseudo_id, sex, age, ethnicity, start_datetime_ip, admission_method) %>%
+    dplyr::rename(start_datetime = start_datetime_ip) %>%
+    dplyr::mutate(end_datetime = as.POSIXct(start_datetime +
                                        as.difftime(rexp(1, rate = 1/(388800)), units = "secs")))
 
   #simulate new patiens who have not come from ED
@@ -85,10 +85,10 @@ get_simulated_ip_data <- function(npat = 800,
 
   #combine new patients and patiens from ED
   simulated_pat_data <- simulated_pat_data %>%
-    rowwise()%>%
-    mutate(age = get_age()) %>%
-    mutate(ethnicity = get_ethnic_cat()) %>%
-    ungroup()
+    dplyr::rowwise()%>%
+    dplyr::mutate(age = get_age()) %>%
+    dplyr::mutate(ethnicity = get_ethnic_cat()) %>%
+    dplyr::ungroup()
 
   simulated_data <- get_simulated_admission_data(simulated_pat_data, start = start, end = end, los_rate = (1/388800))
   simulated_data <- simulated_data[[2]]
@@ -96,33 +96,33 @@ get_simulated_ip_data <- function(npat = 800,
   #add extra rows for 14 and 28 day readmissions
   simulated_readmissions_14 <- simulated_data[rep((nrow(simulated_data) - 20):nrow(simulated_data),1),]
   simulated_readmissions_14 <- simulated_readmissions_14 %>%
-    mutate(start_datetime = start_datetime + lubridate::days(13), end_datetime = end_datetime + lubridate::days(13))
+    dplyr::mutate(start_datetime = start_datetime + lubridate::days(13), end_datetime = end_datetime + lubridate::days(13))
 
   simulated_readmissions_28 <- simulated_data[rep((nrow(simulated_data) - 60):(nrow(simulated_data) - 21),1),]
   simulated_readmissions_28 <- simulated_readmissions_28 %>%
-    mutate(start_datetime = start_datetime + lubridate::days(27), end_datetime = end_datetime + lubridate::days(27))
+    dplyr::mutate(start_datetime = start_datetime + lubridate::days(27), end_datetime = end_datetime + lubridate::days(27))
 
   simulated_readmissions_90 <- simulated_data[rep((nrow(simulated_data) - 150):(nrow(simulated_data) - 61),1),]
   simulated_readmissions_90 <- simulated_readmissions_90 %>%
-    mutate(start_datetime = start_datetime + lubridate::days(89), end_datetime = end_datetime + lubridate::days(89))
+    dplyr::mutate(start_datetime = start_datetime + lubridate::days(89), end_datetime = end_datetime + lubridate::days(89))
 
   simulated_data <- simulated_data %>%
-    rowwise() %>%
-    bind_rows(simulated_readmissions_14) %>%
-    bind_rows(simulated_readmissions_28) %>%
-    mutate(admission_method = get_admission_method()) %>%
-    bind_rows(ed_admissions) %>%
-    mutate(admission_source = get_admission_source()) %>%
-    mutate(discharge_method = get_discharge_method()) %>%
-    mutate(discharge_dest = get_discharge_dest()) %>%
-    mutate(patient_classification = get_patient_classification()) %>%
-    mutate(main_specialty = get_main_specialty()) %>%
-    mutate(local_subspecialty = main_specialty) %>%
-    mutate(diagnosis_code = get_diagnosis_code()) %>%
-    mutate(ward_category = get_ward_category()) %>%
-    mutate(consultant = get_consultant()) %>%
-    mutate(hrg_code = get_hrg_code()) %>%
-    select(-pseudo_id1)
+    dplyr::rowwise() %>%
+    dplyr::bind_rows(simulated_readmissions_14) %>%
+    dplyr::bind_rows(simulated_readmissions_28) %>%
+    dplyr::mutate(admission_method = get_admission_method()) %>%
+    dplyr::bind_rows(ed_admissions) %>%
+    dplyr::mutate(admission_source = get_admission_source()) %>%
+    dplyr::mutate(discharge_method = get_discharge_method()) %>%
+    dplyr::mutate(discharge_dest = get_discharge_dest()) %>%
+    dplyr::mutate(patient_classification = get_patient_classification()) %>%
+    dplyr::mutate(main_specialty = get_main_specialty()) %>%
+    dplyr::mutate(local_subspecialty = main_specialty) %>%
+    dplyr::mutate(diagnosis_code = get_diagnosis_code()) %>%
+    dplyr::mutate(ward_category = get_ward_category()) %>%
+    dplyr::mutate(consultant = get_consultant()) %>%
+    dplyr::mutate(hrg_code = get_hrg_code()) %>%
+    dplyr::select(-pseudo_id1)
 
   simulated_data$episode_id <- 1:nrow(simulated_data)
 
