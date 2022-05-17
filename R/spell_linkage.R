@@ -248,22 +248,7 @@ spell_variables <- function(all_episodes) {
     mortality_df = mortality_df
   )
 
-  print("before reduce")
-
   episode_lists <- Reduce(function(...) dplyr::left_join(..., on = "spell_number"), lst_of_dfs)
-
-  # episode_lists <- dplyr::left_join(const_episodes_df, gender_df)
-  # episode_lists <- dplyr::left_join(episode_lists, age_band_df)
-  # episode_lists <- dplyr::left_join(episode_lists, ep_class_seq_df)
-  # episode_lists <- dplyr::left_join(episode_lists, admission_type_df)
-  # episode_lists <- dplyr::left_join(episode_lists, datetime_df)
-  # episode_lists <- dplyr::left_join(episode_lists, disposal_df)
-  # episode_lists <- dplyr::left_join(episode_lists, hrg_df)
-  # episode_lists <- dplyr::left_join(episode_lists, source_referral_df)
-  # episode_lists <- dplyr::left_join(episode_lists, mortality_df)
-
-  print("after reducee")
-
 
   spell_table <- all_episodes %>%
     dplyr::group_by(spell_number) %>%
