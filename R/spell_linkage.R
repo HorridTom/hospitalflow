@@ -76,7 +76,6 @@ make_moves_table <- function(ed_data = test_ed_data_sample,
 #'
 #' @examples
 make_spell_number <- function(ed_data, inpatient_data, same_type_episode_lag = 1, different_type_episode_lag = 6) {
-
   ed_episodes <- ed_data %>%
     dplyr::mutate(episode_type = "ED")
 
@@ -86,17 +85,18 @@ make_spell_number <- function(ed_data, inpatient_data, same_type_episode_lag = 1
   all_episodes <- dplyr::bind_rows(ed_episodes, ip_episodes) %>%
     dplyr::filter(!is.na(end_datetime)) %>%
     dplyr::arrange(pseudo_id, start_datetime) %>%
+    data.table::data.table() %>%
     dplyr::group_by(pseudo_id) %>%
     dplyr::mutate(episode_lag = difftime(start_datetime, dplyr::lag(end_datetime), units = "hours")) %>%
     dplyr::mutate(prev_episode_type = dplyr::lag(episode_type)) %>%
     dplyr::mutate(new_spell = dplyr::if_else(is.na(prev_episode_type) |
-                                        ((prev_episode_type == episode_type) & episode_lag > same_type_episode_lag) |
-                                        ((prev_episode_type != episode_type) & episode_lag > different_type_episode_lag), TRUE, FALSE)) %>%
+      ((prev_episode_type == episode_type) & episode_lag > same_type_episode_lag) |
+      ((prev_episode_type != episode_type) & episode_lag > different_type_episode_lag), TRUE, FALSE)) %>%
     dplyr::ungroup() %>%
+    tibble::as_tibble() %>%
     dplyr::mutate(spell_number = cumsum(new_spell))
 
   all_episodes
-
 }
 
 
@@ -111,54 +111,161 @@ make_spell_number <- function(ed_data, inpatient_data, same_type_episode_lag = 1
 #' @examples
 spell_variables <- function(all_episodes) {
 
-  episode_lists <- all_episodes %>%
+  only_spell_numbers <- data.frame(spell_number = unique(all_episodes$spell_number))
+
+  const_episodes_df <- all_episodes %>%
     dplyr::group_by(spell_number) %>%
-    tidyr::nest() %>%
-    dplyr::mutate(constituent_ed_episodes = purrr::map(data,
-                                                       get_episode_id_list,
-                                                       episode_type_to_list = "ED"),
-                  constituent_ip_episodes = purrr::map(data,
-                                                       get_episode_id_list,
-                                                       episode_type_to_list = "IP")) %>%
-    dplyr::mutate(gender = purrr::map(data, get_latest_gender)) %>%
-    dplyr::mutate(age_band_start = purrr::map(data, get_age_band_start)) %>%
-    # dplyr::mutate(episode_type = purrr::map(data, get_episode_type)) %>%
-    dplyr::mutate(episode_class_sequence = purrr::map(data, get_episode_class_sequence)) %>%
-    dplyr::mutate(admission_method_type = purrr::map(data, admission_method_class)) %>%
-    dplyr::mutate(initial_ed_end_datetime = purrr::map(data, get_initial_ed_episode_end_datetime)) %>%
-    dplyr::mutate(disposal_code = purrr::map(data, get_disposal_code)) %>%
-    dplyr::mutate(hrg_ae_code = purrr::map(data, get_hrg)) %>%
-    dplyr::mutate(source_referral_ae = purrr::map(data, get_source_of_referral)) %>%
-    dplyr::mutate(died_ip = purrr::map(data, get_mortality_ip)) %>%
-    dplyr::select(-data) %>%
-    tidyr::unnest(cols = c(constituent_ed_episodes, constituent_ip_episodes, gender, age_band_start,
-                           episode_class_sequence, admission_method_type, initial_ed_end_datetime,
-                           disposal_code, hrg_ae_code, source_referral_ae, died_ip))
+    dplyr::summarise(
+      constituent_ed_episodes = list(as.list(episode_id[episode_type == "ED"])),
+      constituent_ip_episodes = list(as.list(episode_id[episode_type == "IP"]))
+    )
 
 
+  gender_df <- all_episodes %>%
+    dplyr::group_by(spell_number) %>%
+    dplyr::filter(!is.na(gender)) %>%
+    dplyr::arrange(dplyr::desc(start_datetime)) %>%
+    dplyr::slice_head(n=1) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(spell_number, gender)
+
+
+  age_band_df <- all_episodes %>%
+    dplyr::group_by(spell_number, pseudo_id) %>%
+    dplyr::filter(!is.na(age_band_start)) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::slice_head(n=1) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(spell_number, age_band_start)
+
+
+  ep_class_seq_df <- all_episodes %>%
+    dplyr::group_by(spell_number) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::summarise(
+      episode_class_sequence = paste(
+        substr(episode_type, start = 1, stop = 1),
+        sep = '',
+        collapse = ''
+      )
+    )
+
+
+  admission_type_df <- all_episodes %>%
+    dplyr::select(spell_number, start_datetime, admission_method) %>%
+    dplyr::group_by(spell_number) %>%
+    dplyr::filter(!is.na(admission_method)) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::mutate(admission_method_type = dplyr::case_when(
+      admission_method == "Waiting list" | admission_method == "Booked" | admission_method == "Planned" ~ "Elective Admissions",
+      admission_method == "Accident and emergency" | admission_method == "General Practitioner" | admission_method == "Bed bureau" ~ "Emergency Admissions",
+      admission_method == "Consultant Clinic" | admission_method == "Mental Health Crisis Resolution Team" | admission_method == "Accident and Emergency Department" ~ "Emergency Admissions",
+      admission_method == "Transfer from another Hospital Provider" | admission_method == "Intended home birth" | admission_method == "Other emergency admission" ~ "Emergency Admissions",
+      admission_method == "Other means" ~ "Emergency Admissions",
+      admission_method == "Admitted ante-partum" | admission_method == "Admitted post-partum"  ~ "Maternity Admissions",
+      admission_method == "Birth-this provider" | admission_method == "Birth-outside provider(not intended home)" | admission_method == "Transfer from other provider(non-emergency)" ~ "Other Admissions")) %>%
+    dplyr::slice_head(n=1) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(spell_number, admission_method_type)
+
+
+  admission_type_df <- dplyr::left_join(only_spell_numbers, admission_type_df, by = "spell_number")
+  admission_type_df$admission_method_type <- ifelse(
+    admission_type_df$admission_method_type == "NULL",
+    as.character(NA),
+    admission_type_df$admission_method_type
+  )
+  admission_type_df <- tibble::as_tibble(admission_type_df)
+
+
+  datetime_df <- all_episodes %>%
+    dplyr::select(spell_number, start_datetime, episode_type, end_datetime) %>%
+    dplyr::group_by(spell_number) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::slice_head(n=1) %>%
+    dplyr::summarise(
+      initial_ed_end_datetime = end_datetime[episode_type == "ED"]
+    )
+  datetime_df <- dplyr::left_join(only_spell_numbers, datetime_df, by = "spell_number")
+
+
+  disposal_df <- all_episodes %>%
+    dplyr::group_by(spell_number, pseudo_id) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::slice_head(n=1) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(spell_number, attendance_disposal) %>%
+    dplyr::rename(disposal_code = attendance_disposal)
+
+
+  hrg_df <- all_episodes %>%
+    dplyr::group_by(spell_number, pseudo_id) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::slice_head(n=1) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(spell_number, hrg_code) %>%
+    dplyr::rename(hrg_ae_code = hrg_code)
+
+
+  source_referral_df <- all_episodes %>%
+    dplyr::group_by(spell_number, pseudo_id) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::slice_head(n=1) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(spell_number, referral_source) %>%
+    dplyr::rename(source_referral_ae = referral_source)
+
+
+  mortality_df <- all_episodes %>%
+    dplyr::group_by(spell_number, pseudo_id) %>%
+    dplyr::arrange(start_datetime) %>%
+    dplyr::mutate(died = dplyr::if_else(discharge_method == 4, TRUE, FALSE)) %>%
+    dplyr::slice_head(n=1) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(spell_number, died) %>%
+    dplyr::rename(died_ip = died)
+
+
+  lst_of_dfs <- list(
+    const_episodes_df = const_episodes_df,
+    gender_df = gender_df,
+    age_band_df = age_band_df,
+    ep_class_seq_df = ep_class_seq_df,
+    admission_type_df = admission_type_df,
+    datetime_df = datetime_df,
+    disposal_df = disposal_df,
+    hrg_df = hrg_df,
+    source_referral_df = source_referral_df,
+    mortality_df = mortality_df
+  )
+
+  episode_lists <- Reduce(function(...) dplyr::left_join(..., by = c("spell_number" = "spell_number")), lst_of_dfs)
 
   spell_table <- all_episodes %>%
     dplyr::group_by(spell_number) %>%
-    dplyr::summarise(spell_start = min(start_datetime, na.rm = TRUE),
-                     spell_end = max(end_datetime, na.rm = TRUE),
-                     number_of_episodes = dplyr::n(),
-                     pseudo_id = dplyr::first(pseudo_id)) %>%
+    dplyr::summarise(
+      spell_start = min(start_datetime, na.rm = TRUE),
+      spell_end = max(end_datetime, na.rm = TRUE),
+      number_of_episodes = dplyr::n(),
+      pseudo_id = dplyr::first(pseudo_id)
+    ) %>%
     dplyr::left_join(episode_lists, by = "spell_number") %>%
-    dplyr::mutate(starts_with_ed = stringr::str_detect(episode_class_sequence, pattern = "^E.*$"),
-                  ed_non_adm = stringr::str_detect(episode_class_sequence, pattern = "^E$"),
-                  ed_comp_non_adm = stringr::str_detect(episode_class_sequence, pattern = "^EE+$"),
-                  ed_admission = stringr::str_detect(episode_class_sequence, pattern = "EI"),
-                  ed_comp_adm = stringr::str_detect(episode_class_sequence, pattern = "^EI+$"),
-                  direct_comp_adm = stringr::str_detect(episode_class_sequence, pattern = "^II+$")) %>%
+    dplyr::mutate(
+      starts_with_ed = stringr::str_detect(episode_class_sequence, pattern = "^E.*$"),
+      ed_non_adm = stringr::str_detect(episode_class_sequence, pattern = "^E$"),
+      ed_comp_non_adm = stringr::str_detect(episode_class_sequence, pattern = "^EE+$"),
+      ed_admission = stringr::str_detect(episode_class_sequence, pattern = "EI"),
+      ed_comp_adm = stringr::str_detect(episode_class_sequence, pattern = "^EI+$"),
+      direct_comp_adm = stringr::str_detect(episode_class_sequence, pattern = "^II+$")
+    ) %>%
     dplyr::mutate(direct_admission = stringr::str_count(episode_class_sequence, pattern = "I") > 0) %>%
     dplyr::rowwise() %>%
     dplyr::mutate(spell_class_col = spell_class(starts_with_ed, ed_non_adm, ed_comp_non_adm, ed_admission, ed_comp_adm, direct_admission, direct_comp_adm)) %>%
     dplyr::ungroup()
 
-  spell_table
+  return(spell_table)
 
 }
-
 
 #' add_spell_variables
 #'
@@ -230,60 +337,6 @@ add_spell_variables <- function(ed_data, inpatient_data, spell_table) {
 
 }
 
-# get_main_specialty <- function(x) {
-#   if(length(x) == 0)
-#     {NA}
-#   else {
-#     inpatient_data %>%
-#       dplyr::filter(episode_id == x[[1]]) %>%
-#       dplyr::slice(1) %>%
-#       dplyr::pull(main_specialty)
-#   }
-# }
-
-
-
-get_episode_id_list <- function(episode_df, episode_type_to_list) {
-  ep_id_v <- episode_df %>%
-    dplyr::filter(episode_type == episode_type_to_list) %>%
-    dplyr::pull(episode_id)
-  list(as.list(ep_id_v))
-}
-
-get_latest_gender <- function(gender_df) {
-  ordered_gender_records <- gender_df %>%
-    dplyr::filter(!is.na(gender)) %>%
-    dplyr::arrange(dplyr::desc(start_datetime)) %>%
-    dplyr::pull(gender)
-
-  ordered_gender_records[1]
-}
-
-get_age_band_start <- function(age_band_df){
-  ordered_age_band <- age_band_df %>% dplyr::filter(!is.na(age_band_start)) %>%
-    dplyr::group_by(pseudo_id) %>%
-    dplyr::arrange(start_datetime) %>%
-    dplyr::pull(age_band_start)
-
-  ordered_age_band[1]
-}
-
-# get_episode_type <- function(episode_type_df) {
-#   episode_type <- episode_type_df %>%
-#     dplyr::filter(!is.na(episode_type)) %>%
-#     dplyr::pull(episode_type)
-#
-# }
-
-
-get_episode_class_sequence <- function(episode_df) {
-  class_vector <- episode_df %>% dplyr::select(start_datetime, episode_type) %>%
-    dplyr::arrange(start_datetime) %>%
-    dplyr::mutate(episode_type = stringr::str_sub(episode_type, start = 1, end = 1)) %>%
-    dplyr::pull(episode_type)
-
-  paste(class_vector, sep = "", collapse = "")
-}
 
 
 spell_class <- function(starts_with_ed, ed_non_adm, ed_comp_non_adm, ed_admission, ed_comp_adm, direct_admission, direct_comp_adm) {
@@ -302,83 +355,6 @@ spell_class <- function(starts_with_ed, ed_non_adm, ed_comp_non_adm, ed_admissio
   }
 }
 
-admission_method_class <- function(admission_method_df) {
-
-  ordered_admission_method <- admission_method_df %>%
-    dplyr::select(start_datetime, admission_method) %>%
-    dplyr::filter(!is.na(admission_method)) %>%
-    dplyr::arrange(start_datetime) %>%
-    dplyr::mutate(admission_method_type = dplyr::case_when(
-      admission_method == "Waiting list" | admission_method == "Booked" | admission_method == "Planned" ~ "Elective Admissions",
-      admission_method == "Accident and emergency" | admission_method == "General Practitioner" | admission_method == "Bed bureau" ~ "Emergency Admissions",
-      admission_method == "Consultant Clinic" | admission_method == "Mental Health Crisis Resolution Team" | admission_method == "Accident and Emergency Department" ~ "Emergency Admissions",
-      admission_method == "Transfer from another Hospital Provider" | admission_method == "Intended home birth" | admission_method == "Other emergency admission" ~ "Emergency Admissions",
-      admission_method == "Other means" ~ "Emergency Admissions",
-      admission_method == "Admitted ante-partum" | admission_method == "Admitted post-partum"  ~ "Maternity Admissions",
-      admission_method == "Birth-this provider" | admission_method == "Birth-outside provider(not intended home)" | admission_method == "Transfer from other provider(non-emergency)" ~ "Other Admissions")) %>%
-    dplyr::pull(admission_method_type)
-
-  ordered_admission_method[1]
 
 
-}
-
-
-
-get_initial_ed_episode_end_datetime <- function(spell_episodes_df) {
-  first_episode_of_spell <- spell_episodes_df %>%
-    dplyr::arrange(start_datetime) %>%
-    dplyr::slice(1)
-
-  if(first_episode_of_spell %>% dplyr::pull(episode_type)=="ED"){
-    return(first_episode_of_spell %>% dplyr::pull(end_datetime))
-
-  }else{
-
-    NA
-  }
-
-}
-
-get_disposal_code <- function(disposal_code_df){
-  disposal_code <- disposal_code_df %>%
-    dplyr::group_by(pseudo_id) %>%
-    dplyr::arrange(start_datetime) %>%
-    dplyr::slice(1) %>%
-    dplyr::pull(attendance_disposal)
-
-  disposal_code[1]
-}
-
-get_source_of_referral <- function(source_of_referral_df){
-  source_referral <- source_of_referral_df %>%
-    dplyr::group_by(pseudo_id) %>%
-    dplyr::arrange(start_datetime) %>%
-    dplyr::slice(1) %>%
-    dplyr::pull(referral_source)
-
-  source_referral[1]
-}
-
-get_hrg <- function(hrg_df){
-  hrg_code <- hrg_df %>%
-    dplyr::group_by(pseudo_id) %>%
-    dplyr::arrange(start_datetime) %>%
-    dplyr::slice(1) %>%
-    dplyr::pull(hrg_code)
-
-  hrg_code[1]
-}
-
-
-get_mortality_ip <- function(died_ip_df){
-
-  died_ip <- died_ip_df %>%
-    dplyr::group_by(pseudo_id) %>%
-    dplyr::arrange(start_datetime) %>%
-    dplyr::mutate(died = dplyr::if_else(discharge_method == 4, TRUE, FALSE)) %>%
-    dplyr::pull(died)
-
-  died_ip[1]
-}
 

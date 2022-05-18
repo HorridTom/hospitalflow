@@ -1,6 +1,7 @@
-context("Make a spell table function and test plot_ed_los_distribution_admission")
 
 test_that("spell table is created correctly", {
+
+  # in the following tests in this script this dataframe will be loaded from testthat/testdata/spell_linkage
   correct_answers <- tibble::tibble(
     spell_number = as.character(c("1", "2", "3", "4", "5", "6", "7", "8", "9")),
     spell_start = as.POSIXct(c("2019-01-02 17:00", "2019-01-03 08:00", "2019-01-03 19:00", "2019-01-01 17:00", "2019-01-02 08:00", "2019-01-03 08:00", "2019-01-04 14:00", "2019-01-05 06:00", "2019-01-04 14:00"), tz = "Europe/London"),
@@ -21,6 +22,7 @@ test_that("spell table is created correctly", {
   referral_source <- c("Emergency Services", "Self Referral", "Health Care Provider", "Emergency Services")
   hrg_code <- c("VB082", "VB083", "VB084", "VB085")
 
+  # in the following tests in this script this dataframe will be loaded from testthat/testdata/spell_linkage
   ed_data_age_sex <- tibble::tibble(
     pseudo_id,
     episode_id,
@@ -44,6 +46,7 @@ test_that("spell table is created correctly", {
   admission_method <- c("Accident and emergency", "Accident and emergency", "Booked", "Booked", "Booked", "Birth-this provider", "Birth-this provider")
   discharge_method <- c(1, 2, 3, 3, 4, 5, 7)
 
+  # in the following tests in this script this dataframe will be loaded from testthat/testdata/spell_linkage
   inpatient_data_age_sex <- tibble::tibble(
     pseudo_id,
     episode_id,
@@ -75,3 +78,4 @@ test_that("spell table is created correctly", {
   # Test results are correct
   expect_equal(result, correct_answers)
 })
+
