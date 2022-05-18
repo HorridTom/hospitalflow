@@ -248,7 +248,7 @@ spell_variables <- function(all_episodes) {
     mortality_df = mortality_df
   )
 
-  episode_lists <- Reduce(function(...) dplyr::left_join(..., on = "spell_number"), lst_of_dfs)
+  episode_lists <- Reduce(function(...) dplyr::left_join(..., by = "spell_number"), lst_of_dfs)
 
   spell_table <- all_episodes %>%
     dplyr::group_by(spell_number) %>%

@@ -29,11 +29,7 @@ Imports:
     scales (>= 1.1.1),
     stringr (>= 1.4.0),
     tibble (>= 3.0.6),
-    tidyr (>= 1.1.2),
-    future (>= 1.24.0),
-    furrr (>= 0.2.0),
-    multidplyr,
-    dtplyr
+    tidyr (>= 1.1.2)
 Suggests: 
     knitr (>= 1.31),
     rmarkdown (>= 2.12),
