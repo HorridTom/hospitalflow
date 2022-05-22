@@ -2,13 +2,29 @@
 
 #' Contingency table between ward category and main specialty
 #'
-#' @param spell_table
+#' @description
+#' \code{get_ward_specialty_contingency_table} returns a table showing the relationship
+#' between ward types and main specialties. Used in patient boarding analysis to infer
+#' what type of patients a given ward is designed to accommodate.
 #'
-#' @return
+#' @param ip_data
+#' \itemize{Hospital inpatient episode data with at least the following fields:
+#'   \item \code{ward_category} - category of the ward;
+#'   \item \code{main_specialty} - main specialty of the clinician responsible for the episode;
+#' }
+#'
+#' @return A contingency table showing the relationship between ward type and
+#' main specialty.
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' get_ward_specialty_contingency_table(
+#'   ip_data = inpatient_data
+#' )
+#' }
 #'
+#' @export
 get_ward_specialty_contingency_table <- function(ip_data){
   # Perform check if the necessary column exist
   if (!("ward_category" %in% colnames(ip_data))) {
