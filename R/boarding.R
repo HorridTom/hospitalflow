@@ -40,5 +40,8 @@ get_ward_specialty_contingency_table <- function(ip_data){
       ip_data$ward_category, ip_data$main_specialty
       )
     )
+
+  tbl <- tbl[gtools::mixedsort(row.names(tbl)),]
+
   return (tbl)
 }
