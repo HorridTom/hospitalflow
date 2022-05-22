@@ -37,7 +37,7 @@ get_ward_specialty_contingency_table <- function(ip_data){
 
   tbl <- as.data.frame.matrix(
     table(
-      spell_table$ward_category, spell_table$main_specialty
+      ip_data$ward_category, ip_data$main_specialty
       )
     )
   return (tbl)
