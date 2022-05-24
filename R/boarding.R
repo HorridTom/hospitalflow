@@ -25,7 +25,7 @@
 #' }
 #'
 #' @export
-get_ward_specialty_contingency_table <- function(ip_data){
+get_ward_specialty_contingency_table <- function(ipData, scaleBy, returnPlot = FALSE){
   # Perform check if the necessary column exist
   if (!("ward_category" %in% colnames(ip_data))) {
     stop("The 'ward_category' column not found in the provided dataframe.")
