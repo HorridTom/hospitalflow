@@ -4,7 +4,7 @@
 \alias{get_ward_specialty_contingency_table}
 \title{Contingency table between ward category and main specialty}
 \usage{
-get_ward_specialty_contingency_table(ip_data)
+get_ward_specialty_contingency_table(ipData, scaleBy, returnPlot = FALSE)
 }
 \arguments{
 \item{ip_data}{\itemize{Hospital inpatient episode data with at least the following fields:
