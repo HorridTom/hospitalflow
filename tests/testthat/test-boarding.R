@@ -19,7 +19,7 @@ test_that("ward type-specialty relationship is computed correctly", {
   # Geting function output
   result <- get_ward_specialty_contingency_table(
     ipData = sample_ip_data,
-    scaleBy = NA,
+    scaleBy = "none",
     returnPlot = FALSE
   ) %>% tibble::as_tibble()
 
