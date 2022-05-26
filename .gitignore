@@ -29,6 +29,7 @@ rsconnect/
 
 # Data
 inst/doc
+inst/extdata/ccsr_icd10_lookup.csv
 
 # Temporarily ignore whole vignette folder as caches contain data
 /vignettes
