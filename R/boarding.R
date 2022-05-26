@@ -7,16 +7,22 @@
 #' between ward types and main specialties or disease groups. Used in patient boarding analysis to infer
 #' what type of patients a given ward is designed to accommodate.
 #'
-#' @param ip_data
+#' @param ipData
 #' \itemize{Hospital inpatient episode data with at least the following fields:
 #'   \item \code{ward_category} - category of the ward;
 #'   \item \code{main_specialty} - main specialty of the clinician responsible for the episode;
 #'   \item \code{ccsr_category_description} - disease group that ICD-10 code of the patient belongs to.
 #' }
 #' @param vars Variables of interest - either \code{"ws"} (ward type - main specialty) or
-#' \code{"ws"} (ward type - CCSR category).
+#' \code{"wd"} (ward type - CCSR disease category).
 #' @param scaleBy
-#' @param returnPlot
+#' \itemize{Whether and how entries of contingency table should be scaled.
+#'   \item \code{"none"} - no scaling, presents absolute episode counts;
+#'   \item \code{"rowsum"} - normalizes by the total number of episodes in a given ward. Useful when investigating the distribution of specialties/diseases among wards.
+#'   \item \code{"colsum"} - normalizes by the total number of episodes in a given specialty/disease group. Useful when investigating the distribution of wards among specialties/diseases.
+#'   \item \code{"total"} - normalizes by the total number of episodes.
+#' }
+#' @param returnPlot A boolean value indicating whether a plot (heatmap) should be return. If \code{FALSE}, a table is returned.
 #'
 #' @return A contingency table (default) or a heatmap showing the relationship between ward type and
 #' main specialty or CCSR categories.
@@ -34,19 +40,6 @@
 #'
 #' @export
 get_contingency_table <- function(ipData, vars, scaleBy = "none", returnPlot = FALSE) {
-  # Perform check if the necessary column exist
-  if (!("ward_category" %in% colnames(ipData))) {
-    stop("The 'ward_category' column not found in the provided dataframe.")
-  }
-
-  if (!("main_specialty" %in% colnames(ipData))) {
-    stop("The 'main_specialty' column not found in the provided dataframe.")
-  }
-
-  if (!("ccsr_category_description" %in% colnames(ipData))) {
-    stop("The 'ccsr_category_description' column not found in the provided dataframe.")
-  }
-
   # Check if vars argument makes sense
   if (!(vars %in% c("ws", "wd"))) {
     stop("Unrecognized value provided to 'vars'. Please provide on of: 'ws', 'wd'.")
@@ -54,6 +47,15 @@ get_contingency_table <- function(ipData, vars, scaleBy = "none", returnPlot = F
 
   # Getting the contingency table
   if (vars == "ws") {
+    # Perform check if the necessary column exist
+    if (!("ward_category" %in% colnames(ipData))) {
+      stop("The 'ward_category' column not found in the provided dataframe.")
+    }
+
+    if (!("main_specialty" %in% colnames(ipData))) {
+      stop("The 'main_specialty' column not found in the provided dataframe.")
+    }
+
     tbl <- as.data.frame.matrix(
     table(
       ipData$ward_category, ipData$main_specialty
@@ -64,6 +66,15 @@ get_contingency_table <- function(ipData, vars, scaleBy = "none", returnPlot = F
     y_axis_label <- "Ward Type"
 
   } else if (vars == "wd") {
+    # Perform check if the necessary column exist
+    if (!("ward_category" %in% colnames(ipData))) {
+      stop("The 'ward_category' column not found in the provided dataframe.")
+    }
+
+    if (!("ccsr_category_description" %in% colnames(ipData))) {
+      stop("The 'ccsr_category_description' column not found in the provided dataframe.")
+    }
+
     tbl <- as.data.frame.matrix(
       table(
         ipData$ward_category, ipData$ccsr_category_description
@@ -123,7 +134,5 @@ get_contingency_table <- function(ipData, vars, scaleBy = "none", returnPlot = F
   } else {
 
     return(tbl)
-
   }
-
 }
