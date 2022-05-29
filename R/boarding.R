@@ -77,6 +77,7 @@ get_contingency_table <- function(ipData, vars, scaleBy = "none", returnPlot = F
     # Load lookup table
     lookup_tbl <- hospitalflow:::icd10_ccsr_mapping
 
+    ipData <- add_ccsr_categories(ipData, lookup_tbl)
 
     # Perform check if the necessary column exist
     if (!("ward_category" %in% colnames(ipData))) {
@@ -149,7 +150,6 @@ get_contingency_table <- function(ipData, vars, scaleBy = "none", returnPlot = F
   }
 }
 
-## create a new function that joins imogens inpatient data with lookup table to produce new inpatient data (it should be the output).
 
 change_icd10_codes <- function (ipData) {
 
@@ -166,4 +166,43 @@ change_icd10_codes <- function (ipData) {
   return(ipData)
 
 }
+
+
+add_ccsr_categories <- function(ipData, mappingTbl) {
+  # Since ICD-10 codes in inpatient_data are specified in the format of X1234,
+  # I need to reformat the ICD-10 codes in the icd10_ccsr_mapping. Natively,
+  # ICD-10 in the icd10_ccsr_mapping are between 3 and 7 (including) in length.
+
+  mappingTbl$icd10cm_code <- ifelse(
+    nchar(mappingTbl$icd10cm_code) == 3,
+    mappingTbl$icd10cm_code,
+    substr(mappingTbl$icd10cm_code, 1, 4)
+  )
+
+  # Truncating the ICD-10 codes results in duplicate values in icd10cm_codes column.
+  # Need to remove duplicates. The code below assumes that less-granular versions of
+  # ICD-10 codes are mapped to the same categories.
+
+  mappingTbl <- mappingTbl %>%
+    dplyr::group_by(icd10cm_code) %>%
+    dplyr::slice_head(n=1) %>%
+    dplyr::ungroup()
+
+
+  # At this point, ICD-10 codes in ipData should be a subset of ICD-10 codes in mapping Tbl.
+  # Checking this.
+
+  if(!all(ipData$diagnosis_code %in% mappingTbl$icd10cm_code)) {
+    stop("There are some ICD-10 codes inside inpatient episode data that cannot be mapped to CCSR categories. Make sure that the format of ICD-10 codes is the same between the 2 tables.")
+  } else {
+    # Performing the left join - resulting is the inpatient episode data with CCSR categories
+    joined_df <- dplyr::left_join(
+      ipData,
+      mappingTbl,
+      by = c("diagnosis_code" = "icd10cm_code")
+    )
+  }
+  return(joined_df)
+}
+
 
