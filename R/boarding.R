@@ -40,10 +40,18 @@
 #'
 #' @export
 get_contingency_table <- function(ipData, vars, scaleBy = "none", returnPlot = FALSE) {
+
   # Check if vars argument makes sense
   if (!(vars %in% c("ws", "wd"))) {
-    stop("Unrecognized value provided to 'vars'. Please provide on of: 'ws', 'wd'.")
+    stop("Unrecognized value provided to 'vars'. Should be one of the following: 'ws', 'wd'.")
   }
+
+  # Check if scaleBy argument makes sense
+  if (!(scaleBy %in% c("none", "rowsum", "colsum", "total"))) {
+    stop("Unrecognized value provided to 'scaleBy'. Should be one of the following: 'none', 'rowsum', 'colsum', 'total'.")
+  }
+
+  ipData <- change_icd10_codes(ipData)
 
   # Getting the contingency table
   if (vars == "ws") {
@@ -136,3 +144,22 @@ get_contingency_table <- function(ipData, vars, scaleBy = "none", returnPlot = F
     return(tbl)
   }
 }
+
+## create a new function that joins imogens inpatient data with lookup table to produce new inpatient data (it should be the output).
+
+change_icd10_codes <- function (ipData) {
+
+  # This function takes the simulated inpatient_data and does 2 things with dignosis_code column:
+  #    1. Changes all instances of G052 to G053. This is done because there is no G052 code in
+  #       CCSR database. Also, there seems to be conflicting information on the internet
+  #       because both of the codes correspond to the same disease when looking at different sources.
+  #    2. Changes F99X to F99 because they encode the same disease and F99X is not present in
+  #       CCSR database.
+
+  ipData$diagnosis_code <- gsub("G052", "G053", ipData$diagnosis_code)
+  ipData$diagnosis_code <- gsub("F99X", "F99", ipData$diagnosis_code)
+
+  return(ipData)
+
+}
+
