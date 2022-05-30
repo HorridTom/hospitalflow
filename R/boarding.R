@@ -84,17 +84,17 @@ get_contingency_table <- function(ipData, vars, scaleBy = "none", returnPlot = F
       stop("The 'ward_category' column not found in the provided dataframe.")
     }
 
-    if (!("ccsr_category_description" %in% colnames(ipData))) {
-      stop("The 'ccsr_category_description' column not found in the provided dataframe.")
+    if (!("ccsr_ip_cat" %in% colnames(ipData))) {
+      stop("The 'ccsr_ip_cat' column not found in the provided dataframe.")
     }
 
     tbl <- as.data.frame.matrix(
       table(
-        ipData$ward_category, ipData$ccsr_category_description
+        ipData$ward_category, ipData$ccsr_ip_cat
       )
     )
     plot_name <- "Relationship between Ward Type and Disease Groups (CCSR Categories)"
-    x_axis_label <- "CCSR Category Description"
+    x_axis_label <- "CCSR IP Category Description"
     y_axis_label <- "Ward Type"
   }
 
