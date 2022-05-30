@@ -32,7 +32,9 @@ main specialty or CCSR categories.
 \description{
 \code{get_ward_specialty_contingency_table} returns a table showing the relationship
 between ward types and main specialties or disease groups. Used in patient boarding analysis to infer
-what type of patients a given ward is designed to accommodate.
+what type of patients a given ward is designed to accommodate. The function is currently using
+a 1-to-1 mapping between ICD-10 codes and CCSR categories. There is a possibility to
+include a 1-to-many mapping in the analysis in the future if needed.
 }
 \examples{
 \dontrun{
