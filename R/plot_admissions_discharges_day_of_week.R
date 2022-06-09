@@ -45,8 +45,8 @@ plot_admissions_discharges_day_of_week <- function(data,
   time_zone <- attr(data$spell_start, "tzone")
 
   # set input dates to have the same time zone as the data
-  startDate <- as.Date(startDate, tz = time_zone)
-  endDate <- as.Date(endDate, tz = time_zone)
+  startDate <- as.POSIXct(startDate, tz = time_zone)
+  endDate <- as.POSIXct(endDate, tz = time_zone)
 
   # selecting the variables needed, with new variables created
   admission_discharge <- data %>%
