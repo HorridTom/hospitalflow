@@ -1,4 +1,3 @@
-context("import_and_standardise")
 
 tmp_data_1 <- paste0(tempfile(), ".csv")
 tmp_data_2 <- paste0(tempfile(), ".csv")
