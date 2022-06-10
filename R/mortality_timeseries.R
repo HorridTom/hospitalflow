@@ -44,7 +44,7 @@ mortality_timeseries <- function(start_date, end_date, data, plot_chart, hospita
     dplyr::summarise(Deaths = dplyr::n())
 
 
-  dt_deaths_disch <- dplyr::left_join(dt_calc_disch, dt_calc_deaths) %>%
+  dt_deaths_disch <- dplyr::left_join(dt_calc_disch, dt_calc_deaths, by = "one_month") %>%
     na.omit()
 
   # function to plot the 4 hrs emergency performance
