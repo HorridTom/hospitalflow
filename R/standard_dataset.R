@@ -127,7 +127,7 @@ spell_type <- function(spell_episode_types) {
 standardise_column_names <- function(data, colname_mapping) {
   oldnames <- colname_mapping %>% dplyr::pull(provided)
   newnames <- colname_mapping %>% dplyr::pull(standard)
-  data %>% dplyr::rename_at(dplyr::vars(!!!oldnames), ~ newnames)
+  data %>% dplyr::rename_at(dplyr::vars(tidyselect::all_of(oldnames)), ~ newnames) # rename_at superseded by rename_with + select. Try to avoid triple exclamation marks. Also, tidyselect is installed!
 }
 
 # Process used to put LGT A&E data into C&W format 2018-12-17
