@@ -6,7 +6,7 @@
 #' @param plot_chart
 #' @param hospital_name
 #'
-#' @return
+#' @return A plot or a dataframe illustrating mortality rate over time.
 #' @export
 #'
 #' @examples
