@@ -10,7 +10,7 @@ mortality_timeseries(start_date, end_date, data, plot_chart, hospital_name)
 \item{hospital_name}{}
 }
 \value{
-
+A plot or a dataframe illustrating mortality rate over time.
 }
 \description{
 mortality_timeseries

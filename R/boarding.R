@@ -76,10 +76,8 @@ get_contingency_table <- function(ipData, vars, scaleBy = "none", returnPlot = F
     y_axis_label <- "Ward Type"
 
   } else if (vars == "wd") {
-    # Load lookup table
-    lookup_tbl <- hospitalflow:::icd10_ccsr_mapping
 
-    ipData <- add_ccsr_categories(ipData, lookup_tbl)
+    ipData <- add_ccsr_categories(ipData, icd10_ccsr_mapping)
 
     # Perform check if the necessary column exist
     if (!("ward_category" %in% colnames(ipData))) {

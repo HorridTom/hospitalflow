@@ -89,7 +89,7 @@ plot_ed_4hourperf_occupancy <- function(data,
     dplyr::rename(n_LoS_over_4hrs = n)
 
 
-  df_LoS_merged <- dplyr::left_join(df_all, df_LoS_over_4hrs)
+  df_LoS_merged <- dplyr::left_join(df_all, df_LoS_over_4hrs, by = "occupancy_on_arrival")
   df_LoS_merged <- df_LoS_merged %>%
     dplyr::mutate(perc_LoS_over_4hrs = (n_LoS_over_4hrs * 100) / n_all)
 
@@ -100,13 +100,13 @@ plot_ed_4hourperf_occupancy <- function(data,
     dplyr::rename(n_W4T_over_4hrs = n)
 
 
-  df_W4T_merged <- dplyr::left_join(df_all, df_W4T_over_4hrs)
+  df_W4T_merged <- dplyr::left_join(df_all, df_W4T_over_4hrs, by = "occupancy_on_arrival")
   df_W4T_merged <- df_W4T_merged %>%
     dplyr::mutate(perc_W4T_over_4hrs = (n_W4T_over_4hrs * 100) / n_all)
 
 
   # putting both analyses together in the right form to plot
-  df_to_plot <- dplyr::full_join(df_LoS_merged, df_W4T_merged)
+  df_to_plot <- dplyr::full_join(df_LoS_merged, df_W4T_merged, by = c("occupancy_on_arrival", "n_all"))
   df_to_plot <- df_to_plot %>%
     dplyr::mutate(n_LoS_over_4hrs = plyr::mapvalues(n_LoS_over_4hrs, from = NA, to = 0, warn_missing = F)) %>%
     dplyr::mutate(perc_LoS_over_4hrs = plyr::mapvalues(perc_LoS_over_4hrs, from = NA, to = 0, warn_missing = F)) %>%

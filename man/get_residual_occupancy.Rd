@@ -10,7 +10,7 @@ get_residual_occupancy(df, t, delta_t)
 \item{delta_t}{}
 }
 \value{
-
+TBD
 }
 \description{
 get_residual_occupancy

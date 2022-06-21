@@ -1,4 +1,3 @@
-context("Generic import standardise and bind")
 
 source("make_generic_standardise_test_data.R")
 

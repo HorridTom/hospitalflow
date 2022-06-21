@@ -74,7 +74,7 @@ plot_readmissions_timeseries <- function(data,
     dplyr::summarise(Readm = dplyr::n())
 
 
-  dt_reamd_disch <- dplyr::left_join(dt_calc_disch, dt_calc_readm) %>%
+  dt_reamd_disch <- dplyr::left_join(dt_calc_disch, dt_calc_readm, by = "one_month") %>%
     tidyr::replace_na(list(Readm = 0))
 
   # function to plot the 4 hrs emergency performance

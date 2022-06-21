@@ -1,4 +1,3 @@
-context("Deaths by month")
 
 test_that("deaths by month is giving the right expected answer", {
   deaths_dt <- readRDS("testdata/deaths_measure_test/deaths_measure_test.rds")

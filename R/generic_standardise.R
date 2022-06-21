@@ -22,13 +22,16 @@ get_factor_recode <- function(config_path) {
   config_file_list <- Sys.glob(file.path(config_path, "*.rds"))
 
   # add column for file names of factor level config files in the config path
-  column_mapping <- column_mapping %>% dplyr::mutate(config_file_name = file.path(config_path, paste0(standard, "_levels.rds")),
-                                                     factor_config_file = dplyr::if_else(config_file_name %in% config_file_list, config_file_name, NA_character_)) %>%
-    dplyr::select(-config_file_name)
+  column_mapping <- column_mapping %>%
+    dplyr::mutate(
+      config_file_name = file.path(config_path, paste0(standard, "_levels.rds")),
+      factor_config_file = dplyr::if_else(config_file_name %in% config_file_list, config_file_name, NA_character_)
+    )
+  column_mapping <-  column_mapping %>% dplyr::select(-config_file_name)
 
   # add column for the level recode mapping specified in the config files
   get_level_mapping <- function(fn) {
-    if(is.na(fn)) {
+    if (is.na(fn)) {
       return(NA)
     } else {
       readRDS(fn)
@@ -41,7 +44,7 @@ get_factor_recode <- function(config_path) {
 
   # add a column containing a named vector that can be used to generate the arguments to fct_recode
   make_recode_vector <- function(level_mapping) {
-    if(all(is.na(level_mapping))) {
+    if (all(is.na(level_mapping))) {
       return(NA)
     } else {
       # take the tibble specifying the mapping from provided to standard levels, and
@@ -60,7 +63,7 @@ get_factor_recode <- function(config_path) {
   fix_factor_recode_nas <- function(recode_call) {
     call_arg_names <- names(recode_call)[3:length(recode_call)]
     call_arg_names[which(call_arg_names == "")] <- "NULL"
-    new_names <- c(names(recode_call)[1:2],call_arg_names)
+    new_names <- c(names(recode_call)[1:2], call_arg_names)
     names(recode_call) <- new_names
     recode_call
   }
@@ -69,7 +72,9 @@ get_factor_recode <- function(config_path) {
     standard <- list(...)[["standard"]]
     recode_vector <- list(...)[["recode_vector"]]
 
-    if(all(is.na(recode_vector))) return(NA)
+    if (all(is.na(recode_vector))) {
+      return(NA)
+    }
 
     call_fct <- rlang::expr(forcats::fct_recode(!!rlang::sym(standard), !!!recode_vector))
 
@@ -83,7 +88,6 @@ get_factor_recode <- function(config_path) {
   column_mapping <- column_mapping %>% dplyr::filter(!is.na(factor_recode_expr))
 
   rlang::set_names(column_mapping %>% dplyr::pull(factor_recode_expr), column_mapping %>% dplyr::pull(standard))
-
 }
 
 
@@ -109,14 +113,17 @@ get_import_col_types <- function(config_path) {
   config_file_list <- Sys.glob(paste0(config_path, "*.rds"))
 
   # add column for file names of factor level config files in the config path
-  column_mapping <- column_mapping %>% dplyr::mutate(config_file_name = paste0(config_path, standard, "_levels.rds"),
-                            factor_config_file = dplyr::if_else(config_file_name %in% config_file_list, config_file_name, NA_character_)) %>%
+  column_mapping <- column_mapping %>%
+    dplyr::mutate(
+      config_file_name = paste0(config_path, standard, "_levels.rds"),
+      factor_config_file = dplyr::if_else(config_file_name %in% config_file_list, config_file_name, NA_character_)
+    ) %>%
     dplyr::select(-config_file_name)
 
   # add a column containing vectors of provided levels for each factor.
 
   get_provided_levels <- function(fn) {
-    if(is.na(fn)) {
+    if (is.na(fn)) {
       return(NA)
     } else {
       readRDS(fn) %>% dplyr::pull(provided)
@@ -136,7 +143,9 @@ get_import_col_types <- function(config_path) {
     standard_col_name <- list(...)[["standard"]]
     provided_levels <- list(...)[["provided_levels"]]
 
-    if(all(is.na(provided_levels))) return(NA)
+    if (all(is.na(provided_levels))) {
+      return(NA)
+    }
 
     rlang::expr(readr::col_factor(levels = !!provided_levels))
   }
@@ -148,14 +157,17 @@ get_import_col_types <- function(config_path) {
     standard_col_name <- list(...)[["standard"]]
     datetime_format <- list(...)[["datetime_format"]]
 
-    if(is.na(datetime_format)) return(NA)
+    if (is.na(datetime_format)) {
+      return(NA)
+    }
 
     rlang::expr(readr::col_datetime(format = !!datetime_format))
   }
 
   column_mapping <- column_mapping %>% dplyr::mutate(importType = dplyr::if_else(is.na(importType),
-                                                                                 purrr::pmap(., function(...) make_datetime_import_spec(...)),
-                                                                                 importType))
+    purrr::pmap(., function(...) make_datetime_import_spec(...)),
+    importType
+  ))
 
   # Any remaining columns specified as readr::character expressions
 
@@ -164,8 +176,9 @@ get_import_col_types <- function(config_path) {
   }
 
   column_mapping <- column_mapping %>% dplyr::mutate(importType = ifelse(is.na(importType),
-                                                                         purrr::pmap(., function(...) make_char_import_spec(...)),
-                                                                                 importType))
+    purrr::pmap(., function(...) make_char_import_spec(...)),
+    importType
+  ))
 
 
   # Label the types with the respective column names and return this as a named
@@ -207,56 +220,76 @@ get_colname_mapping <- function(config_path) {
 #' @examples
 import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
 
-  #get timezone from config
+  # get timezone from config
   datetime_formats <- readRDS(file.path(data_import_list[[1]]$config_path, "datetime_formats.rds"))
 
   # Take the data_import_list and for each element x, load the data located at data_path
   # using configuration specified by the files at config_path.
   # In particular, use the column specification generated by
   # get_import_col_types from the config files.
-  data_config_list <- lapply(data_import_list,
-                             function(x) {list(data = readr::read_csv(x$data_path,
-                                                                      locale = readr::locale(tz = x$time_zone),
-                                                                      col_types = eval(rlang::call2(readr::cols,
-                                                                                                    !!!get_import_col_types(x$config_path),
-                                                                                                    .default = readr::col_skip()))),
-                                               config_path = x$config_path,
-                                               site = x$site,
-                                               facility = x$facility,
-                                               time_zone = x$time_zone)
-    })
+  data_config_list <- lapply(
+    data_import_list,
+    function(x) {
+      list(
+        data = readr::read_csv(x$data_path,
+          locale = readr::locale(tz = x$time_zone),
+          col_types = eval(rlang::call2(readr::cols,
+            !!!get_import_col_types(x$config_path),
+            .default = readr::col_skip()
+          ))
+        ),
+        config_path = x$config_path,
+        site = x$site,
+        facility = x$facility,
+        time_zone = x$time_zone
+      )
+    }
+  )
 
   # Rename the columns in each imported dataset, using the name mapping onto standard hospitalflow
   # variable names specified in the config files at the specified config_path.
-  data_config_list <- lapply(data_config_list,
-                             function(x) {
-                               list(data = standardise_column_names(x$data,
-                                                                    get_colname_mapping(x$config_path) %>%
-                                                                      dplyr::filter(provided %in% colnames(x$data))
-                                                                    ),
-                                    config_path = x$config_path,
-                                    site = x$site,
-                                    facility = x$facility,
-                                    time_zone = x$time_zone)
-                               })
+  data_config_list <- lapply(
+    data_config_list,
+    function(x) {
+      list(
+        data = standardise_column_names(
+          x$data,
+          get_colname_mapping(x$config_path) %>%
+            dplyr::filter(provided %in% colnames(x$data))
+        ),
+        config_path = x$config_path,
+        site = x$site,
+        facility = x$facility,
+        time_zone = x$time_zone
+      )
+    }
+  )
 
   # Recode factors
-  data_config_list <- lapply(data_config_list,
-                             function(x) {
-                               list(data = eval(rlang::call2(dplyr::mutate, .data = x$data,
-                                                             !!!get_factor_recode(x$config_path))),
-                               config_path = x$config_path,
-                               site = x$site,
-                               facility = x$facility,
-                               time_zone = x$time_zone)
-                             })
+  data_config_list <- lapply(
+    data_config_list,
+    function(x) {
+      list(
+        data = eval(rlang::call2(dplyr::mutate,
+          .data = x$data,
+          !!!get_factor_recode(x$config_path)
+        )),
+        config_path = x$config_path,
+        site = x$site,
+        facility = x$facility,
+        time_zone = x$time_zone
+      )
+    }
+  )
 
   # If no site column has been imported, create one and populate with the configured site value
   data_config_list <- lapply(data_config_list, function(x) {
-    if("site" %in% colnames(x$data)) {
-      if(!is.na(x$site)) warning(
-        "Site is specified both as a column in the data and through config. Config value will be ignored."
+    if ("site" %in% colnames(x$data)) {
+      if (!is.na(x$site)) {
+        warning(
+          "Site is specified both as a column in the data and through config. Config value will be ignored."
         )
+      }
     } else {
       x$data <- x$data %>% dplyr::mutate(site = x$site)
     }
@@ -268,28 +301,32 @@ import_and_standardise <- function(data_import_list, remove_duplicates = TRUE) {
 
   # Add episode ids to each data tibble
   data_config_list <- lapply(data_config_list, function(x) {
-    list(data = make_episode_ids(x$data),
-         config_path = x$config_path,
-         site = x$site,
-         facility = x$facility,
-         time_zone = x$time_zone)
-         })
+    list(
+      data = make_episode_ids(x$data),
+      config_path = x$config_path,
+      site = x$site,
+      facility = x$facility,
+      time_zone = x$time_zone
+    )
+  })
 
   # If required, de-dupe each tibble based on pseudo_id, and episode start and end time
-  if(remove_duplicates) {
+  if (remove_duplicates) {
     data_config_list <- lapply(data_config_list, function(x) {
-      list(data = dplyr::distinct(x$data, pseudo_id, start_datetime, end_datetime, .keep_all = TRUE),
-           config_path = x$config_path,
-           site = x$site,
-           facility = x$facility,
-           time_zone = x$time_zone)
+      list(
+        data = dplyr::distinct(x$data, pseudo_id, start_datetime, end_datetime, .keep_all = TRUE),
+        config_path = x$config_path,
+        site = x$site,
+        facility = x$facility,
+        time_zone = x$time_zone
+      )
     })
   }
 
   # Label this list of tibbles with the names of the files they came from
   data_filenames <- sapply(data_import_list, function(x) {
     tools::file_path_sans_ext(basename(x[["data_path"]]))
-    })
+  })
   data_config_list <- setNames(data_config_list, data_filenames)
 
   # Return named list of lists with data tibbles and config metadata
@@ -358,7 +395,11 @@ import_standardise_bind <- function(data_import_list) {
 #'
 filter_config_list <- function(config_list, field, value) {
   config_list <- lapply(config_list, function(x) {
-    if(x[[field]] == value) {x} else {NA}
+    if (x[[field]] == value) {
+      x
+    } else {
+      NA
+    }
   })
   config_list[!is.na(config_list)]
 }
@@ -383,4 +424,3 @@ filter_config_list <- function(config_list, field, value) {
 #   list(data_path = "../cw-data/cw_ip_anonim.csv", config_path = "cw-config/inpatient/"),
 #   list(data_path = "../cw-data/cw_ucc_anonim.csv", config_path = "cw-config/ucc/"),
 #   list(data_path = "../cw-data/cw_ed_anonim.csv", config_path = "cw-config/ed/"))
-

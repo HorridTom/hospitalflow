@@ -26,7 +26,7 @@ convert_rds_cols_to_char <- function(path) {
 #'
 #' @param spell_table
 #'
-#' @return
+#' @return A dataframe obtained after joining \code{spell_table} and \code{specialty_mapping}
 #' @export
 #'
 #' @examples

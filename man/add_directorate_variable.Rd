@@ -10,7 +10,7 @@ add_directorate_variable(spell_table)
 \item{spell_table}{}
 }
 \value{
-
+A dataframe obtained after joining \code{spell_table} and \code{specialty_mapping}
 }
 \description{
 add_directorate_variable

@@ -1,4 +1,3 @@
-context("Calculating the directorate")
 
 test_that("directorate is calculated correctly", {
   correct_answers <- tibble::tibble(

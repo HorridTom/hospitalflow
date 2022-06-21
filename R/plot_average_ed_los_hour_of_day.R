@@ -69,7 +69,7 @@ plot_average_ed_los_hour_of_day <- function(data,
   )
 
   df_padded <- df_time_hr %>%
-    dplyr::left_join(arrivals) %>%
+    dplyr::left_join(arrivals, by = c("Hour", "flow_groups")) %>%
     tidyr::replace_na(list(average_arrivals = 0)) %>%
     dplyr::ungroup()
 
