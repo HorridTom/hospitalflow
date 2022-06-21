@@ -1,10 +1,8 @@
 
-tmp_data_1 <- paste0(tempfile(), ".csv")
-tmp_data_2 <- paste0(tempfile(), ".csv")
-tmp_config_1 <- file.path(tempdir(), "conf1")
-tmp_config_2 <- file.path(tempdir(), "conf2")
 
-setup({
+local_test_data_1 <- function(env = parent.frame()) {
+  tmp_1 <- tempfile(fileext = c(".csv"))
+
   raw_data_1 <- tibble::tibble(
     person_code = c("0001", "0001", "0002", "0002"),
     date1 = c(
@@ -18,6 +16,16 @@ setup({
     sex = c("M", "M", "F", "F"),
     other = c("ab", "bc", "ef", "gt")
   )
+
+  readr::write_csv(raw_data_1, tmp_1)
+  withr::defer(unlink(tmp_1), env)
+
+  tmp_1
+}
+
+local_test_data_2 <- function(env = parent.frame()) {
+  tmp_2 <- tempfile(fileext = c(".csv"))
+
   raw_data_2 <- tibble::tibble(
     person_code = c("0001", "0002", "0002", "0003"),
     date_st = c(
@@ -31,6 +39,17 @@ setup({
     gend = c("Ma", "Fe", "Fe", "Fe"),
     misc = c("rf", "pq", "cv", "nb")
   )
+
+  readr::write_csv(raw_data_2, tmp_2)
+  withr::defer(unlink(tmp_2), env)
+
+  tmp_2
+}
+
+local_config_1 <- function(env = parent.frame()) {
+  tmp_config_1 <- file.path(tempdir(), "conf1")
+  dir.create(tmp_config_1)
+
   col_mapping_1 <- tibble::tibble(
     provided = c("person_code", "date1", "date2", "sex"),
     standard = c(
@@ -49,6 +68,21 @@ setup({
       "%d/%m/%Y %H:%M:%S"
     )
   )
+
+  saveRDS(col_mapping_1, file = file.path(tmp_config_1, "column_mapping.rds"))
+  saveRDS(gender_levels_1, file = file.path(tmp_config_1, "gender_levels.rds"))
+  saveRDS(datetime_formats_1, file = file.path(tmp_config_1, "datetime_formats.rds"))
+
+  withr::defer(unlink(tmp_config_1, recursive = TRUE), env)
+
+  tmp_config_1
+
+}
+
+local_config_2 <- function(env = parent.frame()) {
+  tmp_config_2 <- file.path(tempdir(), "conf2")
+  dir.create(tmp_config_2)
+
   col_mapping_2 <- tibble::tibble(
     provided = c("person_code", "date_st", "date_en", "gend"),
     standard = c(
@@ -68,26 +102,22 @@ setup({
     )
   )
 
-  readr::write_csv(raw_data_1, tmp_data_1)
-  readr::write_csv(raw_data_2, tmp_data_2)
-
-  dir.create(tmp_config_1)
-  dir.create(tmp_config_2)
-
-  saveRDS(col_mapping_1, file = file.path(tmp_config_1, "column_mapping.rds"))
-  saveRDS(gender_levels_1, file = file.path(tmp_config_1, "gender_levels.rds"))
-  saveRDS(datetime_formats_1, file = file.path(tmp_config_1, "datetime_formats.rds"))
   saveRDS(col_mapping_2, file = file.path(tmp_config_2, "column_mapping.rds"))
   saveRDS(gender_levels_2, file = file.path(tmp_config_2, "gender_levels.rds"))
   saveRDS(datetime_formats_2, file = file.path(tmp_config_2, "datetime_formats.rds"))
-})
 
-teardown({
-  unlink(c(tmp_data_1, tmp_data_2))
-  unlink(c(tmp_config_1, tmp_config_2), recursive = TRUE)
-})
+  withr::defer(unlink(tmp_config_2, recursive = TRUE), env)
+
+  tmp_config_2
+
+}
 
 test_that("import_and_standardise correctly brings in data, no dupe removal", {
+  tmp_data_1 <- local_test_data_1()
+  tmp_data_2 <- local_test_data_2()
+  tmp_config_1 <- local_config_1()
+  tmp_config_2 <- local_config_2()
+
   test_import_list <- list(
     list(
       data_path = tmp_data_1,
@@ -170,6 +200,11 @@ test_that("import_and_standardise correctly brings in data, no dupe removal", {
 })
 
 test_that("import_and_standardise correctly brings in data, with dupe removal", {
+  tmp_data_1 <- local_test_data_1()
+  tmp_data_2 <- local_test_data_2()
+  tmp_config_1 <- local_config_1()
+  tmp_config_2 <- local_config_2()
+
   test_import_list <- list(
     list(
       data_path = tmp_data_1,
@@ -247,8 +282,12 @@ test_that("import_and_standardise correctly brings in data, with dupe removal", 
   expect_equal(data_list[[2]] %>% dplyr::select(-episode_id, -site), standardised_data_2)
 })
 
-
 test_that("import_and_standardise correctly sets time zone", {
+  tmp_data_1 <- local_test_data_1()
+  tmp_data_2 <- local_test_data_2()
+  tmp_config_1 <- local_config_1()
+  tmp_config_2 <- local_config_2()
+
   test_import_list <- list(
     list(
       data_path = tmp_data_1,
