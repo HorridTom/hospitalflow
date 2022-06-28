@@ -281,37 +281,109 @@ add_spell_variables <- function(ed_data, inpatient_data, spell_table) {
 
   inpatient_data <- inpatient_data %>% dplyr::mutate(main_specialty = addNA(main_specialty))
 
+
+  # BEFORE
+#
+#   spell_table <- spell_table %>%
+#     dplyr::mutate(main_specialty_start = purrr::map(constituent_ip_episodes, function(x) {
+#       if(length(x) == 0)
+#       {NA}
+#       else {
+#         inpatient_data %>%
+#           dplyr::filter(episode_id == x[[1]]) %>%
+#           dplyr::slice(1) %>%
+#           dplyr::pull(main_specialty)
+#       }
+#     })
+#     )
+
+  # AFTER
+
   spell_table <- spell_table %>%
-    dplyr::mutate(main_specialty_start = purrr::map(constituent_ip_episodes, function(x) {
-      if(length(x) == 0)
-      {NA}
-      else {
-        inpatient_data %>%
-          dplyr::filter(episode_id == x[[1]]) %>%
-          dplyr::slice(1) %>%
-          dplyr::pull(main_specialty)
-      }
-    })
-    )
+    dplyr::mutate(
+      first_ip_ep = spell_table$constituent_ip_episodes %>%
+        sapply(unlist) %>% #maybe not necessary
+        lapply(`[[`, 1) %>% # take the first value
+        replace(.=="NULL", NA) %>% # Replace NULLs with NAs
+        unlist() # Unlist the object: list --> integer vector.
+    ) %>%
+    dplyr::left_join(
+      inpatient_data %>% dplyr::select(episode_id, main_specialty),
+      by = c("first_ip_ep" = "episode_id")
+    ) %>%
+    dplyr:: rename(main_specialty_start = main_specialty) %>%
+    dplyr::select(-first_ip_ep)
+
+
+  # BEFORE
+  #
+  # if("diagnosis_code" %in% colnames(inpatient_data)) {
+  #   spell_table <- spell_table %>%
+  #     dplyr::mutate(diagnosis_codes = purrr::map(constituent_ip_episodes, function(x) {
+  #     if(length(x) == 0)
+  #       {NA}
+  #       else {
+  #         inpatient_data %>%
+  #           dplyr::filter(episode_id %in% x) %>%
+  #           dplyr::pull(diagnosis_code) %>%
+  #           paste(collapse = "#")
+  #     }
+  #   }))
+  # }
+
+  # AFTER
 
   if("diagnosis_code" %in% colnames(inpatient_data)) {
-    spell_table <- spell_table %>% dplyr::mutate(diagnosis_codes = purrr::map(constituent_ip_episodes, function(x) {
-      if(length(x) == 0) {NA} else {
-        inpatient_data %>% dplyr::filter(episode_id %in% x) %>% dplyr::pull(diagnosis_code) %>% paste(collapse = "#")
-      }
-    }))
+    spell_table <- spell_table %>%
+      dplyr::mutate(
+        diagnosis_codes = sapply(
+          constituent_ip_episodes,
+          function(x) {ifelse(
+            length(x) == 0,
+            NA,
+            data.table::setDT(inpatient_data, key = 'episode_id')[data.table:::`[.data.table`(unlist(x)),data.table:::`[.data.table`("diagnosis_code")] %>% paste(collapse = "#") # find a way to replace this part - data.table:::`[.data.table` - with .
+          )
+          }
+        )
+      )
   }
 
+  # BEFORE
+
+  # if("discharge_destination" %in% colnames(inpatient_data)) {
+  #   spell_table <- spell_table %>% dplyr::mutate(discharge_destination = purrr::map(constituent_ip_episodes, function(x) {
+  #     if(length(x) == 0) {NA} else {
+  #       # Note: this actually just takes the discharge destination of the last episode
+  #       # since either this should be the only episode of the spell with this field
+  #       # populated, or it should be constant across (ip) episodes within the spell
+  #       inpatient_data %>%
+  #         dplyr::filter(episode_id == x[[length(x)]]) %>%
+  #         dplyr::slice(1) %>%
+  #         dplyr::pull(discharge_destination)
+  #     }
+  #   }))
+  # }
+
+
+  # AFTER
+
   if("discharge_destination" %in% colnames(inpatient_data)) {
-    spell_table <- spell_table %>% dplyr::mutate(discharge_destination = purrr::map(constituent_ip_episodes, function(x) {
-      if(length(x) == 0) {NA} else {
-        # Note: this actually just takes the discharge destination of the last episode
-        # since either this should be the only episode of the spell with this field
-        # populated, or it should be constant across (ip) episodes within the spell
-        inpatient_data %>% dplyr::filter(episode_id == x[[length(x)]]) %>% dplyr::slice(1) %>% dplyr::pull(discharge_destination)
-      }
-    }))
+    spell_table <- spell_table %>%
+      dplyr::mutate(
+        last_ip_ep = spell_table$constituent_ip_episodes %>%
+          sapply(unlist) %>% #maybe not necessary
+          lapply(tail, n = 1) %>% # take the last value
+          replace(.=="NULL", NA) %>% # Replace NULLs with NAs
+          unlist() # Unlist the object: list --> integer vector.
+      ) %>%
+      dplyr::left_join(
+        inpatient_data %>% dplyr::select(episode_id, discharge_destination),
+        by = c("last_ip_ep" = "episode_id")
+      ) %>%
+      dplyr::select(-last_ip_ep)
   }
+
+
 
   spell_table <- spell_table %>% tidyr::unnest(main_specialty_start) %>%
     dplyr::group_by(pseudo_id) %>%
@@ -354,7 +426,4 @@ spell_class <- function(starts_with_ed, ed_non_adm, ed_comp_non_adm, ed_admissio
     "direct_comp_admission"
   }
 }
-
-
-
 
