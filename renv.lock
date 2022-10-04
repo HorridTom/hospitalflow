@@ -473,10 +473,8 @@
     },
     "gdtools": {
       "Package": "gdtools",
-      "Version": "0.2.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "12a524de5a491ff39debb9311fc0763f"
+      "Version": "0.2.4",
+      "Source": "Repository"
     },
     "generics": {
       "Package": "generics",
@@ -487,10 +485,8 @@
     },
     "gert": {
       "Package": "gert",
-      "Version": "1.1.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "c637d042178a0f65f9703c8d7f2be996"
+      "Version": "1.9.0",
+      "Source": "Repository"
     },
     "ggfortify": {
       "Package": "ggfortify",
@@ -830,10 +826,8 @@
     },
     "nloptr": {
       "Package": "nloptr",
-      "Version": "2.0.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "6e45c045fea34a9d0d1ceaa6fb7c4e91"
+      "Version": "2.0.3",
+      "Source": "Repository"
     },
     "nnet": {
       "Package": "nnet",
@@ -1089,10 +1083,8 @@
     },
     "rootSolve": {
       "Package": "rootSolve",
-      "Version": "1.8.2.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "d62eb8dc158952de565c611ea8498e4c"
+      "Version": "1.8.2.3",
+      "Source": "Repository"
     },
     "roxygen2": {
       "Package": "roxygen2",
@@ -1187,10 +1179,8 @@
     },
     "stringi": {
       "Package": "stringi",
-      "Version": "1.5.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "a063ebea753c92910a4cca7b18bc1f05"
+      "Version": "1.7.8",
+      "Source": "Repository"
     },
     "stringr": {
       "Package": "stringr",
@@ -1215,10 +1205,8 @@
     },
     "systemfonts": {
       "Package": "systemfonts",
-      "Version": "1.0.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "e7c955aea294f44eee62fde18795da6f"
+      "Version": "1.0.4",
+      "Source": "Repository"
     },
     "testthat": {
       "Package": "testthat",
