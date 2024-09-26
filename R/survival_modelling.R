@@ -69,7 +69,7 @@ get_inpatient_snapshot <- function(df, t) {
 #' @param S_function
 #' @param delta_t
 #'
-#' @return
+#' @return TBD
 #' @export
 #'
 #' @examples
@@ -102,7 +102,7 @@ predict_residual_occupancy <- function(df, t, S_function, delta_t, coxmodel = NU
 #' @param t
 #' @param delta_t
 #'
-#' @return
+#' @return TBD
 #' @export
 #'
 #' @examples

@@ -84,51 +84,52 @@ plot_ed_4hourperf_timeseries <- function(data,
   )
   ## ***
 
-  pct <- qicharts2::qic(Time, under_4hrs,
-    n = N, data = sum_4hrs_perf, chart = "pp", ylab = "percent",
-    show.grid = TRUE, multiply = 100
-  )
+  # pct <- qicharts2::qic(Time, under_4hrs,
+  #   n = N, data = sum_4hrs_perf, chart = "pp", ylab = "percent",
+  #   show.grid = TRUE, multiply = 100
+  # )
 
-  # get time zone of data
-  time_zone <- attr(data$start_datetime, "tzone")
-
-  pct$data$x <- as.Date(pct$data$x, tz = time_zone)
-  cht_data <- add_rule_breaks(pct$data)
-  pct <- ggplot2::ggplot(cht_data, ggplot2::aes(x, y, label = x))
-  cutoff <- data.frame(yintercept = 95, cutoff = factor(95))
-
-  # convert arguments to dates and round to nearest quarter
-  st.dt <- as.Date(startDate, format = "%Y-%m-%d", tz = time_zone)
-  ed.dt <- as.Date(endDate, format = "%Y-%m-%d", tz = time_zone)
-  # q.st.dt <- as.Date(zoo::as.yearqtr(st.dt, format = "%Y-%m-%d"))
-  # q.ed.dt <- as.Date(zoo::as.yearqtr(ed.dt, format = "%Y-%m-%d"), frac = 1) + 1
-  cht_axis_breaks <- seq(st.dt, ed.dt, by = "quarters")
-  ylimlow <- min(min(pct$data$y, na.rm = TRUE), min(pct$data$lcl, na.rm = TRUE))
-
-  four_hr_plot <- format_control_chart(pct, r1_col = "orange", r2_col = "steelblue") +
-    ggplot2::geom_hline(ggplot2::aes(yintercept = yintercept, linetype = cutoff),
-      data = cutoff, colour = "#00BB00", linetype = 1
-    ) +
-    ggplot2::scale_x_date(
-      date_breaks = "1 month", labels = scales::date_format("%Y-%m-%d"),
-      breaks = cht_axis_breaks
-    ) + # limits = c(st.dt, ed.dt)
-    ggplot2::annotate("text", ed.dt - 90, 95, vjust = -2, label = "95% Target", colour = "#00BB00") +
-    ggplot2::ggtitle(chart_title) +
-    ggplot2::theme(plot.title = ggplot2::element_text(size = 11, face = "bold")) +
-    # ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, size = 10))
-    ggplot2::labs(
-      x = "Month", y = "Percentage within 4 hours",
-      caption = "*Shewart chart rules apply (see Understanding the Analysis tab for more detail) \nRule 1: Any month outside the control limits \nRule 2: Eight or more consecutive months all above, or all below, the centre line", size = 10
-    ) +
-    ggplot2::ylim(ylimlow, 100) +
-    ggplot2::geom_text(ggplot2::aes(label = ifelse(x == max(x), format(x, "%b-%y"), "")), hjust = -0.05, vjust = 2)
-
-  four_hr_plot
-
+  pct <- autospc::plot_auto_SPC(df = sum_4hrs_perf, chartType = "P'", x = "Time", b = "under_4hrs", n = "N", plotChart = TRUE)
+#  # get time zone of data
+#   time_zone <- attr(data$start_datetime, "tzone")
+#
+#   pct$data$x <- as.Date(pct$data$x, tz = time_zone)
+#   cht_data <- add_rule_breaks(pct$data)
+#   pct <- ggplot2::ggplot(cht_data, ggplot2::aes(x, y, label = x))
+#   cutoff <- data.frame(yintercept = 95, cutoff = factor(95))
+#
+#   # convert arguments to dates and round to nearest quarter
+#   st.dt <- as.Date(startDate, format = "%Y-%m-%d", tz = time_zone)
+#   ed.dt <- as.Date(endDate, format = "%Y-%m-%d", tz = time_zone)
+#   # q.st.dt <- as.Date(zoo::as.yearqtr(st.dt, format = "%Y-%m-%d"))
+#   # q.ed.dt <- as.Date(zoo::as.yearqtr(ed.dt, format = "%Y-%m-%d"), frac = 1) + 1
+#   cht_axis_breaks <- seq(st.dt, ed.dt, by = "quarters")
+#   ylimlow <- min(min(pct$data$y, na.rm = TRUE), min(pct$data$lcl, na.rm = TRUE))
+#
+#   four_hr_plot <- format_control_chart(pct, r1_col = "orange", r2_col = "steelblue") +
+#     ggplot2::geom_hline(ggplot2::aes(yintercept = yintercept, linetype = cutoff),
+#       data = cutoff, colour = "#00BB00", linetype = 1
+#     ) +
+#     ggplot2::scale_x_date(
+#       date_breaks = "1 month", labels = scales::date_format("%Y-%m-%d"),
+#       breaks = cht_axis_breaks
+#     ) + # limits = c(st.dt, ed.dt)
+#     ggplot2::annotate("text", ed.dt - 90, 95, vjust = -2, label = "95% Target", colour = "#00BB00") +
+#     ggplot2::ggtitle(chart_title) +
+#     ggplot2::theme(plot.title = ggplot2::element_text(size = 11, face = "bold")) +
+#     # ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, size = 10))
+#     ggplot2::labs(
+#       x = "Month", y = "Percentage within 4 hours",
+#       caption = "*Shewart chart rules apply (see Understanding the Analysis tab for more detail) \nRule 1: Any month outside the control limits \nRule 2: Eight or more consecutive months all above, or all below, the centre line", size = 10
+#     ) +
+#     ggplot2::ylim(ylimlow, 100) +
+#     ggplot2::geom_text(ggplot2::aes(label = ifelse(x == max(x), format(x, "%b-%y"), "")), hjust = -0.05, vjust = 2)
+#
+#   four_hr_plot
+#
   if (returnPlot == TRUE) {
-    four_hr_plot
+    pct
   } else {
-    four_hr_plot$data %>% tibble::as_tibble()
-  }
+    pct$data %>% tibble::as_tibble()
+  } #what are the column names and column types that are reuturned by else? If necessary, rename the column from the corresponding plot from auto_spc so that all the tests pass.
 }

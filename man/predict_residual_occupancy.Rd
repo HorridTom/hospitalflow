@@ -10,7 +10,7 @@ predict_residual_occupancy(df, t, S_function, delta_t, coxmodel = NULL)
 \item{delta_t}{}
 }
 \value{
-
+TBD
 }
 \description{
 predict_residual_occupancy

@@ -1,4 +1,3 @@
-context("calculate and plot the Unscheduled ED 'occupancy' by day and hour between startDay and endDay")
 
 # constructed data
 pseudo_id <- c(1, 2, 5, 7, 8, 9, 10)

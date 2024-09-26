@@ -1,4 +1,3 @@
-context("Occupancy at specified time")
 
 test_that("Occupancy at specified time correct for improvised data", {
 

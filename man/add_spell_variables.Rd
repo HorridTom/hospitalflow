@@ -7,11 +7,20 @@
 add_spell_variables(ed_data, inpatient_data, spell_table)
 }
 \arguments{
-\item{spell_table}{pre-created from ed_data and inpatient_data using make_spell_table}
+\item{ed_data}{Episode data from emergency department}
+
+\item{inpatient_data}{Inpatient episode data}
+
+\item{spell_table}{pre-created from \code{ed_data} and \code{inpatient_data}
+using \code{make_spell_table} function}
 }
 \value{
-
+A spell table with 8 additional variables.
 }
 \description{
-add_spell_variables
+This function is to be called on the \code{spell_table}, which was generated
+by running \code{make_spell_table},and appends 8 additional variables to it that are
+related to previous discharges: \code{main_specialty_start}, \code{diagnosis_codes},
+\code{discharge_destination}, \code{prev_disch}, \code{prev_disch_dest}, \code{prev_disch_diagnoses},
+\code{all_prev_diagnoses}, \code{days_since_prev_disch}.
 }

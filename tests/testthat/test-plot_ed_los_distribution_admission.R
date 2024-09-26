@@ -37,6 +37,11 @@ test_that("length of stay is correctly analysed for attendances and admissions f
   result <- result %>% dplyr::arrange(Variable)
   result$Value <- as.numeric(result$Value)
 
+  # The line below is necessary for the test to pass when using testthat, edition 3.
+  # Because the `result` tibble does not have the 'spec' attribute, it needs to be
+  # removed from the `correct_answers` tibble so that the 2 tibbles are identical.
+  attributes(correct_answers)$spec <- NULL
+
   # Test results are correct
   expect_equal(result %>% dplyr::arrange(Time_binned, Variable), correct_answers %>% dplyr::arrange(Time_binned, Variable))
 })

@@ -269,11 +269,18 @@ spell_variables <- function(all_episodes) {
 
 #' add_spell_variables
 #'
-#' @param ed_data
-#' @param inpatient_data
-#' @param spell_table pre-created from ed_data and inpatient_data using make_spell_table
+#' @description This function is to be called on the \code{spell_table}, which was generated
+#' by running \code{make_spell_table},and appends 8 additional variables to it that are
+#' related to previous discharges: \code{main_specialty_start}, \code{diagnosis_codes},
+#' \code{discharge_destination}, \code{prev_disch}, \code{prev_disch_dest}, \code{prev_disch_diagnoses},
+#' \code{all_prev_diagnoses}, \code{days_since_prev_disch}.
 #'
-#' @return
+#' @param ed_data Episode data from emergency department
+#' @param inpatient_data Inpatient episode data
+#' @param spell_table pre-created from \code{ed_data} and \code{inpatient_data}
+#' using \code{make_spell_table} function
+#'
+#' @return A spell table with 8 additional variables.
 #' @export
 #'
 #' @examples
